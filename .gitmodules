@@ -1,0 +1,105 @@
+[submodule "site-lisp/auto-complete"]
+    path = site-lisp/auto-complete
+    url = git://github.com/auto-complete/auto-complete
+[submodule "site-lisp/auto-complete-auctex"]
+    path = site-lisp/auto-complete-auctex
+    url = git://github.com/monsanto/auto-complete-auctex
+[submodule "site-lisp/circe"]
+    path = site-lisp/circe
+    url = git://github.com/jorgenschaefer/circe
+[submodule "site-lisp/dash"]
+    path = site-lisp/dash
+    url = git://github.com/magnars/dash.el
+[submodule "site-lisp/elpy"]
+    path = site-lisp/elpy
+    url = git://github.com/jorgenschaefer/elpy
+[submodule "site-lisp/emacs-calfw"]
+    path = site-lisp/emacs-calfw
+    url = git://github.com/kiwanami/emacs-calfw
+[submodule "site-lisp/emacs-git-gutter"]
+    path = site-lisp/emacs-git-gutter
+    url = git://github.com/syohex/emacs-git-gutter
+[submodule "site-lisp/emms"]
+    path = site-lisp/emms
+    url = git://git.sv.gnu.org/emms.git
+[submodule "site-lisp/expand-region"]
+    path = site-lisp/expand-region
+    url = git://github.com/magnars/expand-region.el
+[submodule "site-lisp/fill-column-indicator"]
+    path = site-lisp/fill-column-indicator
+    url = git://github.com/alpaker/Fill-Column-Indicator
+[submodule "site-lisp/find-file-in-project"]
+    path = site-lisp/find-file-in-project
+    url = git://github.com/technomancy/find-file-in-project
+[submodule "site-lisp/guide-key"]
+    path = site-lisp/guide-key
+    url = git://github.com/kbkbkbkb1/guide-key
+[submodule "site-lisp/haskell-mode"]
+    path = site-lisp/haskell-mode
+    url = git://github.com/haskell/haskell-mode
+[submodule "site-lisp/highlight-indentation"]
+    path = site-lisp/highlight-indentation
+    url = git://github.com/antonj/Highlight-Indentation-for-Emacs/
+[submodule "site-lisp/ido-ubiquitous"]
+    path = site-lisp/ido-ubiquitous
+    url = git://github.com/DarwinAwardWinner/ido-ubiquitous
+[submodule "site-lisp/idomenu"]
+    path = site-lisp/idomenu
+    url = git://github.com/emacsmirror/idomenu
+[submodule "site-lisp/internodeum"]
+    path = site-lisp/internodeum
+    url = git://github.com/spacebat/internodeum.el
+[submodule "site-lisp/js2-mode"]
+    path = site-lisp/js2-mode
+    url = git://github.com/mooz/js2-mode
+[submodule "site-lisp/js2-refactor"]
+    path = site-lisp/js2-refactor
+    url = git://github.com/magnars/js2-refactor.el
+[submodule "site-lisp/magit"]
+    path = site-lisp/magit
+    url = git://github.com/magit/magit
+[submodule "site-lisp/multiple-cursors"]
+    path = site-lisp/multiple-cursors
+    url = git://github.com/magnars/multiple-cursors.el
+[submodule "site-lisp/nethack-el"]
+    path = site-lisp/nethack-el
+    url = git://github.com/tali713/nethack-el
+[submodule "site-lisp/nose"]
+    path = site-lisp/nose
+    url = git://github.com/emacsmirror/nose
+[submodule "site-lisp/pkgbuild-mode"]
+    path = site-lisp/pkgbuild-mode
+    url = git://github.com/juergenhoetzel/pkgbuild-mode
+[submodule "site-lisp/popwin-el"]
+    path = site-lisp/popwin-el
+    url = git://github.com/m2ym/popwin-el
+[submodule "site-lisp/rainbow-mode"]
+    path = site-lisp/rainbow-mode
+    url = git://github.com/emacsmirror/rainbow-mode
+[submodule "site-lisp/s"]
+    path = site-lisp/s
+    url = git://github.com/magnars/s.el
+[submodule "site-lisp/slime"]
+    path = site-lisp/slime
+    url = git://github.com/nablaone/slime
+[submodule "site-lisp/smartparens"]
+    path = site-lisp/smartparens
+    url = git://github.com/Fuco1/smartparens
+[submodule "site-lisp/smex"]
+    path = site-lisp/smex
+    url = git://github.com/nonsequitur/smex
+[submodule "site-lisp/swank-js"]
+    path = site-lisp/swank-js
+    url = git://github.com/swank-js/swank-js
+[submodule "site-lisp/virtualenv"]
+    path = site-lisp/virtualenv
+    url = git://github.com/aculich/virtualenv.el
+[submodule "site-lisp/yasnippet"]
+    path = site-lisp/yasnippet
+    url = git://github.com/capitaomorte/yasnippet
+[submodule "site-lisp/themes/zenburn"]
+    path = site-lisp/themes/zenburn
+    url = git://github.com/bbatsov/zenburn-emacs
+[submodule "site-lisp/themes/solarized"]
+    path = site-lisp/themes/solarized
+    url = git://github.com/bbatsov/solarized-emacs

@@ -21,7 +21,6 @@
 (setq org-log-done 'time)
 (setq org-agenda-files (file-expand-wildcards "~/doc/org/*.org"))
 
-
 (defun my-org-archive-done-tasks ()
   (interactive)
   (org-map-entries 'org-archive-subtree "/DONE" 'file))

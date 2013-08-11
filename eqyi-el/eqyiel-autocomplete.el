@@ -9,9 +9,9 @@
 
 ;; this is kind of too much stuff
 (setq-default ac-sources '(ac-source-yasnippet
-                           ac-source-abbrev
-                           ac-source-dictionary
-                           ac-source-words-in-same-mode-buffers
+                           ;; ac-source-abbrev
+                           ;; ac-source-dictionary
+                           ;; ac-source-words-in-same-mode-buffers
                            ac-source-filename))
 
 (defun ac-emacs-lisp-mode-setup ()
@@ -31,13 +31,14 @@
 (global-auto-complete-mode t)
 (ac-flyspell-workaround)
 
-(setq ac-auto-show-menu 0.1
+(setq ac-auto-show-menu 0.2
       ac-quick-help-delay 0.2
       ac-use-menu-map t
-      ac-auto-start t
+      ac-auto-start nil
       ac-comphist-file "~/.cache/emacs/ac-comphist.dat")
 
 (diminish 'auto-complete-mode)
 
+(ac-set-trigger-key "TAB")
 
 (provide 'eqyiel-autocomplete)

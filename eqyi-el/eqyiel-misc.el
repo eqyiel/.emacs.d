@@ -7,11 +7,29 @@
 (require 'diminish)
 (require 'tiling)
 (require 'buffer-move)
-(global-set-key (kbd "H-SPC") 'tiling-cycle)
-(global-set-key (kbd "M-H-k") 'buf-move-up)
-(global-set-key (kbd "M-H-j") 'buf-move-down)
+
+;; switch between windows more easily.
+
+;; (defun eqyiel-back-window ()
+;;   (interactive)
+;;   (other-window -1))
+
+(global-set-key (kbd "H-h") 'windmove-left)
+(global-set-key (kbd "H-j") 'windmove-down)
+(global-set-key (kbd "H-k") 'windmove-up)
+(global-set-key (kbd "H-l") 'windmove-right)
+
+(global-set-key (kbd "H-b") 'shrink-window-horizontally)
+(global-set-key (kbd "H-f") 'enlarge-window-horizontally)
+(global-set-key (kbd "H-n") 'shrink-window)
+(global-set-key (kbd "H-p") 'enlarge-window)
+
 (global-set-key (kbd "M-H-h") 'buf-move-left)
+(global-set-key (kbd "M-H-j") 'buf-move-down)
+(global-set-key (kbd "M-H-k") 'buf-move-up)
 (global-set-key (kbd "M-H-l") 'buf-move-right)
+
+(global-set-key (kbd "H-SPC") 'tiling-cycle)
 
 (setq smex-save-file "~/.cache/emacs/smex-items")
 
@@ -24,7 +42,7 @@
 (global-set-key (kbd "C-c C-c M-x") 'execute-extended-command)
 
 (require 'yasnippet)
-(setq yas-snippet-dirs (quote ("~/.emacs.d/config/snippets"
+(setq yas-snippet-dirs (quote ("~/.emacs.d/eqyi-el/snippets"
                                "~/.emacs.d/site-lisp/yasnippet/snippets")))
 (yas-global-mode t)
 (global-set-key (kbd "C-c TAB") 'yas-expand)
@@ -63,6 +81,23 @@
 ;; https://github.com/alpaker/Fill-Column-Indicator
 (require 'fill-column-indicator)
 (add-hook 'prog-mode-hook 'turn-on-fci-mode)
+
+;; https://github.com/alpaker/Fill-Column-Indicator/issues/21
+(defvar sanityinc/fci-mode-suppressed nil)
+(defadvice popup-create (before suppress-fci-mode activate)
+  "Suspend fci-mode while popups are visible"
+  (set (make-local-variable 'sanityinc/fci-mode-suppressed) fci-mode)
+  (when fci-mode
+    (turn-off-fci-mode)))
+(defadvice popup-delete (after restore-fci-mode activate)
+  "Restore fci-mode when all popups have closed"
+  (when (and (not popup-instances) sanityinc/fci-mode-suppressed)
+    (setq sanityinc/fci-mode-suppressed nil)
+    (turn-on-fci-mode)))
+
+(require 'git-gutter)
+(global-git-gutter-mode t)
+(diminish 'git-gutter-mode)
 
 (autoload 'pkgbuild-mode "pkgbuild-mode.el" "PKGBUILD mode." t)
 (setq auto-mode-alist (append '(("/PKGBUILD$" . pkgbuild-mode))

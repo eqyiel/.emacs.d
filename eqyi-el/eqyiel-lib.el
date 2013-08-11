@@ -2,19 +2,6 @@
 ;; Most of these are taken from other people.  Where possible, a link to the
 ;; original author precedes the function.
 
-;; switch between windows more easily.
-
-(defun eqyiel-back-window ()
-  (interactive)
-  (other-window -1))
-
-(global-set-key (kbd "H-j") 'eqyiel-back-window)
-(global-set-key (kbd "H-k") 'other-window)
-(global-set-key (kbd "H-h") 'shrink-window-horizontally)
-(global-set-key (kbd "H-l") 'enlarge-window-horizontally)
-(global-set-key (kbd "H-n") 'shrink-window)
-(global-set-key (kbd "H-p") 'enlarge-window)
-
 ;; http://david.rothlis.net/emacs/ergonomics.html
 
 (defun kill-region-or-backward-kill-word (&optional arg region)

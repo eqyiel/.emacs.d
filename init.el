@@ -28,11 +28,11 @@
 (require 'eqyiel-ido)
 (require 'eqyiel-misc)
 (require 'eqyiel-org)
-;; (require 'eqyiel-emms)
-
-;; (require 'eqyiel-slime)
+(require 'eqyiel-slime)
 (require 'eqyiel-python)
 (require 'eqyiel-haskell)
+(require 'eqyiel-c)
+;; (require 'eqyiel-emms)
 
 (put 'downcase-region 'disabled nil)
 (put 'emms-browser-delete-files 'disabled nil)

@@ -10,8 +10,9 @@
 (column-number-mode 1)
 (show-paren-mode 1)
 (blink-cursor-mode 1)
-(global-hl-line-mode t)
-(delete-selection-mode t)
+(global-hl-line-mode 1)
+(delete-selection-mode 1)
+(global-subword-mode 1)
 
 (defalias 'yes-or-no-p 'y-or-n-p)
 (defvaralias 'c-basic-offset 'tab-width)
@@ -46,6 +47,7 @@
       kept-old-versions 2
       version-control t
       vc-make-backup-files t
+      echo-keystrokes 0.1
       auto-save-list-file-prefix "~/.cache/emacs/backup/.saves-")
 
 (setq bookmark-default-file "~/.cache/emacs/emacs.bmk")
@@ -80,6 +82,8 @@
 (add-to-list 'tramp-default-proxies-alist '(".*" "\\`root\\'" "/ssh:%h:"))
 (add-to-list 'tramp-default-proxies-alist '("\\`localhost\\'" "\\`root\\'" nil))
 
+(require 'winner)
+(winner-mode t)
 
 (require 'saveplace)
 (setq save-place-file "~/.cache/emacs/saveplace")

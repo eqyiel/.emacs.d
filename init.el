@@ -16,9 +16,9 @@
 
 (require 'eqyiel-defaults)
 (require 'eqyiel-lib)
-
+(require 'eqyiel-abbrev)
 (require 'eqyiel-autocomplete)
-(require 'eqyiel-calfw)
+(require 'eqyiel-org)
 (require 'eqyiel-circe)
 (require 'eqyiel-desktop)
 (require 'eqyiel-gnuplot)
@@ -27,7 +27,7 @@
 (require 'eqyiel-ibuffer)
 (require 'eqyiel-ido)
 (require 'eqyiel-misc)
-(require 'eqyiel-org)
+(require 'eqyiel-calfw)
 (require 'eqyiel-slime)
 (require 'eqyiel-python)
 (require 'eqyiel-haskell)

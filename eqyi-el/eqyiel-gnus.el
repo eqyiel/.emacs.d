@@ -89,7 +89,8 @@
 ;;              '((nntp "news.internode.on.net")
 ;;                (nntp "news.giganews.com")))
 
-(add-to-list 'gnus-secondary-select-methods '(nntp "localhost"))
+;; for leafnode
+;; (add-to-list 'gnus-secondary-select-methods '(nntp "localhost"))
 
 ;; http://notmuchmail.org/emacstips/
 ;; One annoying standard configuration of message mode is that it will hide the
@@ -107,6 +108,19 @@
 
 ;; For sending via flinders account, must quote the entire address when prompted
 ;; for username, and also put the same thing in from field.  Mystifying.
+
+(setq gnus-gcc-mark-as-read t)
+
+;; Set the Gcc: header based on which topic we are in.
+(setq gnus-topic-topology
+      '(("Gnus" visible)
+        (("rkm.id.au" visible nil
+          ((gcc-self . "nnimap:rkm.id.au/Sent"))))
+        (("gmail.com" visible nil nil))
+        (("internode.on.net" visible nil
+          ((gcc-self . "nnimap:internode.on.net/Sent"))))
+        (("flinders.edu.au" visible nil
+          ((gcc-self . "nnimap:flinders.edu.au/Sent"))))))
 
 (setq gnus-posting-styles
       '(("gmail.com"        (address "eqyiel@gmail.com")

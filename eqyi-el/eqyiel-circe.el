@@ -61,7 +61,8 @@
                                  ("#gnus" circe-highlight-nick-face)
                                  ("#python" circe-highlight-nick-face)
                                  ("#tilaa" circe-highlight-nick-face)
-                                 ("#webpy" circe-highlight-nick-face)))
+                                 ("#webpy" circe-highlight-nick-face)
+                                 ("##c++" circe-highlight-nick-face)))
 
 (setq lui-flyspell-alist '(("." "en_US")))
 

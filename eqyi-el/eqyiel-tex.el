@@ -20,4 +20,8 @@
 (eval-after-load 'latex
   '(define-key LaTeX-mode-map (kbd "C-c TAB") 'yas-expand))
 
+(if (fboundp 'fci-mode)
+    '((add-hook 'latex-mode-hook 'turn-on-fci-mode)
+      (add-hook 'tex-mode-hook 'turn-on-fci-mode)))
+
 (require 'auto-complete-auctex)

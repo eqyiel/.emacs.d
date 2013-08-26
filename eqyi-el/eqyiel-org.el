@@ -17,7 +17,7 @@
   (lambda () (interactive) (org-capture nil "c")))
 
 (setq org-drawers (quote ("importants")))
-(setq org-log-done (quote time))
+;; (setq org-log-done (quote time))
 (setq org-log-done 'time)
 (setq org-agenda-files (file-expand-wildcards "~/doc/org/*.org"))
 

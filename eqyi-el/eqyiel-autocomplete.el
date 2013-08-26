@@ -34,7 +34,7 @@
 (setq ac-auto-show-menu 0.2
       ac-quick-help-delay 0.2
       ac-use-menu-map t
-      ac-auto-start nil
+      ac-auto-start 0.1
       ac-comphist-file "~/.cache/emacs/ac-comphist.dat")
 
 (diminish 'auto-complete-mode)

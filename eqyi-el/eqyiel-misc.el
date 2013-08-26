@@ -74,6 +74,11 @@
 (sp-use-paredit-bindings)
 (diminish 'smartparens-mode)
 
+(sp-pair "\\\"" nil :actions :rem)
+;; (define-key emacs-lisp-mode-map (kbd ")") 'sp-up-sexp)
+;; (define-key c++-mode-map (kbd ")") 'sp-up-sexp)
+;; (define-key c++-mode-map (kbd "\"") 'sp-up-sexp)
+
 (require 'highlight-indentation)
 (add-hook 'prog-mode-hook 'highlight-indentation-mode)
 (diminish 'highlight-indentation-mode)
@@ -106,5 +111,9 @@
 (autoload 'nethack "nethack" "Play Nethack." t)
 (setq nethack-program "/usr/bin/nethack"
       nethack-use-tiles t)
+
+(require 'pretty-mode)
+(global-pretty-mode)
+;; (add-hook 'prog-mode-hook 'turn-on-pretty-mode)
 
 (provide 'eqyiel-misc)

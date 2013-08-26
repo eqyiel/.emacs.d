@@ -2,6 +2,7 @@
 
 ;; http://alexott.net/en/writings/emacs-devenv/EmacsCedet.html
 
+(require 'flymake)
 (require 'semantic)
 (require 'semantic/ia)
 (require 'semantic/bovine/gcc)
@@ -12,7 +13,7 @@
       '(global-semantic-idle-scheduler-mode
         global-semanticdb-minor-mode
         global-semantic-idle-summary-mode
-        global-semantic-idle-completions-mode
+        ;; global-semantic-idle-completions-mode
         global-semantic-decoration-mode
         global-semantic-highlight-func-mode
         global-semantic-stickyfunc-mode
@@ -22,6 +23,7 @@
 (defun my-semantic-hook ()
   (imenu-add-to-menubar "TAGS"))
 (add-hook 'semantic-init-hooks 'my-semantic-hook)
+
 
 ;; (global-ede-mode t)
 
@@ -43,13 +45,27 @@
 ;;                       :spp-table '(("isUnix" . "")
 ;;                                    ("BOOST_TEST_DYN_LINK" . "")))
 
+
+(setq help-at-pt-timer-delay 0.1
+      help-at-pt-display-when-idle t)
+
+      ;; help-at-pt-display-when-idle 'flymake-overlay
+
 (defun ac-c-mode-setup ()
   (setq ac-sources (append '(ac-source-yasnippet
                              ac-source-filename
                              ac-source-gtags
-                             ac-source-semantic))))
+                             ac-source-semantic-raw))))
 
-(add-hook 'c-mode-common-hook 'ac-c-mode-setup)
+(add-hook 'c++-mode-hook
+          (lambda ()
+            (progn (ac-c-mode-setup)
+                   (flymake-mode-on))))
+
+(add-hook 'makefile-mode-hook
+          (lambda ()
+            (setq indent-tabs-mode t
+                  tab-width 8)))
 
 (semantic-mode 1)
 

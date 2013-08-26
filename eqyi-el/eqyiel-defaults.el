@@ -14,14 +14,15 @@
 (delete-selection-mode 1)
 (global-subword-mode 1)
 
-(defalias 'yes-or-no-p 'y-or-n-p)
-(defvaralias 'c-basic-offset 'tab-width)
-(defvaralias 'cperl-indent-level 'tab-width)
 
 (setq-default
  indent-tabs-mode nil
  fill-column 80
  tab-width 4)
+
+(defalias 'yes-or-no-p 'y-or-n-p)
+(defvaralias 'c-basic-offset 'tab-width)
+(defvaralias 'cperl-indent-level 'tab-width)
 
 (setq
  buffer-file-coding-system 'utf-8-unix
@@ -50,7 +51,9 @@
       echo-keystrokes 0.1
       auto-save-list-file-prefix "~/.cache/emacs/backup/.saves-")
 
-(setq bookmark-default-file "~/.cache/emacs/emacs.bmk")
+;; I mean it!
+(setq bookmark-default-file "~/.cache/emacs/emacs.bmk"
+      url-cache-directory "~/.cache/emacs/url/cache")
 
 (setq
  apropos-do-all t
@@ -117,6 +120,18 @@
                             (format "Directory %s does not exist. Create it?"
                                     dir)))
                   (make-directory dir t))))))
+
+
+;; http://stackoverflow.com/a/12958498/2204400
+;; Makefile headaches.
+;; Try this if the defadvice doesn't work out.  https://github.com/glasserc/ethan-wspace
+
+(defadvice whitespace-cleanup (around whitespace-cleanup-indent-tab
+                                      activate)
+  "Fix whitespace-cleanup indent-tabs-mode bug"
+  (let ((whitespace-indent-tabs-mode indent-tabs-mode)
+        (whitespace-tab-width tab-width))
+    ad-do-it))
 
 (add-hook 'before-save-hook 'whitespace-cleanup)
 

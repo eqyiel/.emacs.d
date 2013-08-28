@@ -103,6 +103,3 @@
 [submodule "site-lisp/themes/solarized"]
     path = site-lisp/themes/solarized
     url = http://github.com/bbatsov/solarized-emacs
-[submodule "site-lisp/pretty-mode"]
-	path = site-lisp/pretty-mode
-	url = http://github.com/cofi/pretty-mode

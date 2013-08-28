@@ -112,8 +112,4 @@
 (setq nethack-program "/usr/bin/nethack"
       nethack-use-tiles t)
 
-(require 'pretty-mode)
-(global-pretty-mode)
-;; (add-hook 'prog-mode-hook 'turn-on-pretty-mode)
-
 (provide 'eqyiel-misc)

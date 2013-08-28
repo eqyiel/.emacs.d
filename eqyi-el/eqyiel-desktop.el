@@ -2,7 +2,6 @@
 
 ;;Remember what files I was working on
 
-
 (require 'desktop)
 
 (setq desktop-path '("~/.cache/emacs/")

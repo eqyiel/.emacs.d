@@ -81,6 +81,10 @@
       tramp-persistency-file-name "~/.cache/emacs/tramp"
       tramp-auto-save-directory "~/.cache/emacs/backup")
 
+;; when tramp successfully logs in but hangs, it's probably because
+;; tramp-terminal-prompt-regexp doesn't recognise it:
+;; http://stackoverflow.com/a/8363532
+
 ;; note: uses sudo password, not root password.  no need to allow ssh for root.
 (add-to-list 'tramp-default-proxies-alist '(".*" "\\`root\\'" "/ssh:%h:"))
 (add-to-list 'tramp-default-proxies-alist '("\\`localhost\\'" "\\`root\\'" nil))
@@ -121,6 +125,15 @@
                                     dir)))
                   (make-directory dir t))))))
 
+
+;; http://www.emacswiki.org/emacs/DiredReuseDirectoryBuffer#toc1
+;; Reuse same dired buffer when doing dired-up-directory
+(add-hook 'dired-mode-hook
+ (lambda ()
+  (define-key dired-mode-map (kbd "^")
+    (lambda () (interactive) (find-alternate-file "..")))
+  ; was dired-up-directory
+ ))
 
 ;; http://stackoverflow.com/a/12958498/2204400
 ;; Makefile headaches.

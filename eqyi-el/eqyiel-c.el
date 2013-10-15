@@ -45,7 +45,7 @@
 ;;                       :spp-table '(("isUnix" . "")
 ;;                                    ("BOOST_TEST_DYN_LINK" . "")))
 
-
+;; get feedback from flymake
 (setq help-at-pt-timer-delay 0.1
       help-at-pt-display-when-idle t)
 
@@ -57,10 +57,30 @@
                              ac-source-gtags
                              ac-source-semantic-raw))))
 
-(add-hook 'c++-mode-hook
-          (lambda ()
-            (progn (ac-c-mode-setup)
-                   (flymake-mode-on))))
+;; (add-hook 'c++-mode-hook
+;;           (lambda ()
+;;             (progn (ac-c-mode-setup)
+;;                    (flymake-mode-on))))
+
+
+;; (add-hook 'c-mode-hook
+;;           (lambda ()
+;;             (progn (ac-c-mode-setup)
+;;                    (if (file-exists-p "Makefile")
+;;                        (flymake-mode-on)
+;;                      (message "No Makefile here, not turning on flymake.")))))
+
+(defun my-cc-mode-hook ()
+  (progn (ac-c-mode-setup)
+         (setq tab-width 2
+               c-basic-offset 2)
+         ;; (if (file-exists-p "Makefile")
+         ;;     (flymake-mode-on)
+         ;;   (message "No Makefile here, not turning on flymake."))
+         ))
+
+(add-hook 'c-mode-hook 'my-cc-mode-hook)
+(add-hook 'c++-mode-hook 'my-cc-mode-hook)
 
 (add-hook 'makefile-mode-hook
           (lambda ()

@@ -146,8 +146,7 @@
     (ssl "mahe0054@uni.flinders.edu.au" "pod51003.outlook.com" 587
          "mahe0054@uni.flinders.edu.au" nil)
     (ssl "r@rkm.id.au" "rkm.id.au" 587 "r@rkm.id.au" nil)
-    (ssl "eqyiel@internode.on.net" "mail.internode.on.net" 465
-         "eqyiel@internode.on.net" nil)))
+    (ssl "eqyiel@internode.on.net" "mail.internode.on.net" 25 "eqyiel" nil)))
 
 ;; have the name show up, please.
 (require 'message)
@@ -222,6 +221,9 @@
       gnus-home-directory "~/"
       gnus-kill-files-directory "~/news/"
       gnus-summary-display-arrow t
+      gnus-refer-thread-limit t
+      gnus-fetch-old-headers 'some
+      ;; gnus-fetch-old-headers t
       gnus-uu-be-dangerous t)
 
 (setq-default

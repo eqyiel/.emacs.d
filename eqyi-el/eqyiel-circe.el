@@ -8,10 +8,11 @@
 (if (file-exists-p "~/.private.el")
     (load-file "~/.private.el")
   (setq eqyiel/freenode-pw nil
-        eqyiel/bitlbee-pw nil))
+        eqyiel/bitlbee-pw nil
+        eqyiel/austnet-pw nil))
 
 (setq circe-network-options
-      `(("znc"
+      `(("freenode"
          :nick "eqyiel"
          :host "rkm.id.au"
          :service "7777"
@@ -22,12 +23,19 @@
          :host "rkm.id.au"
          :service "7777"
          :tls t
-         :pass ,eqyiel/bitlbee-pw)))
+         :pass ,eqyiel/bitlbee-pw)
+        ("austnet"
+         :nick "eqyiel"
+         :host "rkm.id.au"
+         :service "7777"
+         :tls t
+         :pass ,eqyiel/austnet-pw)))
 
 (defun irc ()
   "Connect to IRC."
   (interactive)
-  (circe "znc"))
+  (circe "freenode")
+  (circe "austnet"))
 
 (setq
  lui-time-stamp-position 'right-margin

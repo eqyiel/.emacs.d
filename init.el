@@ -32,8 +32,10 @@
 (require 'eqyiel-python)
 (require 'eqyiel-haskell)
 (require 'eqyiel-c)
+(require 'eqyiel-tex)
 ;; (require 'eqyiel-emms)
 
 (put 'downcase-region 'disabled nil)
 (put 'emms-browser-delete-files 'disabled nil)
 (put 'upcase-region 'disabled nil)
+(put 'dired-find-alternate-file 'disabled nil)

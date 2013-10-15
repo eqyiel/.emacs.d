@@ -57,5 +57,7 @@
   '((">>" "→" nil 1)
     ("wtf" "WTF" nil 1)))
 
-
+(define-abbrev-table 'global-abbrev-table
+  '(("tias" "Try It And See™" nil 1)
+    ("drhouse" "ಠ_ಠ" nil 1)))
 (provide 'eqyiel-abbrev)

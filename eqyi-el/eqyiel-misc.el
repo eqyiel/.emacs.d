@@ -74,10 +74,9 @@
 (sp-use-paredit-bindings)
 (diminish 'smartparens-mode)
 
-(sp-pair "\\\"" nil :actions :rem)
-;; (define-key emacs-lisp-mode-map (kbd ")") 'sp-up-sexp)
-;; (define-key c++-mode-map (kbd ")") 'sp-up-sexp)
-;; (define-key c++-mode-map (kbd "\"") 'sp-up-sexp)
+;; don't do this: "\"\""
+(setq sp-autoescape-string-quote nil)
+(setq sp-autoskip-closing-pair 'always)
 
 (require 'highlight-indentation)
 (add-hook 'prog-mode-hook 'highlight-indentation-mode)

@@ -1,6 +1,7 @@
 ;;; eqyiel-defaults.el
 
-(set-face-attribute 'default nil :height 100 :family "DejaVu Sans Mono")
+(set-face-attribute 'default nil :height 120 :family "DejaVu Sans Mono")
+;; (set-face-attribute 'default nil :height 100 :family "DejaVu Sans Mono")
 
 (menu-bar-mode -1)
 (scroll-bar-mode -1)
@@ -36,9 +37,10 @@
 
 (setq browse-url-browser-function 'browse-url-generic)
 
-(if (executable-find "conkeror")
-    (setq browse-url-generic-program "conkeror")
-  (setq browse-url-generic-program "firefox"))
+(setq browse-url-generic-program "firefox")
+;; (if (executable-find "conkeror")
+;;     (setq browse-url-generic-program "conkeror")
+;;   (setq browse-url-generic-program "firefox"))
 
 ;; don't litter
 (setq backup-by-copying t
@@ -76,6 +78,10 @@
 (setq global-auto-revert-non-file-buffers t
       auto-revert-verbose nil)
 
+;; highlight isearch matches even when not in isearch, use
+;; lazy-highlight-cleanup to clean up
+(setq lazy-highlight-cleanup nil)
+
 (require 'tramp)
 (setq tramp-default-method "ssh"
       tramp-persistency-file-name "~/.cache/emacs/tramp"
@@ -100,8 +106,15 @@
 (setq uniquify-buffer-name-style 'forward)
 
 (require 'recentf)
-(setq recentf-save-file "~/.cache/emacs/.recentf")
+(setq recentf-save-file "~/.cache/emacs/.recentf"
+      recentf-max-saved-items 1000)
 (recentf-mode 1)
+
+(require 'savehist)
+(setq history-length 1000)
+(savehist-mode 1)
+
+
 
 (require 'epa-file)
 (epa-file-enable)
@@ -174,5 +187,9 @@
 (global-set-key (kbd "<C-mouse-4>") 'text-scale-decrease)
 (global-set-key (kbd "<C-up>") 'text-scale-increase)
 (global-set-key (kbd "<C-down>") 'text-scale-decrease)
+
+;; don't accidentally tap suspend-frame
+(global-unset-key [(control x)(control z)])
+(global-unset-key [(control z)])
 
 (provide 'eqyiel-defaults)

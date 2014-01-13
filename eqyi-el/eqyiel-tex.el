@@ -29,4 +29,12 @@
                (output-pdf "xdg-open")
                (output-html "xdg-open"))))))
 
+;; todo: make editing bibtex files nicer,
+;; newline-and-indent doesn't do what it is supposed to do, and to align things
+;; you have to type C-c C-q
+;; 2 is a much better indent than 18
+;; (setq bibtex-text-indentation 2)
+;; (setq bibtex-contline-indentation 2)
+;; (setq bibtex-field-indentation 2)
+
 (provide 'eqyiel-tex)

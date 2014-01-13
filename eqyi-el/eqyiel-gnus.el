@@ -143,8 +143,10 @@
 
 (defvar smtp-accounts
   '((ssl "eqyiel@gmail.com" "smtp.gmail.com" 587 "eqyiel@gmail.com" nil)
-    (ssl "mahe0054@uni.flinders.edu.au" "pod51003.outlook.com" 587
-         "mahe0054@uni.flinders.edu.au" nil)
+    (ssl "mahe0054@uni.flinders.edu.au" "smtp.office365.com" 587
+         "mahe0054@uni.flinders.edu.au" nil) ;; flinders now uses office365
+    ;; (ssl "mahe0054@uni.flinders.edu.au" "pod51003.outlook.com" 587
+    ;;      "mahe0054@uni.flinders.edu.au" nil)
     (ssl "r@rkm.id.au" "rkm.id.au" 587 "r@rkm.id.au" nil)
     (ssl "eqyiel@internode.on.net" "mail.internode.on.net" 25 "eqyiel" nil)))
 
@@ -263,18 +265,18 @@
 ;; (setq mm-automatic-display (remove "text/html" mm-automatic-display))
 
 ;; http://sachachua.com/blog/2007/12/gnus-multi-pane-tricks-or-i-heart-planet-emacsen/
-(gnus-add-configuration
- '(article
-   (horizontal 1.0
-               (vertical 60 (group 1.0))
-               (vertical 1.0
-                         (summary 0.20 point)
-                         (article 1.0)))))
+;; (gnus-add-configuration
+;;  '(article
+;;    (horizontal 1.0
+;;                (vertical 40 (group 1.0))
+;;                (vertical 1.0
+;;                          (summary 0.20 point)
+;;                          (article 1.0)))))
 
-(gnus-add-configuration
- '(summary
-   (horizontal 1.0
-               (vertical 60 (group 1.0))
-               (vertical 1.0 (summary 1.0 point)))))
+;; (gnus-add-configuration
+;;  '(summary
+;;    (horizontal 1.0
+;;                (vertical 40 (group 1.0))
+;;                (vertical 1.0 (summary 1.0 point)))))
 
 (provide 'eqyiel-gnus)

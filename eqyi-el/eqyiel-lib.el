@@ -284,6 +284,19 @@ file of a buffer in an external program."
   '(define-key dired-mode-map
      (vector 'remap 'beginning-of-buffer) 'dired-jump-to-bottom))
 
+; sprunge.us owns
+(defun sprunge (prefix)
+  "Posts the current buffer to sprunge, and shows the resulting URL in a new
+buffer.  If invoked with the universal argument / prefix, upload the whole file,
+else upload just the region."
+  (interactive "P")
+  (let ((filename "/tmp/sprunge-post"))
+    (if prefix (write-file filename)
+      (write-region (region-beginning) (region-end) filename))
+    (insert (shell-command-to-string
+             (concat "curl -s -F 'sprunge=<" filename "' http://sprunge.us")))
+    (delete-char -1))) ; Newline after URL
+
 ;; http://www.emacswiki.org/emacs/EmacsAsDaemon#toc9
 
 (defun server-shutdown ()

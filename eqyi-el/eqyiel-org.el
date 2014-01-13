@@ -9,7 +9,12 @@
 
 ;; http://julien.danjou.info/projects/emacs-packages#org-contacts
 (setq org-contacts-files '("~/doc/org/contacts.org"))
+
 (setq org-contacts-icon-use-gravatar nil) ;; yuck!
+
+;; show me today +7 days in the agenda instead of this week, we don't care what
+;; happened yesterday
+(setq org-agenda-start-on-weekday nil)
 
 ;;; Make it easy to use in Gnus.
 (org-contacts-gnus-insinuate)

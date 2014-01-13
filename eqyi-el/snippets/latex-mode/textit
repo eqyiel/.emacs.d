@@ -1,0 +1,4 @@
+# name: \textit{ ... }
+# key: textit
+# --
+\textit{$1}$0

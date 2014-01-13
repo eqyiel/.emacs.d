@@ -1,0 +1,4 @@
+# name: \textbf{ ... }
+# key: textbf
+# --x
+\textbf{$1}$0

@@ -19,9 +19,6 @@
 [submodule "site-lisp/emacs-git-gutter"]
     path = site-lisp/emacs-git-gutter
     url = http://github.com/syohex/emacs-git-gutter
-[submodule "site-lisp/emms"]
-    path = site-lisp/emms
-    url = http://github.com/emacsmirror/emms
 [submodule "site-lisp/expand-region"]
     path = site-lisp/expand-region
     url = http://github.com/magnars/expand-region.el
@@ -79,21 +76,12 @@
 [submodule "site-lisp/s"]
     path = site-lisp/s
     url = http://github.com/magnars/s.el
-[submodule "site-lisp/slime"]
-    path = site-lisp/slime
-    url = http://github.com/nablaone/slime
 [submodule "site-lisp/smartparens"]
     path = site-lisp/smartparens
     url = http://github.com/Fuco1/smartparens
 [submodule "site-lisp/smex"]
     path = site-lisp/smex
     url = http://github.com/nonsequitur/smex
-[submodule "site-lisp/swank-js"]
-    path = site-lisp/swank-js
-    url = http://github.com/swank-js/swank-js
-[submodule "site-lisp/virtualenv"]
-    path = site-lisp/virtualenv
-    url = http://github.com/aculich/virtualenv.el
 [submodule "site-lisp/yasnippet"]
     path = site-lisp/yasnippet
     url = http://github.com/capitaomorte/yasnippet
@@ -106,3 +94,9 @@
 [submodule "site-lisp/git-modes"]
 	path = site-lisp/git-modes
 	url = git://github.com/magit/git-modes
+[submodule "site-lisp/pyvenv"]
+	path = site-lisp/pyvenv
+	url = http://github.com/jorgenschaefer/pyvenv
+[submodule "site-lisp/org-caldav"]
+	path = site-lisp/org-caldav
+	url = http://github.com/dengste/org-caldav

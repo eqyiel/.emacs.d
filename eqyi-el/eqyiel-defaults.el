@@ -111,7 +111,8 @@
 (recentf-mode 1)
 
 (require 'savehist)
-(setq history-length 1000)
+(setq savehist-file "~/.cache/emacs/history"
+      history-length 1000)
 (savehist-mode 1)
 
 

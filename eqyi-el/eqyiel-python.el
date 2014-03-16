@@ -1,7 +1,7 @@
 ;;; eqyiel-python.el
 
-(setenv "PYMACS_PYTHON" "python2")
-(setenv "PYTHONPATH" "${PYTHONPATH}:~/.local/lib/python2.7")
+;; (setenv "PYMACS_PYTHON" "python2")
+(setenv "PYTHONPATH" "${PYTHONPATH}:~/.emacs.d/site-lisp/elpy/:~/.local/lib/python2.7")
 
 (require 'elpy)
 
@@ -10,7 +10,6 @@
 
 (setq flymake-no-changes-timeout 60
       flymake-start-syntax-check-on-newline nil)
-
 
 (setq elpy-rpc-python-command "python2"
       python-shell-interpreter "python2"

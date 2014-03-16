@@ -8,7 +8,7 @@
 (require 'org-contacts)
 
 ;; http://julien.danjou.info/projects/emacs-packages#org-contacts
-(setq org-contacts-files '("~/doc/org/contacts.org"))
+(setq org-contacts-files '("~/doc/org/contacts.org.gpg"))
 
 (setq org-contacts-icon-use-gravatar nil) ;; yuck!
 
@@ -24,23 +24,23 @@
 (setq org-drawers (quote ("importants")))
 ;; (setq org-log-done (quote time))
 (setq org-log-done 'time)
-(setq org-agenda-files (file-expand-wildcards "~/doc/org/*.org"))
+(setq org-agenda-files (file-expand-wildcards "~/doc/org/*.org.gpg"))
 
 (defun my-org-archive-done-tasks ()
   (interactive)
   (org-map-entries 'org-archive-subtree "/DONE" 'file))
 
 (setq org-capture-templates
-      '(("t" "Todo" entry (file+headline "~/doc/org/orgtest.org" "Tasks")
+      '(("t" "Todo" entry (file+headline "~/doc/org/todo.org.gpg" "Tasks")
          "* TODO %?\n  %i\n  %a")
-        ("j" "Journal" entry (file+datetree "~/doc/org/orgtest.org")
+        ("j" "Journal" entry (file+datetree "~/doc/org/todo.org.gpg")
          "* %?\nEntered on %U\n  %i\n  %a")
-        ("c" "Contacts" entry (file "~/doc/org/contacts.org")
+        ("c" "Contacts" entry (file "~/doc/org/contacts.org.gpg")
                "** %(org-contacts-template-name)
   :PROPERTIES:
   :EMAIL: %(org-contacts-template-email)
   :END:")
-        ("m" "Add a contact manually" entry (file "~/doc/org/contacts.org")
+        ("m" "Add a contact manually" entry (file "~/doc/org/contacts.org.gpg")
          "** %^{Name}
   :PROPERTIES:
   :EMAIL:

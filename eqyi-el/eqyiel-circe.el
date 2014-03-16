@@ -83,6 +83,18 @@
  circe-format-say "<{nick}> {body}"
  circe-format-self-say "<{nick}> {body}")
 
+;; <ldionmarcil> [12:45:32 25/02/14] any way I could have
+;;               circe-reduce-lurker-spam only for certain channels?
+;; <mtp> [12:45:43 25/02/14] yes
+;; <mtp> [12:46:35 25/02/14] (defun mtp/channel-mode nil
+;; <mtp> [12:46:36 25/02/14]   (when (member-ignore-case
+;;       circe-chat-target (list "#some-channel"))
+;; <mtp> [12:46:36 25/02/14]     (set (make-variable-buffer-local
+;;       'circe-reduce-lurker-spam) t)))
+;; <mtp> [12:46:50 25/02/14] and have that in the channel-mode hook
+;; <ldionmarcil> [14:15:27 25/02/14] thanks mtp
+
+
 ;; see if this is not too annoying
 ;; (setq tracking-ignored-buffers '(("#archlinux" circe-highlight-nick-face)
 ;;                                  ("##japanese" circe-highlight-nick-face)

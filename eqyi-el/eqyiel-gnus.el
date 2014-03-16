@@ -260,6 +260,10 @@
      (add-to-list 'mm-attachment-override-types "image/*")
      (setq mm-inline-large-images 'resize)))
 
+;; stop message-mode from adding the Fcc: header when notmuch is loaded.
+(eval-after-load "notmuch"
+  (setq notmuch-fcc-dirs nil))
+
 ;; http://www.gnus.org/manual/gnus_398.html#SEC461
 ;; If you don't want HTML rendered, even if there's no text alternative add
 ;; (setq mm-automatic-display (remove "text/html" mm-automatic-display))

@@ -28,7 +28,7 @@
 (require 'eqyiel-ido)
 (require 'eqyiel-misc)
 (require 'eqyiel-calfw)
-(require 'eqyiel-slime)
+;; (require 'eqyiel-slime)
 (require 'eqyiel-python)
 (require 'eqyiel-haskell)
 (require 'eqyiel-c)

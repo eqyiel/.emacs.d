@@ -92,11 +92,20 @@
     path = site-lisp/themes/solarized
     url = http://github.com/bbatsov/solarized-emacs
 [submodule "site-lisp/git-modes"]
-	path = site-lisp/git-modes
-	url = git://github.com/magit/git-modes
+    path = site-lisp/git-modes
+    url = git://github.com/magit/git-modes
 [submodule "site-lisp/pyvenv"]
-	path = site-lisp/pyvenv
-	url = http://github.com/jorgenschaefer/pyvenv
+    path = site-lisp/pyvenv
+    url = http://github.com/jorgenschaefer/pyvenv
 [submodule "site-lisp/org-caldav"]
-	path = site-lisp/org-caldav
-	url = http://github.com/dengste/org-caldav
+    path = site-lisp/org-caldav
+    url = http://github.com/dengste/org-caldav
+[submodule "site-lisp/emacs-eclim"]
+    path = site-lisp/emacs-eclim
+    url = https://github.com/senny/emacs-eclim
+[submodule "site-lisp/ido-vertical"]
+    path = site-lisp/ido-vertical
+    url = http://github.com/gempesaw/ido-vertical-mode.el
+[submodule "site-lisp/sublimity"]
+    path = site-lisp/sublimity
+    url = https://github.com/zk-phi/sublimity

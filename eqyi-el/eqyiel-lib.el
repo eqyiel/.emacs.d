@@ -2,6 +2,18 @@
 ;; Most of these are taken from other people.  Where possible, a link to the
 ;; original author precedes the function.
 
+
+;; http://www.emacswiki.org/emacs/LoadingLispFiles
+
+(defmacro with-library (symbol &rest body)
+  `(condition-case nil
+       (progn
+         (require ',symbol)
+         ,@body)
+     (error (message (format "I guess we don't have %s available." ',symbol))
+            nil)))
+(put 'with-library 'lisp-indent-function 1)
+
 ;; http://david.rothlis.net/emacs/ergonomics.html
 
 (defun kill-region-or-backward-kill-word (&optional arg region)
@@ -47,13 +59,14 @@
        (list ?\"))
   (paredit-mode 1))
 
+;; http://www.emacswiki.org/emacs/FullScreen#toc22
+
 (defun toggle-fullscreen ()
+  "Depends on community/wmctrl"
   (interactive)
-  ;; TODO: this only works for X. patches welcome for other OSes.
-  (x-send-client-message nil 0 nil "_NET_WM_STATE" 32
-                         '(2 "_NET_WM_STATE_MAXIMIZED_VERT" 0))
-  (x-send-client-message nil 0 nil "_NET_WM_STATE" 32
-                         '(2 "_NET_WM_STATE_MAXIMIZED_HORZ" 0)))
+  (shell-command "wmctrl -r :ACTIVE: -btoggle,fullscreen"))
+
+(global-set-key [f11] 'toggle-fullscreen)
 
 ;; http://whattheemacsd.com/editing-defuns.el-01.html
 
@@ -220,6 +233,8 @@ file of a buffer in an external program."
     (when filename
       (kill-new filename)
       (message "Copied buffer file name '%s' to the clipboard." filename))))
+
+;; http://whattheemacsd.com/file-defuns.el-01.html
 
 (defun rename-file-and-buffer ()
   "Renames current buffer and file it is visiting."

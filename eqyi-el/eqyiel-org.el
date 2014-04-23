@@ -5,19 +5,17 @@
 (setq org-directory "~/doc/org/")
 (add-hook 'org-mode-hook 'turn-on-auto-fill)
 
-(require 'org-contacts)
-
 ;; http://julien.danjou.info/projects/emacs-packages#org-contacts
-(setq org-contacts-files '("~/doc/org/contacts.org.gpg"))
 
-(setq org-contacts-icon-use-gravatar nil) ;; yuck!
+(with-library org-contacts
+              (setq org-contacts-files '("~/doc/org/contacts.org.gpg"))
+              (setq org-contacts-icon-use-gravatar nil) ;; yuck!
+              (org-contacts-gnus-insinuate))
 
 ;; show me today +7 days in the agenda instead of this week, we don't care what
 ;; happened yesterday
 (setq org-agenda-start-on-weekday nil)
 
-;;; Make it easy to use in Gnus.
-(org-contacts-gnus-insinuate)
 (define-key gnus-summary-mode-map (kbd "C-;")
   (lambda () (interactive) (org-capture nil "c")))
 

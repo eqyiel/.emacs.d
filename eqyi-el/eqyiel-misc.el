@@ -10,10 +10,6 @@
 
 ;; switch between windows more easily.
 
-;; (defun eqyiel-back-window ()
-;;   (interactive)
-;;   (other-window -1))
-
 (global-set-key (kbd "H-h") 'windmove-left)
 (global-set-key (kbd "H-j") 'windmove-down)
 (global-set-key (kbd "H-k") 'windmove-up)

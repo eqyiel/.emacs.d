@@ -9,20 +9,20 @@
 
 (setq semanticdb-default-save-directory "~/.cache/emacs/semanticdb")
 
-(setq semantic-default-submodes
-      '(global-semantic-idle-scheduler-mode
-        global-semanticdb-minor-mode
-        global-semantic-idle-summary-mode
-        ;; global-semantic-idle-completions-mode
-        global-semantic-decoration-mode
-        global-semantic-highlight-func-mode
-        global-semantic-stickyfunc-mode
-        global-semantic-mru-bookmark-mode
-        global-semantic-idle-local-symbol-highlight-mode))
+;; (setq semantic-default-submodes
+;;       '(global-semantic-idle-scheduler-mode
+;;         global-semanticdb-minor-mode
+;;         global-semantic-idle-summary-mode
+;;         ;; global-semantic-idle-completions-mode
+;;         global-semantic-decoration-mode
+;;         global-semantic-highlight-func-mode
+;;         global-semantic-stickyfunc-mode
+;;         global-semantic-mru-bookmark-mode
+;;         global-semantic-idle-local-symbol-highlight-mode))
 
-(defun my-semantic-hook ()
-  (imenu-add-to-menubar "TAGS"))
-(add-hook 'semantic-init-hooks 'my-semantic-hook)
+;; (defun my-semantic-hook ()
+;;   (imenu-add-to-menubar "TAGS"))
+;; (add-hook 'semantic-init-hooks 'my-semantic-hook)
 
 
 ;; (global-ede-mode t)
@@ -54,8 +54,9 @@
 (defun ac-c-mode-setup ()
   (setq ac-sources (append '(ac-source-yasnippet
                              ac-source-filename
-                             ac-source-gtags
-                             ac-source-semantic-raw))))
+                             ;; ac-source-gtags
+                             ;; ac-source-semantic-raw
+                             ac-source-semantic))))
 
 ;; (add-hook 'c++-mode-hook
 ;;           (lambda ()

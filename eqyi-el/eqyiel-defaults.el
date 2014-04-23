@@ -83,9 +83,12 @@
 (setq lazy-highlight-cleanup nil)
 
 (require 'tramp)
-(setq tramp-default-method "ssh"
-      tramp-persistency-file-name "~/.cache/emacs/tramp"
-      tramp-auto-save-directory "~/.cache/emacs/backup")
+(setq tramp-persistency-file-name "~/.cache/emacs/tramp"
+      tramp-auto-save-directory "~/.cache/emacs/backup"
+      tramp-default-method "scp"
+      ;; tramp-debug-buffer t
+      ;; tramp-verbose 10
+      )
 
 ;; when tramp successfully logs in but hangs, it's probably because
 ;; tramp-terminal-prompt-regexp doesn't recognise it:
@@ -114,11 +117,6 @@
 (setq savehist-file "~/.cache/emacs/history"
       history-length 1000)
 (savehist-mode 1)
-
-
-
-(require 'epa-file)
-(epa-file-enable)
 
 ;; (require 'package)
 ;; (setq package-user-dir "~/.emacs.d/site-lisp/elpa")

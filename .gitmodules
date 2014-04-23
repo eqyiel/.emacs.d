@@ -1,6 +1,3 @@
-[submodule "site-lisp/auto-complete"]
-    path = site-lisp/auto-complete
-    url = http://github.com/auto-complete/auto-complete
 [submodule "site-lisp/auto-complete-auctex"]
     path = site-lisp/auto-complete-auctex
     url = http://github.com/monsanto/auto-complete-auctex
@@ -82,9 +79,6 @@
 [submodule "site-lisp/smex"]
     path = site-lisp/smex
     url = http://github.com/nonsequitur/smex
-[submodule "site-lisp/yasnippet"]
-    path = site-lisp/yasnippet
-    url = http://github.com/capitaomorte/yasnippet
 [submodule "site-lisp/themes/zenburn"]
     path = site-lisp/themes/zenburn
     url = http://github.com/bbatsov/zenburn-emacs
@@ -106,6 +100,15 @@
 [submodule "site-lisp/ido-vertical"]
     path = site-lisp/ido-vertical
     url = http://github.com/gempesaw/ido-vertical-mode.el
-[submodule "site-lisp/sublimity"]
-    path = site-lisp/sublimity
-    url = https://github.com/zk-phi/sublimity
+[submodule "site-lisp/legalese"]
+	path = site-lisp/legalese
+	url = https://github.com/jorgenschaefer/legalese
+[submodule "site-lisp/yasnippet"]
+	path = site-lisp/yasnippet
+	url = https://github.com/capitaomorte/yasnippet
+[submodule "site-lisp/auto-complete"]
+	path = site-lisp/auto-complete
+	url = https://github.com/auto-complete/auto-complete
+[submodule "site-lisp/circe-notifications"]
+	path = site-lisp/circe-notifications
+	url = eigenlicht:/srv/git/circe-notifications

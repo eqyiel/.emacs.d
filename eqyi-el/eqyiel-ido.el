@@ -2,6 +2,10 @@
 
 (require 'ido)
 (require 'ido-ubiquitous)
+(require 'ido-vertical-mode)
+
+(if (commandp 'ido-vertical-mode)
+    (ido-vertical-mode t))
 
 ;; if tramp is loaded
 (add-to-list 'ido-work-directory-list-ignore-regexps tramp-file-name-regexp)

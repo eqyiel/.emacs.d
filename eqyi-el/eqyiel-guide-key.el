@@ -11,8 +11,8 @@
 ;;; https://github.com/kbkbkbkb1/guide-key
 
 (require 'guide-key)
-;; (setq guide-key/guide-key-sequence '("C-x r" "C-x 4"))
-;; (setq guide-key/guide-key-highlight-command-regexp "rectangle")
+(setq guide-key/guide-key-sequence '("C-x r" "C-x 4" "C-x 8" "C-c"))
+(setq guide-key/guide-key-highlight-command-regexp "rectangle")
 
 (defun guide-key/my-hook-function-for-org-mode ()
   (guide-key/add-local-guide-key-sequence "C-c")
@@ -38,7 +38,6 @@
   (guide-key/add-local-guide-key-sequence "M")
   (guide-key/add-local-guide-key-sequence "A")
   (guide-key/add-local-guide-key-sequence "C-c")
-  ;; (guide-key/add-local-guide-key-sequence "C-c C-x")
   (guide-key/add-local-highlight-command-regexp "gnus-group-"))
 (add-hook 'gnus-group-mode-hook 'guide-key/my-hook-function-for-gnus-group-mode)
 

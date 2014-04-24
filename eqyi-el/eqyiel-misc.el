@@ -1,12 +1,19 @@
 ;;; eqyiel-misc.el
 
-;; pull in libraries that aren't part of emacs, and don't have complex enough
-;; configuration to warrant their own file
+(require 'diminish)
+
+(require 'smartparens)
+(require 'smartparens-config)
+(smartparens-global-mode t)
+(sp-use-paredit-bindings)
+(diminish 'smartparens-mode)
+
+;; don't do this: "\"\""
+(setq sp-autoescape-string-quote nil)
+(setq sp-autoskip-closing-pair 'always)
 
 (require 'magit)
-(require 'diminish)
-(require 'tiling)
-(require 'buffer-move)
+;; (autoload 'magit-status "magit")
 
 ;; switch between windows more easily.
 
@@ -20,33 +27,60 @@
 (global-set-key (kbd "H-n") 'shrink-window)
 (global-set-key (kbd "H-p") 'enlarge-window)
 
+;; (require 'buffer-move)
+(autoload 'buf-move-left "buffer-move")
+(autoload 'buf-move-down "buffer-move")
+(autoload 'buf-move-up "buffer-move")
+(autoload 'buf-move-right "buffer-move")
+
 (global-set-key (kbd "M-H-h") 'buf-move-left)
 (global-set-key (kbd "M-H-j") 'buf-move-down)
 (global-set-key (kbd "M-H-k") 'buf-move-up)
 (global-set-key (kbd "M-H-l") 'buf-move-right)
 
+;; (require 'tiling)
+(autoload 'tiling-cycle "tiling")
+
 (global-set-key (kbd "H-SPC") 'tiling-cycle)
 
-(setq smex-save-file "~/.cache/emacs/smex-items")
+(eval-after-load "smex"
+  '(setq smex-save-file "~/.cache/emacs/smex-items"))
 
-(require 'smex) ; Not needed if you use package.el
-(smex-initialize) ; Can be omitted. This might cause a (minimal) delay
-                  ; when Smex is auto-initialized on its first run.
+;; (require 'smex) ; Not needed if you use package.el
+(autoload 'smex "smex")
+(autoload 'smex-major-mode-commands "smex")
+(autoload 'execute-extended-command "smex")
+;; (smex-initialize) ; Can be omitted. This might cause a (minimal) delay
+;;                   ; when Smex is auto-initialized on its first run.
 (global-set-key (kbd "M-x") 'smex)
 (global-set-key (kbd "M-X") 'smex-major-mode-commands)
 ;; This is your old M-x.
 (global-set-key (kbd "C-c C-c M-x") 'execute-extended-command)
 
-(require 'yasnippet)
-(setq yas-snippet-dirs (quote ("~/.emacs.d/eqyi-el/snippets"
-                               "~/.emacs.d/site-lisp/yasnippet/snippets")))
+;; (require 'yasnippet)
+(autoload 'yas-global-mode "yasnippet")
+(eval-after-load "yasnippet"
+  '(setq yas-snippet-dirs (quote ("~/.emacs.d/eqyi-el/snippets"
+                                  "~/.emacs.d/site-lisp/yasnippet/snippets"))
+         yas-prompt-functions '(yas-ido-prompt)))
 (yas-global-mode t)
 (global-set-key (kbd "C-c TAB") 'yas-expand)
-(setq yas-prompt-functions '(yas-ido-prompt))
-(diminish 'yas-minor-mode)
+(eval-after-load "yasnippet"
+  '(diminish 'yas-minor-mode))
 
-(require 'multiple-cursors)
-(setq mc/list-file "~/.cache/emacs/mc-lists.el")
+;; (require 'multiple-cursors)
+(autoload 'mc/edit-lines "multiple-cursors")
+(autoload 'mc/mark-next-like-this "multiple-cursors")
+(autoload 'mc-mark-previous-like-this "multiple-cursors")
+(autoload 'mc/mark-all-like-this "multiple-cursors")
+(autoload 'mc/edit-lines "multiple-cursors")
+(autoload 'mc/edit-ends-of-lines "multiple-cursors")
+(autoload 'mc/edit-beginnings-of-lines "multiple-cursors")
+(autoload 'set-rectangular-region-anchor "multiple-cursors")
+
+(eval-after-load "multiple-cursors"
+  '(setq mc/list-file "~/.cache/emacs/mc-lists.el"))
+
 (global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
 (global-set-key (kbd "C->") 'mc/mark-next-like-this)
 (global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
@@ -58,28 +92,24 @@
 ;; Rectangular region mode
 (global-set-key (kbd "C-S-SPC") 'set-rectangular-region-anchor)
 
-(require 'expand-region)
+;; (require 'expand-region)
+(autoload 'er/expand-region "expand-region")
 (global-set-key (kbd "C-=") 'er/expand-region)
 
-(require 'column-marker)
+;; (require 'column-marker)
+(autoload 'column-marker-1 "column-marker")
 (global-set-key (kbd "C-c m") 'column-marker-1)
 
-(require 'smartparens)
-(require 'smartparens-config)
-(smartparens-global-mode t)
-(sp-use-paredit-bindings)
-(diminish 'smartparens-mode)
-
-;; don't do this: "\"\""
-(setq sp-autoescape-string-quote nil)
-(setq sp-autoskip-closing-pair 'always)
-
-(require 'highlight-indentation)
+;; (require 'highlight-indentation)
+(autoload 'highlight-indentation-mode "highlight-indentation")
 (add-hook 'prog-mode-hook 'highlight-indentation-mode)
-(diminish 'highlight-indentation-mode)
+(eval-after-load "highlight-indentation"
+  '(diminish 'highlight-indentation-mode))
 
 ;; https://github.com/alpaker/Fill-Column-Indicator
-(require 'fill-column-indicator)
+;; (require 'fill-column-indicator)
+(autoload 'turn-on-fci-mode "fill-column-indicator")
+(autoload 'fci-mode "fill-column-indicator")
 (add-hook 'prog-mode-hook 'turn-on-fci-mode)
 
 ;; https://github.com/alpaker/Fill-Column-Indicator/issues/21
@@ -95,9 +125,14 @@
     (setq sanityinc/fci-mode-suppressed nil)
     (turn-on-fci-mode)))
 
-(require 'git-gutter)
-(global-git-gutter-mode t)
-(diminish 'git-gutter-mode)
+;; (require 'git-gutter)
+;; this make start up pretty slow when enabled globally
+;; maybe it would be better hooked into projectile or something?
+(autoload 'git-gutter-mode "git-gutter")
+(autoload 'global-git-gutter-mode "git-gutter")
+;; (global-git-gutter-mode t)
+(eval-after-load "git-gutter"
+  '(diminish 'git-gutter-mode))
 
 (autoload 'pkgbuild-mode "pkgbuild-mode.el" "PKGBUILD mode." t)
 (setq auto-mode-alist (append '(("/PKGBUILD$" . pkgbuild-mode))

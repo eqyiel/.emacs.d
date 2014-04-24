@@ -12,8 +12,14 @@
 (add-to-list 'custom-theme-load-path "~/.emacs.d/site-lisp/themes/zenburn")
 (add-to-list 'custom-theme-load-path "~/.emacs.d/site-lisp/themes/solarized")
 
-(load-theme 'zenburn t)
-;; (load-theme 'solarized-dark t)
+;; (load-theme 'zenburn t)
+(load-theme 'solarized-dark t)
+;; (load-theme 'solarized-light t)
+
+;; before
+;; real    0m15.347s
+;; user    0m0.012s
+;; sys     0m0.008s
 
 (require 'eqyiel-defaults)
 (require 'eqyiel-lib)
@@ -21,7 +27,7 @@
 (require 'eqyiel-autocomplete)
 (require 'eqyiel-org)
 (require 'eqyiel-circe)
-(require 'eqyiel-desktop)
+;; (require 'eqyiel-desktop)
 ;; (require 'eqyiel-gnuplot)
 (require 'eqyiel-gnus)
 (require 'eqyiel-guide-key)
@@ -36,6 +42,10 @@
 ;; (require 'eqyiel-java)
 ;; (require 'eqyiel-tex)
 ;; ;; (require 'eqyiel-emms)
+
+(eval-after-load "warnings"
+  ;; stop warning me about my load path including ~/.emacs.d
+  '(setq display-warning-minimum-level :error))
 
 (put 'emms-browser-delete-files 'disabled nil)
 (put 'dired-find-alternate-file 'disabled nil)

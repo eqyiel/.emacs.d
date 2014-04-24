@@ -1,30 +1,27 @@
 ;;; eqyiel-ibuffer.el
 
-(require 'ibuffer)
+(autoload 'ibuffer "ibuffer")
 
-(setq ibuffer-saved-filter-groups
+(eval-after-load "ibuffer"
+  '(setq ibuffer-saved-filter-groups
       (quote (("default"
                ("Org" ;; all org-related buffers
                 (mode . org-mode))
                ("Mail"
                 (or  ;; mail-related buffers
                  (mode . message-mode)
-                 (mode . mail-mode)))
+                 (mode . mail-mode)
+                 (mode . gnus-summary-mode)
+                 (mode . gnus-article-mode)
+                 (mode . gnus-group-mode)))
                ("~/.emacs.d/"
                 (filename . ".emacs.d/"))
-               ("Programming" ;; prog stuff not already in MyProjectX
-                (or
-                 (mode . c-mode)
-                 (mode . c++-mode)
-                 (mode . java-mode)
-                 (mode . perl-mode)
-                 (mode . python-mode)
-                 (mode . emacs-lisp-mode)
-                 (mode . haskell-mode)
-                 (mode . html-mode)
-                 (mode . css-mode)
-                 (mode . js2-mode)))
-               ("IRC"   (mode . circe-channel-mode))))))
+               ("Programming"
+                 (or
+                  (mode . prog-mode)
+                  (mode . lisp-interaction-mode)))
+               ("IRC"
+                (mode . circe-channel-mode)))))))
 
 (add-hook 'ibuffer-mode-hook
           (lambda ()

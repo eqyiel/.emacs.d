@@ -16,8 +16,9 @@
 ;; happened yesterday
 (setq org-agenda-start-on-weekday nil)
 
-(define-key gnus-summary-mode-map (kbd "C-;")
-  (lambda () (interactive) (org-capture nil "c")))
+(eval-after-load "gnus"
+  '(define-key gnus-summary-mode-map (kbd "C-;")
+  (lambda () (interactive) (org-capture nil "c"))))
 
 (setq org-drawers (quote ("importants")))
 ;; (setq org-log-done (quote time))

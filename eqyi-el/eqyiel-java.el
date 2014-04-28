@@ -1,30 +1,25 @@
-(require 'eclim)
-(global-eclim-mode)
-(require 'eclimd)
-(require 'ac-emacs-eclim-source)
-;; (ac-emacs-eclim-config)
+;;; eqyiel-java.el
 
-(setq eclim-java-documentation-root "/usr/share/doc/java7")
+(autoload 'eclim-mode "eclim" nil t)
+(autoload 'start-eclimd "eclimd" nil t)
+;; (autoload 'eclim-mode "ac-emacs-eclim-source")
 
-;; doesn't appear to work
-(setq eclim-default-workspace "~/doc/flinders/comp3751_s1_2014/code")
+(eval-after-load "eclim"
+  '(setq eclim-java-documentation-root "/usr/share/doc/java7"
+         eclim-auto-save nil)) ; annoying
 
-;; why does this make emacs lock up?
-(setq eclim-auto-save nil)              ; annoying!
+(eval-after-load "eclimd"
+  '(setq eclimd-default-workspace "~/doc/flinders/comp3751_s1_2014/code"))
 
-(defun ac-java-mode-setup ()
+(defun eqyiel-ac-java-mode-setup ()
   (setq ac-sources (append '(ac-source-yasnippet
                             ac-source-filename
-                            ac-source-emacs-eclim
-                            ;; ac-source-gtags
-                            ;; ac-source-semantic-raw
-                            ac-source-semantic))))
+                            ac-source-emacs-eclim))))
 
-(defun my-java-mode-hook ()
-  (progn (ac-java-mode-setup)
-         (setq tab-width 2
-               c-basic-offset 2)))
+(defun eqyiel-java-mode-hook ()
+  (progn (eqyiel-ac-java-mode-setup)
+         (eclim-mode)))
 
-(add-hook 'java-mode-hook 'my-java-mode-hook)
+(add-hook 'java-mode-hook 'eqyiel-java-mode-hook)
 
 (provide 'eqyiel-java)

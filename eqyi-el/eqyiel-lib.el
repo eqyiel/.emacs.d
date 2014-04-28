@@ -2,7 +2,6 @@
 ;; Most of these are taken from other people.  Where possible, a link to the
 ;; original author precedes the function.
 
-
 ;; http://www.emacswiki.org/emacs/LoadingLispFiles
 
 (defmacro with-library (symbol &rest body)

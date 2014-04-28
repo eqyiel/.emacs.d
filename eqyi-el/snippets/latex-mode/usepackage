@@ -1,4 +1,5 @@
-# name: \usepackage{ ... }
-# key: usepackage
+# -*- mode: snippet -*-
+# name: usepackage
+# key: pkg
 # --
-\usepackage{$1}$0
+\usepackage{$0}

@@ -57,8 +57,8 @@
 (add-hook 'message-mode-hook 'guide-key/my-hook-function-for-message-mode)
 
 ;;; Cool, but a bit too much
-;; (setq guide-key/guide-key-sequence '("C-x")
-;;       guide-key/recursive-key-sequence-flag t)
+(setq guide-key/guide-key-sequence '("C-x" "C-c")
+      guide-key/recursive-key-sequence-flag t)
 
 (guide-key-mode 1)
 

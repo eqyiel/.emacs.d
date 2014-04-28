@@ -57,7 +57,26 @@
   '((">>" "→" nil 1)
     ("wtf" "WTF" nil 1)))
 
-(define-abbrev-table 'global-abbrev-table
-  '(("tias" "Try It And See™" nil 1)
-    ("drhouse" "ಠ_ಠ" nil 1)))
+;; (define-abbrev-table 'global-abbrev-table
+;;   '(("no" "thanks" nil 1)
+;;     ("I" "don't" nil 1)
+;;     ("need" "any" nil 1)
+;;     ("global" "abbrevs" nil 1)
+;;     ("right" "now" nil 1)))
+
+;; doesn't work?
+(define-abbrev-table 'circe-channel-mode-abbrev-table
+  '(("tias" "Try It And See™")
+    (":smoking:" "(-。-)y-゜゜゜")
+    (":confused:" "(゜-゜)")
+    (":happy:" "(✿◠‿◠)")
+    (":surprised:" "°o°")
+    (":infatuation:" "(*°∀°)=3")
+    (":shrug:" "¯\_(ツ)_/¯")
+    (":kitaa:" "キタ━━━(゜∀゜)━━━!!!!!")
+    (":tableflip:" "(╯°□°）╯︵ ┻━┻")
+    (":rageflip:" "(ノಠ益ಠ)ノ彡┻━┻")
+    (":doubleflip:" "┻━┻ ︵ヽ(`Д´)ﾉ︵ ┻━┻")
+    (":lookofdisapproval:" "ಠ_ಠ")))
+
 (provide 'eqyiel-abbrev)

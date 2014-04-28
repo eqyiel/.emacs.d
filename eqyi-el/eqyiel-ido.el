@@ -2,10 +2,17 @@
 
 (require 'ido)
 (require 'ido-ubiquitous)
-(require 'ido-vertical-mode)
 
-(if (commandp 'ido-vertical-mode)
-    (ido-vertical-mode t))
+(defun eqyiel-ido-vertical-define-keys ()
+  "C-n/p may be more intuitive in a vertical layout, but that doesn't mean you
+can steal M-p from smex!!"
+  (define-key ido-completion-map (kbd "C-n") 'ido-next-match)
+  (define-key ido-completion-map (kbd "C-p") 'ido-prev-match))
+
+(with-library ido-vertical-mode
+  (turn-on-ido-vertical)
+  (remove-hook 'ido-setup-hook 'ido-vertical-define-keys)
+  (add-hook 'ido-setup-hook 'eqyiel-ido-vertical-define-keys))
 
 ;; if tramp is loaded
 (add-to-list 'ido-work-directory-list-ignore-regexps tramp-file-name-regexp)

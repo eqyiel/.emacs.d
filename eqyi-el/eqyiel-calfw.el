@@ -4,24 +4,15 @@
 ;; (require 'calfw-org)
 ;; (require 'calendar)
 
-(autoload 'cfw:open-calendar-buffer "calfw")
+(autoload 'cfw:open-calendar-buffer "calfw" nil t)
+(autoload 'cfw:org-create-source "calfw-org" nil t)
 
 ;; (setq  number-of-diary-entries 31) ;; the fuck is this
 ;; (define-key calendar-mode-map "f" 'calendar-forward-day)
 ;; (define-key calendar-mode-map "n" 'calendar-forward-day)
 ;; (define-key calendar-mode-map "b" 'calendar-backward-day)
 
-;;(require 'japanese-holidays) ;; breaks layout
-(eval-after-load "calendar"
-  '(setq calendar-mark-holidays-flag t
-         calendar-holidays (append
-                            australian-holidays
-                            general-holidays
-                            solar-holidays
-                            oriental-holidays)))
-
 ;; todo: only have the ones that are public holidays here
-
 (setq australian-holidays
   '((holiday-fixed 01 01 "New Year's Day")
     (holiday-fixed 01 25 "Australia Day")
@@ -44,6 +35,16 @@
     (holiday-fixed 12 26 "Boxing Day")
     (holiday-fixed 12 31 "New Year's Eve")))
 
+;;(require 'japanese-holidays) ;; breaks layout
+(eval-after-load "calendar"
+  '(setq calendar-mark-holidays-flag t
+         calendar-holidays (append
+                            australian-holidays
+                            general-holidays
+                            solar-holidays
+                            oriental-holidays)))
+
+
       ;; calendar-holidays '((holiday-fixed 01 01 "Gesetzlicher Feiertag (Neujahr)")
       ;;                     (holiday-fixed 05 01 "Gesetzlicher Feiertag (Maifeiertag)")
       ;;                     (holiday-fixed 10 03 "Gesetzlicher Feiertag (Tag der Deutschen Einheit)")
@@ -54,12 +55,12 @@
       ;;                     (holiday-easter-etc 39 "Gesetzlicher Feiertag (Christi Himmelfahrt)")
       ;;                     (holiday-easter-etc 50 "Gesetzlicher Feiertag (Pfingstmontag)")))
 
-(eval-after-load "calfw"
-  '(progn
-     (require 'calfw-org)
-     (require 'calendar)))
+;; (eval-after-load "calfw"
+;;   '(progn
+;;      (require 'calfw-org)
+;;      (require 'calendar)))
 
-(defun my-open-calendar ()
+(defun eqyiel-open-calendar ()
   (interactive)
   (cfw:open-calendar-buffer
    :contents-sources

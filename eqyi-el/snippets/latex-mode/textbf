@@ -1,4 +1,5 @@
-# name: \textbf{ ... }
-# key: textbf
-# --x
+# -*- mode: snippet -*-
+# name: textbf
+# key: b
+# --
 \textbf{$1}$0

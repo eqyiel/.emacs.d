@@ -12,14 +12,9 @@
 (add-to-list 'custom-theme-load-path "~/.emacs.d/site-lisp/themes/zenburn")
 (add-to-list 'custom-theme-load-path "~/.emacs.d/site-lisp/themes/solarized")
 
-;; (load-theme 'zenburn t)
-(load-theme 'solarized-dark t)
+(load-theme 'zenburn t)
+;; (load-theme 'solarized-dark t)
 ;; (load-theme 'solarized-light t)
-
-;; before
-;; real    0m15.347s
-;; user    0m0.012s
-;; sys     0m0.008s
 
 (require 'eqyiel-defaults)
 (require 'eqyiel-lib)
@@ -39,15 +34,18 @@
 ;; ;; (require 'eqyiel-python)
 ;; ;; (require 'eqyiel-haskell)
 ;; (require 'eqyiel-c)
-;; (require 'eqyiel-java)
+(require 'eqyiel-java)
 ;; (require 'eqyiel-tex)
 ;; ;; (require 'eqyiel-emms)
 
-(eval-after-load "warnings"
-  ;; stop warning me about my load path including ~/.emacs.d
-  '(setq display-warning-minimum-level :error))
+;; https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
 
-(put 'emms-browser-delete-files 'disabled nil)
-(put 'dired-find-alternate-file 'disabled nil)
-(put 'upcase-region 'disabled nil)
-(put 'downcase-region 'disabled nil)
+(setq display-time-world-list '(("Asia/Tokyo" "Tokyo")
+                                ("Australia/Adelaide" "Adelaide")
+                                ("Australia/Brisbane" "Brisbane")
+                                ("Australia/Canberra" "Canberra")
+                                ("Australia/Darwin" "Darwin")
+                                ("Australia/Hobart" "Hobart")
+                                ("Australia/Melbourne" "Melbourne")
+                                ("Australia/Perth" "Perth")
+                                ("Australia/Sydney" "Sydney")))

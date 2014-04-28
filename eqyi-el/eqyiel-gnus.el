@@ -1,7 +1,7 @@
 ;;; eqyiel-gnus.el
 
 ;; (require 'gnus)
-(autoload 'gnus "gnus")
+(autoload 'gnus "gnus" nil t)
 
 ;; init from this file, not ~/.gnus
 (eval-after-load "gnus"
@@ -13,10 +13,6 @@
   '(setq gnus-startup-file "~/.config/gnus/newsrc" ;; don't pollute my homedir
          gnus-save-newsrc-file t
          gnus-read-newsrc-file t))
-
-(eval-after-load "startup"
-  '(setq user-mail-address "r@rkm.id.au"
-         mail-host-address "rkm.id.au"))
 
 ;; http://www.emacswiki.org/emacs/EasyPG#toc8
 
@@ -74,7 +70,6 @@
   ;; don't query the server and slow down my startup
   '(setq gnus-check-new-newsgroups 'ask-server))
 
-
 ;; use topic headings for groups, like [ Gnus ], [ misc ], etc.
 (add-hook 'gnus-group-mode-hook 'gnus-topic-mode)
 
@@ -82,11 +77,10 @@
 (add-hook 'gnus-select-group-hook 'gnus-group-set-timestamp)
 
 ;; when in message mode, wrap the text according to `fill-column'.
-;; is the lambda necessary?
-(add-hook 'message-mode-hook 'turn-on-auto-fill)
+ (add-hook 'message-mode-hook 'turn-on-auto-fill)
 
 (eval-after-load "gnus"
-  '(if (string-equal system-name "alcor")
+  '(if (string-equal system-name "alcor.rkm.id.au")
        (setq gnus-select-method
              '(nnimap "dovecot"
                       (nnimap-address "localhost")
@@ -122,33 +116,21 @@
          ;; add Cc and Bcc headers to the message buffer
          message-default-mail-headers "Cc: \nBcc: \n"))
 
-
 ;; http://www.emacswiki.org/emacs/MultipleSMTPAccounts
 ;; Let Gnus change the "From:" line by looking at current group we are in.
 ;; For sending via flinders account, must quote the entire address when prompted
 ;; for username, and also put the same thing in from field.  Mystifying.
 
 (eval-after-load "gnus"
-  '(progn
-     (setq gnus-topic-topology
-           '(("Gnus" visible)
-             (("rkm.id.au" visible nil
-               ((gcc-self . "nnimap:rkm.id.au/Sent"))))
-             (("gmail.com" visible nil nil))
-             (("internode.on.net" visible nil
-               ((gcc-self . "nnimap:internode.on.net/Sent"))))
-             (("flinders.edu.au" visible nil
-               ((gcc-self . "nnimap:flinders.edu.au/Sent"))))))
-
-     (setq gnus-posting-styles
-           '(("gmail.com"        (address "eqyiel@gmail.com")
-              (name "Ruben Maher"))
-             ("flinders.edu.au"  (address "mahe0054@uni.flinders.edu.au")
-              (name "Ruben Maher"))
-             ("rkm.id.au"        (address "r@rkm.id.au")
-              (name "Ruben Maher"))
-             ("internode.on.net" (address "eqyiel@internode.on.net")
-              (name "Ruben Maher"))))))
+  '(setq gnus-posting-styles
+         '(("gmail.com"        (address "eqyiel@gmail.com")
+            (name "Ruben Maher"))
+           ("flinders.edu.au"  (address "mahe0054@uni.flinders.edu.au")
+            (name "Ruben Maher"))
+           ("rkm.id.au"        (address "r@rkm.id.au")
+            (name "Ruben Maher"))
+           ("internode.on.net" (address "eqyiel@internode.on.net")
+            (name "Ruben Maher")))))
 
 ;; Each component of smtp-accounts has the form
 ;; (protocol  "adres_matched_in_From_field@foo.com"
@@ -163,13 +145,8 @@
   '((ssl "eqyiel@gmail.com" "smtp.gmail.com" 587 "eqyiel@gmail.com" nil)
     (ssl "mahe0054@uni.flinders.edu.au" "smtp.office365.com" 587
          "mahe0054@uni.flinders.edu.au" nil) ;; flinders now uses office365
-    ;; (ssl "mahe0054@uni.flinders.edu.au" "pod51003.outlook.com" 587
-    ;;      "mahe0054@uni.flinders.edu.au" nil)
     (ssl "r@rkm.id.au" "rkm.id.au" 587 "r@rkm.id.au" nil)
     (ssl "eqyiel@internode.on.net" "mail.internode.on.net" 25 "eqyiel" nil)))
-
-
-;; default smtpmail.el configurations.
 
 (eval-after-load "gnus"
   '(progn
@@ -272,16 +249,41 @@
      (setq mm-inline-large-images-proportion 0.5)
      (setq shr-blocked-images nil)))
 
-;; (eval-after-load "mm-decode"
-(eval-after-load "mm"
+(eval-after-load "mm-decode"
   '(progn
-     (add-to-list 'mm-discouraged-alternatives "text/html")
      (add-to-list 'mm-discouraged-alternatives "text/richtext")
+     (add-to-list 'mm-discouraged-alternatives "text/html")
      (add-to-list 'mm-attachment-override-types "image/*")
      (setq mm-inline-large-images 'resize)))
 
 ;; stop message-mode from adding the Fcc: header when notmuch is loaded.
 (eval-after-load "notmuch"
   (setq notmuch-fcc-dirs nil))
+
+;; if the newsrc.eld file gets hosed, drop these in there to avoid having to set
+;; it from scatch again
+;; (setq gnus-topic-topology
+;;       '(("Gnus" visible)
+;;         (("rkm.id.au" visible nil
+;;           ((gcc-self . "rkm.id.au/Sent"))))
+;;         (("internode.on.net" visible nil
+;;           ((gcc-self . "internode.on.net/Sent"))))
+;;         (("gmail.com" visible nil
+;;           ((gcc-self . "gmail.com/Sent"))))
+;;         (("flinders.edu.au" visible nil
+;;           ((gcc-self . "flinders.edu.au/Sent"))))))
+
+;; (setq gnus-topic-alist
+;;       '(("Gnus")
+;;         ("flinders.edu.au" "flinders.edu.au/Sent" "flinders.edu.au/Spam"
+;;         "flinders.edu.au" "flinders.edu.au/Keep" "flinders.edu.au/New"
+;;         "flinders.edu.au/Bin")
+;;         ("internode.on.net" "internode.on.net/Spam" "internode.on.net/Sent"
+;;         "internode.on.net/Drafts" "internode.on.net/New" "internode.on.net"
+;;         "internode.on.net/Bin")
+;;         ("gmail.com" "gmail.com" "gmail.com/Sent" "gmail.com/Spam"
+;;         "gmail.com/New" "gmail.com/Bin")
+;;         ("rkm.id.au" "rkm.id.au/Sent" "rkm.id.au/RSS" "rkm.id.au"
+;;         "rkm.id.au/Keep" "rkm.id.au/New")))
 
 (provide 'eqyiel-gnus)

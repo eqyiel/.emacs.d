@@ -66,7 +66,9 @@
                     "gnutls-cli --insecure -p %p %h"
                     "gnutls-cli --insecure -p %p %h --protocols ssl3"))
 
-(autoload 'circe-notifications-enable "circe-notifications")
+;; (define-abbrev-table circe-channel-mode-abbrev-table nil)
+
+(autoload 'circe-notifications-enable "circe-notifications" nil t)
 
 (eval-after-load "circe-notifications"
   '(setq circe-notifications-watch-nicks

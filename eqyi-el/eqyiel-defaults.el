@@ -1,6 +1,8 @@
 ;;; eqyiel-defaults.el
 
-(setq user-full-name "Ruben Maher")     ;yep
+(setq user-full-name "Ruben Maher"
+      user-mail-address "r@rkm.id.au"
+      mail-host-address "rkm.id.au")
 
 (set-face-attribute 'default nil :height 120 :family "DejaVu Sans Mono")
 
@@ -19,7 +21,7 @@
 (setq-default
  indent-tabs-mode nil
  fill-column 80
- tab-width 4)
+ tab-width 2)
 
 (defalias 'yes-or-no-p 'y-or-n-p)
 (defvaralias 'c-basic-offset 'tab-width)
@@ -41,7 +43,18 @@
 ;;     (setq browse-url-generic-program "conkeror")
 ;;   (setq browse-url-generic-program "firefox"))
 
-;; don't litter my .emacs.d
+(eval-after-load "warnings"
+  ;; stop warning me about my load path including ~/.emacs.d
+  '(setq display-warning-minimum-level :error))
+
+;; stop nagging me to enable these useful commands
+
+(put 'dired-find-alternate-file 'disabled nil)
+(put 'upcase-region 'disabled nil)
+(put 'downcase-region 'disabled nil)
+
+;; don't litter my ~/.emacs.d
+
 (setq backup-by-copying t
       backup-directory-alist '(("." . "~/.cache/emacs/backup"))
       delete-old-versions t
@@ -57,8 +70,8 @@
       custom-file "~/.emacs.d/eqyi-el/eqyiel-custom-junk.el")
 
 ;; I mean it
-(eval-after-load 'kkc
-  (setq kkc-init-file-name "~/.cache/emacs/kkcrc"))
+(eval-after-load "kkc"
+  '(setq kkc-init-file-name "~/.cache/emacs/kkcrc"))
 
 (setq apropos-do-all t
       inhibit-startup-message t
@@ -74,9 +87,9 @@
       x-select-enable-primary t
       x-stretch-cursor t)
 
-;; auto refresh buffers
+;; automagically refresh buffers if they are changed on disk
 (global-auto-revert-mode)
-;; also auto refresh dired, but be quiet about it please
+;; same for directories, but be quiet about it please
 (setq global-auto-revert-non-file-buffers t
       auto-revert-verbose nil)
 

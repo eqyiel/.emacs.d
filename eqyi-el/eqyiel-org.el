@@ -3,22 +3,27 @@
 (eval-after-load "org"
   '(progn
      (setq
-      org-directory "~/doc/org"
+      org-directory "/ssh:eigenlicht:/home/eqyiel/org"
       org-log-done 'time
-      org-agenda-files (file-expand-wildcards "~/doc/org/*.org*")
+      org-agenda-files (file-expand-wildcards "/ssh:eigenlicht:/home/eqyiel/org/*.org*")
       org-capture-templates
-      '(("t" "Todo" entry (file+headline "~/doc/org/new.org" "Tasks")
+      '(("t" "Todo" entry
+         (file+headline "/ssh:eigenlicht:/home/eqyiel/org/new.org.gpg" "Tasks")
          "* TODO %?")
-        ("r" "Read" entry (file+headline "~/doc/org/new.org" "Read")
+        ("r" "Read" entry
+         (file+headline "/ssh:eigenlicht:/home/eqyiel/org/new.org.gpg" "Read")
          "** %?")
-        ("w" "Watch" entry (file+headline "~/doc/org/new.org" "Watch")
+        ("w" "Watch" entry
+         (file+headline "/ssh:eigenlicht:/home/eqyiel/org/new.org.gpg" "Watch")
          "** %?")
-        ("c" "Contacts" entry (file "~/doc/org/contacts.org.gpg")
+        ("c" "Contacts" entry
+         (file "/ssh:eigenlicht:/home/eqyiel/org/contacts.org.gpg")
          "** %(org-contacts-template-name)
   :PROPERTIES:
   :EMAIL: %(org-contacts-template-email)
   :END:")
-        ("m" "Add a contact manually" entry (file "~/doc/org/contacts.org.gpg")
+        ("m" "Add a contact manually" entry
+         (file "/ssh:eigenlicht:/home/eqyiel/org/contacts.org.gpg")
          "** %^{Name}
   :PROPERTIES:
   :EMAIL:
@@ -27,7 +32,8 @@
 
 (eval-after-load "gnus"
   '(with-library org-contacts
-     (setq org-contacts-files '("~/doc/org/contacts.org.gpg")
+     (setq org-contacts-files
+           '("/ssh:eigenlicht:/home/eqyiel/org/contacts.org.gpg")
            org-contacts-icon-use-gravatar nil) ; yuck
      (org-contacts-gnus-insinuate)
      (define-key gnus-summary-mode-map (kbd "C-;")
@@ -73,8 +79,9 @@ URL and title."
          org-caldav-url
          "http://eigengrau.rkm.id.au/remote.php/caldav/calendars/eqyiel"
          org-caldav-calendar-id "test" ; name of calendar in owncloud
-         org-caldav-inbox "~/doc/org/caldav-test.org"
-         org-caldav-files '("~/doc/org/test-calendar-events.org")
+         org-caldav-inbox "/ssh:eigenlicht:/home/eqyiel/org/caldav-test.org"
+         org-caldav-files
+         '("/ssh:eigenlicht:/home/eqyiel/org/test-calendar-events.org")
          org-icalendar-timezone "Australia/Adelaide"))
 
 (provide 'eqyiel-org)

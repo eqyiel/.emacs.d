@@ -23,6 +23,10 @@
  fill-column 80
  tab-width 2)
 
+(eval-after-load "sh-mode" ; why don't you respect tab-width
+  '(setq sh-basic-offset 2
+         sh-indentation 2))
+
 (defalias 'yes-or-no-p 'y-or-n-p)
 (defvaralias 'c-basic-offset 'tab-width)
 (defvaralias 'cperl-indent-level 'tab-width)

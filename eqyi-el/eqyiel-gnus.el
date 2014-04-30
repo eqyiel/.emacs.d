@@ -1,5 +1,7 @@
 ;;; eqyiel-gnus.el
 
+;; requires gnutls!
+
 ;; (require 'gnus)
 (autoload 'gnus "gnus" nil t)
 
@@ -262,6 +264,7 @@
 
 ;; if the newsrc.eld file gets hosed, drop these in there to avoid having to set
 ;; it from scatch again
+;; for home: -------------------------------------------------------------------
 ;; (setq gnus-topic-topology
 ;;       '(("Gnus" visible)
 ;;         (("rkm.id.au" visible nil
@@ -285,5 +288,57 @@
 ;;         "gmail.com/New" "gmail.com/Bin")
 ;;         ("rkm.id.au" "rkm.id.au/Sent" "rkm.id.au/RSS" "rkm.id.au"
 ;;         "rkm.id.au/Keep" "rkm.id.au/New")))
+
+;; and for remote: -------------------------------------------------------------
+;; (setq gnus-topic-topology
+;;       '(("Gnus" visible)
+;;         (("rkm.id.au" visible nil
+;;           ((gcc-self . "Sent"))))
+;;         (("internode.on.net" visible nil
+;;           ((gcc-self . "internode.on.net/Sent"))))
+;;         (("gmail.com" visible nil
+;;           ((gcc-self . "gmail.com/Sent"))))
+;;         (("flinders.edu.au" visible nil
+;;           ((gcc-self . "flinders.edu.au/Sent"))))))
+
+;; (setq gnus-topic-alist
+;;       '(("Gnus" "nndraft:drafts")
+;;         ("flinders.edu.au"
+;;          "nnimap+flinders.edu.au:Calendar"
+;;          "nnimap+flinders.edu.au:Contacts"
+;;          "nnimap+flinders.edu.au:Deleted Items"
+;;          "nnimap+flinders.edu.au:Drafts"
+;;          "nnimap+flinders.edu.au:INBOX"
+;;          "nnimap+flinders.edu.au:Journal"
+;;          "nnimap+flinders.edu.au:Junk E-Mail"
+;;          "nnimap+flinders.edu.au:Keep"
+;;          "nnimap+flinders.edu.au:Notes"
+;;          "nnimap+flinders.edu.au:Outbox"
+;;          "nnimap+flinders.edu.au:Sent Items"
+;;          "nnimap+flinders.edu.au:Tasks")
+;;         ("internode.on.net"
+;;          "internode.on.net/Spam"
+;;          "internode.on.net/Sent"
+;;          "internode.on.net/Drafts"
+;;          "internode.on.net/New"
+;;          "internode.on.net"
+;;          "internode.on.net/Bin")
+;;         ("gmail.com"
+;;          "nnimap+gmail.com:[Gmail]/Starred"
+;;          "nnimap+gmail.com:[Gmail]"
+;;          "nnimap+gmail.com:[Gmail]/Drafts"
+;;          "nnimap+gmail.com:[Gmail]/Sent Mail"
+;;          "nnimap+gmail.com:[Gmail]/Spam"
+;;          "nnimap+gmail.com:[Gmail]/All Mail"
+;;          "nnimap+gmail.com:[Gmail]/Important"
+;;          "nnimap+gmail.com:INBOX"
+;;          "nnimap+gmail.com:[Gmail]/Bin")
+;;         ("rkm.id.au"
+;;          "INBOX"
+;;          "RSS"
+;;          "Sent"
+;;          "Trash"
+;;          "Drafts"
+;;          "Keep")))
 
 (provide 'eqyiel-gnus)

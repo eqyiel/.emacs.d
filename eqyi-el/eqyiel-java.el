@@ -20,6 +20,8 @@
   (progn (eqyiel-ac-java-mode-setup)
          (eclim-mode)))
 
+(define-key eclim-mode-map (kbd "C-c C-c") 'eclim-run-class)
+
 (add-hook 'java-mode-hook 'eqyiel-java-mode-hook)
 
 (provide 'eqyiel-java)

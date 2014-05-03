@@ -295,14 +295,20 @@
 ;;         (("rkm.id.au" visible nil
 ;;           ((gcc-self . "Sent"))))
 ;;         (("internode.on.net" visible nil
-;;           ((gcc-self . "internode.on.net/Sent"))))
+;;           ((gcc-self . "nnimap+internode.on.net:Sent"))))
 ;;         (("gmail.com" visible nil
-;;           ((gcc-self . "gmail.com/Sent"))))
+;;           ((gcc-self . ""nnimap+gmail.com:[Gmail]/Sent Mail"))))
 ;;         (("flinders.edu.au" visible nil
-;;           ((gcc-self . "flinders.edu.au/Sent"))))))
-
+;;           ((gcc-self . "nnimap+flinders.edu.au:Sent Items"))))))
+;;
 ;; (setq gnus-topic-alist
 ;;       '(("Gnus" "nndraft:drafts")
+;;         ("internode.on.net"
+;;          "nnimap+internode.on.net:Drafts"
+;;          "nnimap+internode.on.net:Sent"
+;;          "nnimap+internode.on.net:Trash"
+;;          "nnimap+internode.on.net:Spam"
+;;          "nnimap+internode.on.net:INBOX")
 ;;         ("flinders.edu.au"
 ;;          "nnimap+flinders.edu.au:Calendar"
 ;;          "nnimap+flinders.edu.au:Contacts"
@@ -316,13 +322,6 @@
 ;;          "nnimap+flinders.edu.au:Outbox"
 ;;          "nnimap+flinders.edu.au:Sent Items"
 ;;          "nnimap+flinders.edu.au:Tasks")
-;;         ("internode.on.net"
-;;          "internode.on.net/Spam"
-;;          "internode.on.net/Sent"
-;;          "internode.on.net/Drafts"
-;;          "internode.on.net/New"
-;;          "internode.on.net"
-;;          "internode.on.net/Bin")
 ;;         ("gmail.com"
 ;;          "nnimap+gmail.com:[Gmail]/Starred"
 ;;          "nnimap+gmail.com:[Gmail]"

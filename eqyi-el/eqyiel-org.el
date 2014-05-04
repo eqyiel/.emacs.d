@@ -16,6 +16,9 @@
         ("w" "Watch" entry
          (file+headline "/ssh:eigenlicht:/home/eqyiel/org/new.org.gpg" "Watch")
          "** %?")
+        ("l" "Listen" entry
+         (file+headline "/ssh:eigenlicht:/home/eqyiel/org/new.org.gpg" "Listen")
+         "** %?")
         ("c" "Contacts" entry
          (file "/ssh:eigenlicht:/home/eqyiel/org/contacts.org.gpg")
          "** %(org-contacts-template-name)
@@ -27,7 +30,15 @@
          "** %^{Name}
   :PROPERTIES:
   :EMAIL:
-  :END:")))
+  :END:"))
+      org-todo-keywords ; pinched from sachac
+      '((sequence
+         "TODO(t)"  ; next action
+         "TOBLOG(b)"  ; next action
+         "STARTED(s)"
+         "WAITING(w@/!)"
+         "SOMEDAY(.)" "|" "DONE(x!)" "CANCELLED(c@)")
+        (sequence "TODELEGATE(-)" "DELEGATED(d)" "COMPLETE(x)")))
      (add-hook 'org-mode-hook 'turn-on-auto-fill)))
 
 (eval-after-load "gnus"

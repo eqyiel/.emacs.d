@@ -311,6 +311,23 @@ else upload just the region."
              (concat "curl -s -F 'sprunge=<" filename "' http://sprunge.us")))
     (delete-char -1))) ; Newline after URL
 
+(defun shift-by-one-region (start end)
+  (interactive "r")
+  (translate-region start end shift-by-one-translate-table))
+
+(defvar shift-by-one-translate-table
+  (let ((str (make-string 127 0))
+        (i 0))
+    (while (< i 127)
+      (aset str i i)
+      (setq i (1+ i)))
+    (setq i 0)
+    (while (< i 26)
+      (aset str (+ i ?a) (+ (% (+ i 1) 26) ?a))
+      (aset str (+ i ?A) (+ (% (+ i 1) 26) ?A))
+      (setq i (1+ i)))
+    str))
+
 ;; http://www.emacswiki.org/emacs/EmacsAsDaemon#toc9
 
 (defun server-shutdown ()

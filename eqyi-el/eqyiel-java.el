@@ -9,7 +9,13 @@
          eclim-auto-save nil)) ; annoying
 
 (eval-after-load "eclimd"
-  '(setq eclimd-default-workspace "~/doc/flinders/comp3751_s1_2014/code"))
+  '(progn
+     (global-eclim-mode)
+     (define-key eclim-mode-map (kbd "C-c C-c") 'eclim-run-class)
+     (if (string-equal system-name "alcor.rkm.id.au")
+         (setq eclimd-default-workspace "~/doc/flinders/comp3751_s1_2014/code")
+       (setq eclimd-default-workspace "~/doc/comp3751/code"
+             eclim-eclipse-dirs "/opt/eclipse"))))
 
 (defun eqyiel-ac-java-mode-setup ()
   (setq ac-sources (append '(ac-source-yasnippet
@@ -17,10 +23,7 @@
                             ac-source-emacs-eclim))))
 
 (defun eqyiel-java-mode-hook ()
-  (progn (eqyiel-ac-java-mode-setup)
-         (eclim-mode)))
-
-(define-key eclim-mode-map (kbd "C-c C-c") 'eclim-run-class)
+  (eqyiel-ac-java-mode-setup))
 
 (add-hook 'java-mode-hook 'eqyiel-java-mode-hook)
 

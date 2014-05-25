@@ -19,23 +19,24 @@
         ("l" "Listen" entry
          (file+headline "/ssh:eigenlicht:/home/eqyiel/org/new.org.gpg" "Listen")
          "** %?")
+        ("c" "Contacts" entry
+                   (file "/ssh:eigenlicht:/home/eqyiel/org/contacts.org.gpg")
+                   "** %(org-contacts-template-name)
+:PROPERTIES:
+:EMAIL: %(org-contacts-template-email)
+:END:")
+                  ("m" "Add a contact manually" entry
+                   (file "/ssh:eigenlicht:/home/eqyiel/org/contacts.org.gpg")
+                   "** %^{Name}
+:PROPERTIES:
+:EMAIL:
+:END:")
         ))
      (add-hook 'org-mode-hook 'turn-on-auto-fill)))
 
 (eval-after-load "org-contacts"
   '(add-to-list org-capture-templates
-                (("c" "Contacts" entry
-                  (file "/ssh:eigenlicht:/home/eqyiel/org/contacts.org.gpg")
-                  "** %(org-contacts-template-name)
-:PROPERTIES:
-:EMAIL: %(org-contacts-template-email)
-:END:")
-                 ("m" "Add a contact manually" entry
-                  (file "/ssh:eigenlicht:/home/eqyiel/org/contacts.org.gpg")
-                  "** %^{Name}
-:PROPERTIES:
-:EMAIL:
-:END:"))))
+                '()))
 
 (eval-after-load "gnus"
   '(with-library org-contacts

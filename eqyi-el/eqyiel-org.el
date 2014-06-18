@@ -19,6 +19,9 @@
         ("l" "Listen" entry
          (file+headline "/ssh:eigenlicht:/home/eqyiel/org/new.org.gpg" "Listen")
          "** %?")
+        ("u" "Quote" entry
+         (file+headline "/ssh:eigenlicht:/home/eqyiel/org/new.org.gpg" "Quote")
+         "** %?")
         ("c" "Contacts" entry
                    (file "/ssh:eigenlicht:/home/eqyiel/org/contacts.org.gpg")
                    "** %(org-contacts-template-name)

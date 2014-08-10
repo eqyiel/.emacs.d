@@ -109,9 +109,9 @@
 [submodule "site-lisp/auto-complete"]
 	path = site-lisp/auto-complete
 	url = https://github.com/auto-complete/auto-complete
-[submodule "site-lisp/circe-notifications"]
-	path = site-lisp/circe-notifications
-	url = eigenlicht:/srv/git/circe-notifications
 [submodule "site-lisp/markdown-mode"]
 	path = site-lisp/markdown-mode
 	url = git://jblevins.org/git/markdown-mode.git
+[submodule "site-lisp/circe-notifications"]
+	path = site-lisp/circe-notifications
+	url = eigenlicht:/srv/git/circe-notifications

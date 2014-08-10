@@ -68,7 +68,7 @@
 
 ;; (define-abbrev-table circe-channel-mode-abbrev-table nil)
 
-(autoload 'circe-notifications-enable "circe-notifications" nil t)
+(autoload 'enable-circe-notifications "circe-notifications" nil t)
 
 (eval-after-load "circe-notifications"
   '(setq circe-notifications-watch-nicks
@@ -99,7 +99,7 @@ enabling notifications."
     (progn
       (message "OK.")
       (remove-hook 'circe-receive-message-functions 'eqyiel-circe-wait-for-znc)
-      (circe-notifications-enable))))
+      (enable-circe-notifications))))
 
 (defadvice circe-reconnect (before eqyiel-remove-circe-notifications)
   (setq eqyiel-circe-znc-notices 0)

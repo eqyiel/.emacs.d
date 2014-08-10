@@ -31,7 +31,7 @@
 (require 'eqyiel-misc)
 (require 'eqyiel-calfw)
 ;; ;; (require 'eqyiel-slime)
-;; ;; (require 'eqyiel-python)
+(require 'eqyiel-python)
 ;; ;; (require 'eqyiel-haskell)
 ;; (require 'eqyiel-c)
 (require 'eqyiel-java)

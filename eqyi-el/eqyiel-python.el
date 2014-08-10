@@ -3,21 +3,21 @@
 ;; (setenv "PYMACS_PYTHON" "python2")
 (setenv "PYTHONPATH" "${PYTHONPATH}:~/.emacs.d/site-lisp/elpy/:~/.local/lib/python2.7")
 
-(require 'elpy)
+;; (require 'elpy)
+(autoload 'elpy-enable "elpy" nil t)
+(autoload 'pyvenv-activate "pyvenv-activate" nil t)
+(autoload 'pyvenv "pyvenv-activate" nil t)
 
-(elpy-enable t) ;; passing t skips elpy-initialize-variables.
-                ;; we want this because otherwise it overrides stuff.
+(eval-after-load "elpy"
+  '(setq elpy-set-backend "rope"
+         elpy-rpc-python-command "python2"
+         flymake-no-changes-timeout 60
+         flymake-start-syntax-check-on-newline nil
+         python-check-command "pyflakes"
+         python-shell-interpreter "python2"))
 
-(setq flymake-no-changes-timeout 60
-      flymake-start-syntax-check-on-newline nil)
-
-(setq elpy-rpc-python-command "python2"
-      python-shell-interpreter "python2"
-      python-check-command "pyflakes"
-      elpy-set-backend "rope")
-
-(defun turn-on-electric-pair-mode ()
-  (electric-pair-mode t))
-(add-hook 'python-mode-hook 'turn-on-electric-pair-mode)
+;; Passing t skips elpy-initialize-variables.  This is desirable because I
+;; want to set up auto-complete myself.
+(add-hook 'python-mode-hook (lambda () (elpy-enable t)))
 
 (provide 'eqyiel-python)

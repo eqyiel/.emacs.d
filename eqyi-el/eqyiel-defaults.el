@@ -170,6 +170,7 @@
     ad-do-it))
 
 (add-hook 'before-save-hook 'whitespace-cleanup)
+;; (remove-hook 'before-save-hook 'whitespace-cleanup)
 
 ;; let me use S-SPC to scroll backwards in info mode
 (eval-after-load "info"

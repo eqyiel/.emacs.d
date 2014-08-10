@@ -112,3 +112,6 @@
 [submodule "site-lisp/circe-notifications"]
 	path = site-lisp/circe-notifications
 	url = eigenlicht:/srv/git/circe-notifications
+[submodule "site-lisp/markdown-mode"]
+	path = site-lisp/markdown-mode
+	url = git://jblevins.org/git/markdown-mode.git

@@ -1,12 +1,6 @@
 ;;; eqyiel-misc.el
 
-;; first pull in libraries we use all the time
-
-;; diminish --------------------------------------------------------------------
-
 (require 'diminish)
-
-;; smartparens -----------------------------------------------------------------
 
 (require 'smartparens)
 (require 'smartparens-config)
@@ -18,8 +12,6 @@
 ;; don't do this: "\"\""
 (setq sp-autoescape-string-quote nil)
 (setq sp-autoskip-closing-pair 'always)
-
-;; yasnippet -------------------------------------------------------------------
 
 (require 'yasnippet)
 
@@ -33,19 +25,11 @@
 (yas-global-mode t)
 (global-set-key (kbd "C-c TAB") 'yas-expand)
 
-;; key-chord -------------------------------------------------------------------
-
 (require 'key-chord)
 (key-chord-mode 1)
 (key-chord-define-global "jk" 'er/expand-region)
 
-;; everything beyond here is loaded on-demand
-
-;; magit -----------------------------------------------------------------------
-
 (autoload 'magit-status "magit" nil t)
-
-;; switch between windows more easily ------------------------------------------
 
 (global-set-key (kbd "H-h") 'windmove-left)
 (global-set-key (kbd "H-j") 'windmove-down)
@@ -71,8 +55,6 @@
 
 (global-set-key (kbd "H-SPC") 'tiling-cycle)
 
-;; smex ------------------------------------------------------------------------
-
 (eval-after-load "smex"
   '(setq smex-save-file "~/.cache/emacs/smex-items"))
 
@@ -84,8 +66,6 @@
 (global-set-key (kbd "M-x") 'smex)
 (global-set-key (kbd "M-X") 'smex-major-mode-commands)
 (global-set-key (kbd "C-c C-c M-x") 'execute-extended-command)
-
-;; multiple-cursors ------------------------------------------------------------
 
 (autoload 'mc/edit-lines "multiple-cursors" nil t)
 (autoload 'mc/mark-next-like-this "multiple-cursors" nil t)
@@ -110,25 +90,17 @@
 ;; Rectangular region mode
 (global-set-key (kbd "C-S-SPC") 'set-rectangular-region-anchor)
 
-;; expand-region ---------------------------------------------------------------
-
 (autoload 'er/expand-region "expand-region" nil t)
 (global-set-key (kbd "C-=") 'er/expand-region)
 
-;; column-marker ---------------------------------------------------------------
-
 (autoload 'column-marker-1 "column-marker" nil t)
 (global-set-key (kbd "C-c m") 'column-marker-1)
-
-;; highlight-indentation -------------------------------------------------------
 
 (autoload 'highlight-indentation-mode "highlight-indentation" nil t)
 (add-hook 'prog-mode-hook 'highlight-indentation-mode)
 
 (eval-after-load "highlight-indentation"
   '(diminish 'highlight-indentation-mode))
-
-;; fill-column-indicator -------------------------------------------------------
 
 ;; https://github.com/alpaker/Fill-Column-Indicator
 ;; (require 'fill-column-indicator)
@@ -151,8 +123,6 @@
     (setq sanityinc/fci-mode-suppressed nil)
     (turn-on-fci-mode)))
 
-;; git-gutter ------------------------------------------------------------------
-
 ;; this make start up pretty slow when enabled globally
 ;; maybe it would be better hooked into projectile or something?
 (autoload 'git-gutter-mode "git-gutter" nil t)
@@ -161,20 +131,20 @@
 (eval-after-load "git-gutter"
   '(diminish 'git-gutter-mode))
 
-;; pkgbuild-mode ---------------------------------------------------------------
-
 (autoload 'pkgbuild-mode "pkgbuild-mode.el" "PKGBUILD mode." t)
 (setq auto-mode-alist (append '(("/PKGBUILD$" . pkgbuild-mode))
                               auto-mode-alist))
-
-;; nethack ---------------------------------------------------------------------
 
 (autoload 'nethack "nethack" "Play Nethack." t)
 (setq nethack-program "/usr/bin/nethack"
       nethack-use-tiles t)
 
-;; legalese --------------------------------------------------------------------
-
 (autoload 'legalese "legalese" nil t)
+
+(autoload 'markdown-mode "markdown-mode"
+   "Major mode for editing Markdown files" t)
+(add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
+(add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
+(add-hook 'markdown-mode-hook (lambda () (longlines-mode t)))
 
 (provide 'eqyiel-misc)

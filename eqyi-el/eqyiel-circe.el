@@ -61,8 +61,12 @@
 
 (add-hook 'lui-mode-hook 'eqyiel-circe-set-margin)
 
-(setq tls-program '("openssl s_client -connect %h:%p -no_ssl2 -ign_eof
-                                      -CAfile ~/.config/certs/znc.crt"
+;; (setq tls-program '("openssl s_client -connect %h:%p -no_ssl2 -ign_eof
+;;                                       -CAfile ~/.config/certs/znc.crt"
+;;                     "gnutls-cli --insecure -p %p %h"
+;;                     "gnutls-cli --insecure -p %p %h --protocols ssl3"))
+
+(setq tls-program '("openssl s_client -connect %h:%p -no_ssl2 -ign_eof"
                     "gnutls-cli --insecure -p %p %h"
                     "gnutls-cli --insecure -p %p %h --protocols ssl3"))
 

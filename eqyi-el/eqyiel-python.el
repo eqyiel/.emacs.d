@@ -1,23 +1,19 @@
 ;;; eqyiel-python.el
 
-;; (setenv "PYMACS_PYTHON" "python2")
-(setenv "PYTHONPATH" "${PYTHONPATH}:~/.emacs.d/site-lisp/elpy/:~/.local/lib/python2.7")
-
-;; (require 'elpy)
+(setenv "PYTHONPATH" "${PYTHONPATH}:~/.emacs.d/site-lisp/elpy/")
 (autoload 'elpy-enable "elpy" nil t)
 (autoload 'pyvenv-activate "pyvenv-activate" nil t)
 (autoload 'pyvenv "pyvenv-activate" nil t)
 
 (eval-after-load "elpy"
-  '(setq elpy-set-backend "rope"
-         elpy-rpc-python-command "python2"
+  '(setq elpy-rpc-backend "jedi"
+         elpy-rpc-python-command "python"
          flymake-no-changes-timeout 60
          flymake-start-syntax-check-on-newline nil
          python-check-command "pyflakes"
-         python-shell-interpreter "python2"))
+         python-shell-interpreter "python"))
 
-;; Passing t skips elpy-initialize-variables.  This is desirable because I
-;; want to set up auto-complete myself.
-(add-hook 'python-mode-hook (lambda () (elpy-enable t)))
+;; (add-hook 'python-mode-hook (lambda () (elpy-enable t)))
+(add-hook 'python-mode-hook (lambda () (elpy-enable)))
 
 (provide 'eqyiel-python)

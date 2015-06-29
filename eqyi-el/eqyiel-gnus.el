@@ -79,10 +79,12 @@
 (add-hook 'gnus-select-group-hook 'gnus-group-set-timestamp)
 
 ;; when in message mode, wrap the text according to `fill-column'.
- (add-hook 'message-mode-hook 'turn-on-auto-fill)
+ ;; (add-hook 'message-mode-hook 'turn-on-auto-fill)
+;; actually, could you not?
+;; It doesn't look nice when people are using a proportional font ;___;
 
 (eval-after-load "gnus"
-  '(if (string-equal system-name "alcor.rkm.id.au")
+  '(if (string-equal system-name "ayanami")
        (setq gnus-select-method
              '(nnimap "dovecot"
                       (nnimap-address "localhost")
@@ -104,6 +106,10 @@
                        (nnimap-stream ssl))
                (nnimap "flinders.edu.au"
                        (nnimap-address "outlook.office365.com")
+                       (nnimap-server-port 993)
+                       (nnimap-stream ssl))
+               (nnimap "huttriverprovince.com.au"
+                       (nnimap-address "huttriverprovince.com.au")
                        (nnimap-server-port 993)
                        (nnimap-stream ssl)))))))
 
@@ -131,6 +137,8 @@
             (name "Ruben Maher"))
            ("rkm.id.au"        (address "r@rkm.id.au")
             (name "Ruben Maher"))
+           ("huttriverprovince.com.au" (address "info@huttriverprovince.com.au")
+            (name "Hutt River Province"))
            ("internode.on.net" (address "eqyiel@internode.on.net")
             (name "Ruben Maher")))))
 
@@ -148,7 +156,9 @@
     (ssl "mahe0054@uni.flinders.edu.au" "smtp.office365.com" 587
          "mahe0054@uni.flinders.edu.au" nil) ;; flinders now uses office365
     (ssl "r@rkm.id.au" "rkm.id.au" 587 "r@rkm.id.au" nil)
-    (ssl "eqyiel@internode.on.net" "mail.internode.on.net" 25 "eqyiel" nil)))
+    (ssl "eqyiel@internode.on.net" "mail.internode.on.net" 25 "eqyiel" nil)
+    (ssl "info@huttriverprovince.com.au" "rkm.id.au" 587
+         "info@huttriverprovince.com.au" nil)))
 
 (eval-after-load "gnus"
   '(progn

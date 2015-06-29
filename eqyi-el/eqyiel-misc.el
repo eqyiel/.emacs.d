@@ -18,7 +18,9 @@
 (eval-after-load "yasnippet"
   '(progn
      (setq yas-snippet-dirs
-           '("~/.emacs.d/eqyi-el/snippets")
+           '("~/.emacs.d/eqyi-el/snippets"
+             "~/.emacs.d/site-lisp/yasnippet/snippets"
+             "~/.emacs.d/site-lisp/elpy/snippets")
            yas-prompt-functions '(yas-ido-prompt))
      (diminish 'yas-minor-mode)))
 
@@ -69,7 +71,7 @@
 
 (autoload 'mc/edit-lines "multiple-cursors" nil t)
 (autoload 'mc/mark-next-like-this "multiple-cursors" nil t)
-(autoload 'mc-mark-previous-like-this "multiple-cursors" nil t)
+(autoload 'mc/mark-previous-like-this "multiple-cursors" nil t)
 (autoload 'mc/mark-all-like-this "multiple-cursors" nil t)
 (autoload 'mc/edit-lines "multiple-cursors" nil t)
 (autoload 'mc/edit-ends-of-lines "multiple-cursors" nil t)
@@ -98,30 +100,38 @@
 
 (autoload 'highlight-indentation-mode "highlight-indentation" nil t)
 (add-hook 'prog-mode-hook 'highlight-indentation-mode)
-
 (eval-after-load "highlight-indentation"
   '(diminish 'highlight-indentation-mode))
 
-;; https://github.com/alpaker/Fill-Column-Indicator
-;; (require 'fill-column-indicator)
-(autoload 'turn-on-fci-mode "fill-column-indicator" nil t)
-(autoload 'fci-mode "fill-column-indicator" nil t)
-(add-hook 'prog-mode-hook 'turn-on-fci-mode)
+;; (autoload 'idle-highlight-mode "idle-highlight-mode" nil t)
+;; (add-hook 'prog-mode-hook 'idle-highlight-mode)
 
-;; https://github.com/alpaker/Fill-Column-Indicator/issues/21
-(defvar sanityinc/fci-mode-suppressed nil)
+(autoload 'column-enforce-mode "column-enforce-mode" nil t)
+(add-hook 'prog-mode-hook 'column-enforce-mode)
+(eval-after-load "highlight-indentation"
+  '(diminish 'column-enforce-mode))
 
-(defadvice popup-create (before suppress-fci-mode activate)
-  "Suspend fci-mode while popups are visible"
-  (set (make-local-variable 'sanityinc/fci-mode-suppressed) fci-mode)
-  (when fci-mode
-    (turn-off-fci-mode)))
 
-(defadvice popup-delete (after restore-fci-mode activate)
-  "Restore fci-mode when all popups have closed"
-  (when (and (not popup-instances) sanityinc/fci-mode-suppressed)
-    (setq sanityinc/fci-mode-suppressed nil)
-    (turn-on-fci-mode)))
+;; ;; https://github.com/alpaker/Fill-Column-Indicator
+;; ;; (require 'fill-column-indicator)
+;; (autoload 'turn-on-fci-mode "fill-column-indicator" nil t)
+;; (autoload 'fci-mode "fill-column-indicator" nil t)
+;; (add-hook 'prog-mode-hook 'turn-on-fci-mode)
+
+;; ;; https://github.com/alpaker/Fill-Column-Indicator/issues/21
+;; (defvar sanityinc/fci-mode-suppressed nil)
+
+;; (defadvice popup-create (before suppress-fci-mode activate)
+;;   "Suspend fci-mode while popups are visible"
+;;   (set (make-local-variable 'sanityinc/fci-mode-suppressed) fci-mode)
+;;   (when fci-mode
+;;     (turn-off-fci-mode)))
+
+;; (defadvice popup-delete (after restore-fci-mode activate)
+;;   "Restore fci-mode when all popups have closed"
+;;   (when (and (not popup-instances) sanityinc/fci-mode-suppressed)
+;;     (setq sanityinc/fci-mode-suppressed nil)
+;;     (turn-on-fci-mode)))
 
 ;; this make start up pretty slow when enabled globally
 ;; maybe it would be better hooked into projectile or something?
@@ -146,5 +156,24 @@
 (add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
 (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
 (add-hook 'markdown-mode-hook (lambda () (longlines-mode t)))
+
+(autoload 'web-mode "web-mode")
+(add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.[gj]sp\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
+
+(defun eqyiel-web-mode-hook ()
+  (setq web-mode-markup-indent-offset 2
+        web-mode-css-indent-offset 2
+        web-mode-code-indent-offset 2
+        ;; use server-side comment instead of html/css/js
+        web-mode-comment-style 2))
+
+(add-hook 'web-mode-hook 'eqyiel-web-mode-hook)
 
 (provide 'eqyiel-misc)

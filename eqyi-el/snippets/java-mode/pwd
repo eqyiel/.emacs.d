@@ -2,4 +2,4 @@
 # name: pwd
 # key: pwd
 # --
-System.out.println(System.getProperty("user.dir"));$0
+System.out.println("Working Directory = " + System.getProperty("user.dir"));$0

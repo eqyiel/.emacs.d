@@ -23,8 +23,9 @@
  fill-column 80
  tab-width 2)
 
-(eval-after-load "sh-mode" ; why don't you respect tab-width
-  '(setq sh-basic-offset 2
+(eval-after-load "shell-script-mode" ; why don't you respect tab-width
+  '(setq sh-make-vars-local nil
+         sh-basic-offset 2
          sh-indentation 2))
 
 (defalias 'yes-or-no-p 'y-or-n-p)
@@ -53,9 +54,10 @@
 
 ;; stop nagging me to enable these useful commands
 
-(put 'dired-find-alternate-file 'disabled nil)
-(put 'upcase-region 'disabled nil)
-(put 'downcase-region 'disabled nil)
+(dolist (x '(dired-find-alternate-file
+             upcase-region
+             downcase-region))
+  (put x 'disabled nil))
 
 ;; don't litter my ~/.emacs.d
 

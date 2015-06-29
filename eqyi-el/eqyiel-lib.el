@@ -328,6 +328,19 @@ else upload just the region."
       (setq i (1+ i)))
     str))
 
+
+;; http://stackoverflow.com/q/7362625
+(defun print-to-pdf ()
+  (interactive)
+  (ps-spool-buffer-with-faces)
+  (switch-to-buffer "*PostScript*")
+  (write-file "/tmp/tmp.ps")
+  (kill-buffer "tmp.ps")
+  (setq cmd (concat "ps2pdf14 /tmp/tmp.ps /home/eqyiel/" "file.pdf"))
+  (shell-command cmd)
+  (shell-command "rm /tmp/tmp.ps")
+  (message (concat "Saved to:  /home/eqyiel/" "file.pdf")))
+
 ;; http://www.emacswiki.org/emacs/EmacsAsDaemon#toc9
 
 (defun server-shutdown ()
@@ -335,5 +348,14 @@ else upload just the region."
   (interactive)
   (save-some-buffers)
   (kill-emacs))
+
+;; search for missing commas for one line in a csv file
+(defun count-commas ()
+  (interactive)
+  (let ((i 0))
+    (beginning-of-line)
+    (while (re-search-forward "," (line-end-position) t)
+      (setq i (+ i 1)))
+    (message "found %s" i)))
 
 (provide 'eqyiel-lib)

@@ -12,14 +12,18 @@
 (add-to-list 'custom-theme-load-path "~/.emacs.d/site-lisp/themes/zenburn")
 (add-to-list 'custom-theme-load-path "~/.emacs.d/site-lisp/themes/solarized")
 
-(load-theme 'zenburn t)
+;; (load-theme 'adwaita t)
+;; (load-theme 'zenburn t)
 ;; (load-theme 'solarized-dark t)
-;; (load-theme 'solarized-light t)
+(load-theme 'solarized-light t)
+
+(require 'eqyiel-custom-junk)
 
 (require 'eqyiel-defaults)
 (require 'eqyiel-lib)
 (require 'eqyiel-abbrev)
-(require 'eqyiel-autocomplete)
+;; (require 'eqyiel-autocomplete)
+(require 'eqyiel-company)
 (require 'eqyiel-org)
 (require 'eqyiel-circe)
 ;; (require 'eqyiel-desktop)
@@ -35,8 +39,11 @@
 ;; ;; (require 'eqyiel-haskell)
 ;; (require 'eqyiel-c)
 (require 'eqyiel-java)
-;; (require 'eqyiel-tex)
+(require 'eqyiel-tex)
 ;; ;; (require 'eqyiel-emms)
+(require 'eqyiel-javascript)
+(require 'eqyiel-web)
+
 
 ;; https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
 

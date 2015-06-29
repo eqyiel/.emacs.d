@@ -2,28 +2,32 @@
 
 (autoload 'eclim-mode "eclim" nil t)
 (autoload 'start-eclimd "eclimd" nil t)
+(autoload 'company-emacs-eclim "company-emacs-eclim" nil t)
 ;; (autoload 'eclim-mode "ac-emacs-eclim-source")
 
 (eval-after-load "eclim"
   '(setq eclim-java-documentation-root "/usr/share/doc/java7"
          eclim-auto-save nil)) ; annoying
 
+(eval-after-load "eclim"
+  '(setq company-eclim-auto-save nil
+         company-eclim-executable
+         "eclim"))
+
 (eval-after-load "eclimd"
   '(progn
      (global-eclim-mode)
      (define-key eclim-mode-map (kbd "C-c C-c") 'eclim-run-class)
-     (if (string-equal system-name "alcor.rkm.id.au")
-         (setq eclimd-default-workspace "~/doc/flinders/comp3751_s1_2014/code")
-       (setq eclimd-default-workspace "~/doc/comp3751/code"
-             eclim-eclipse-dirs "/opt/eclipse"))))
-
-(defun eqyiel-ac-java-mode-setup ()
-  (setq ac-sources (append '(ac-source-yasnippet
-                            ac-source-filename
-                            ac-source-emacs-eclim))))
+     (define-key eclim-mode-map (kbd "<f5>") 'eclim-project-build)
+     (setq eclimd-default-workspace "~/doc/flinders/comp3712_s1_2015/")))
 
 (defun eqyiel-java-mode-hook ()
-  (eqyiel-ac-java-mode-setup))
+  (company-emacs-eclim-setup))
+
+;; (defun eqyiel-java-mode-hook ()
+;;   (set (make-local-variable 'company-backends) '((company-eclim
+;;                                                   company-emacs-eclim
+;;                                                   company-yasnippet))))
 
 (add-hook 'java-mode-hook 'eqyiel-java-mode-hook)
 

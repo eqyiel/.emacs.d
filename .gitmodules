@@ -1,6 +1,3 @@
-[submodule "site-lisp/auto-complete-auctex"]
-    path = site-lisp/auto-complete-auctex
-    url = http://github.com/monsanto/auto-complete-auctex
 [submodule "site-lisp/circe"]
     path = site-lisp/circe
     url = http://github.com/jorgenschaefer/circe
@@ -55,9 +52,6 @@
 [submodule "site-lisp/multiple-cursors"]
     path = site-lisp/multiple-cursors
     url = http://github.com/magnars/multiple-cursors.el
-[submodule "site-lisp/nethack-el"]
-    path = site-lisp/nethack-el
-    url = http://github.com/tali713/nethack-el
 [submodule "site-lisp/nose"]
     path = site-lisp/nose
     url = http://github.com/emacsmirror/nose
@@ -106,12 +100,30 @@
 [submodule "site-lisp/yasnippet"]
 	path = site-lisp/yasnippet
 	url = https://github.com/capitaomorte/yasnippet
-[submodule "site-lisp/auto-complete"]
-	path = site-lisp/auto-complete
-	url = https://github.com/auto-complete/auto-complete
 [submodule "site-lisp/markdown-mode"]
 	path = site-lisp/markdown-mode
 	url = git://jblevins.org/git/markdown-mode.git
 [submodule "site-lisp/circe-notifications"]
 	path = site-lisp/circe-notifications
-	url = eigenlicht:/srv/git/circe-notifications
+	url = sakura:/srv/git/circe-notifications
+[submodule "site-lisp/web-mode"]
+	path = site-lisp/web-mode
+	url = https://github.com/fxbois/web-mode
+[submodule "site-lisp/company-mode"]
+	path = site-lisp/company-mode
+	url = https://github.com/company-mode/company-mode
+[submodule "site-lisp/column-enforce-mode"]
+	path = site-lisp/column-enforce-mode
+	url = https://github.com/purcell/column-enforce-mode
+[submodule "site-lisp/idle-highlight-mode"]
+	path = site-lisp/idle-highlight-mode
+	url = https://github.com/nonsequitur/idle-highlight-mode
+[submodule "site-lisp/tern"]
+	path = site-lisp/tern
+	url = https://github.com/marijnh/tern
+[submodule "site-lisp/company-tern"]
+	path = site-lisp/company-tern
+	url = https://github.com/proofit404/company-tern
+[submodule "site-lisp/cedet"]
+	path = site-lisp/cedet
+	url = http://git.code.sf.net/p/cedet/git

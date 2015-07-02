@@ -1,10 +1,46 @@
 ;;; eqyiel-company.el
 
-(require 'company)
+(autoload 'global-company-mode "company" nil t)
+(autoload 'company-dabbrev-code "company-dabbrev-code" nil t)
+(autoload 'company-elisp "company-elisp" nil t)
+(autoload 'company-gtags "company-gtags" nil t)
+(autoload 'company-ispell "company-ispell" nil t)
+(autoload 'gtags-mode "gtags" nil t)
 
-(add-to-list 'company-backends 'company-yasnippet)
 (add-hook 'after-init-hook 'global-company-mode)
 (global-set-key (kbd "M-/") 'company-complete)
+
+;; default backends
+(setq company-backends
+      '((company-yasnippet
+         company-dabbrev
+         company-files
+         company-ispell)))
+
+;; emacs lisp
+(defun eqyiel-company-elisp ()
+  (set (make-local-variable 'company-backends)
+       '((company-yasnippet
+          company-elisp
+          company-capf
+          company-keywords
+          company-dabbrev-code
+          company-files
+          company-ispell))))
+(add-hook 'emacs-lisp-mode-hook 'eqyiel-company-elisp)
+
+(defun eqyiel-company-java ()
+  (gtags-mode t)
+  (set (make-local-variable 'company-backends)
+       '((company-yasnippet
+          company-gtags
+          company-capf
+          company-keywords
+          company-dabbrev-code
+          company-files
+          ;; company-ispell
+          ))))
+(add-hook 'java-mode-hook 'eqyiel-company-java)
 
 ;; (defun check-expansion ()
 ;;   (save-excursion

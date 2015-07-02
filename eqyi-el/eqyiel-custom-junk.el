@@ -20,6 +20,10 @@
      ("tabular")
      ("tabular*")
      ("lstlisting" current-indentation))))
+ '(ede-project-directories
+   (quote
+    ("/home/eqyiel/.emacs.d/eqyi-el" "/home/eqyiel/dev/android")))
+ '(magit-use-overlays nil)
  '(solarized-distinct-fringe-background t)
  '(solarized-high-contrast-mode-line t)
  '(solarized-use-variable-pitch nil))

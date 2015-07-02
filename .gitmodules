@@ -25,9 +25,6 @@
 [submodule "site-lisp/guide-key"]
     path = site-lisp/guide-key
     url = http://github.com/kbkbkbkb1/guide-key
-[submodule "site-lisp/haskell-mode"]
-    path = site-lisp/haskell-mode
-    url = http://github.com/haskell/haskell-mode
 [submodule "site-lisp/highlight-indentation"]
     path = site-lisp/highlight-indentation
     url = http://github.com/antonj/Highlight-Indentation-for-Emacs/
@@ -118,12 +115,9 @@
 [submodule "site-lisp/idle-highlight-mode"]
 	path = site-lisp/idle-highlight-mode
 	url = https://github.com/nonsequitur/idle-highlight-mode
-[submodule "site-lisp/tern"]
-	path = site-lisp/tern
-	url = https://github.com/marijnh/tern
-[submodule "site-lisp/company-tern"]
-	path = site-lisp/company-tern
-	url = https://github.com/proofit404/company-tern
 [submodule "site-lisp/cedet"]
 	path = site-lisp/cedet
 	url = http://git.code.sf.net/p/cedet/git
+[submodule "site-lisp/popup-el"]
+	path = site-lisp/popup-el
+	url = https://github.com/auto-complete/popup-el

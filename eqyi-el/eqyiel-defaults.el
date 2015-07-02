@@ -184,7 +184,8 @@
 
 (eval-after-load "ispell"
   '(when (executable-find ispell-program-name)
-     (setq ispell-dictionary "en_GB")
+     (setq ispell-dictionary "en_GB"
+           ispell-personal-dictionary "~/.aspell.en.pws")
      (add-hook 'text-mode-hook 'turn-on-flyspell)))
 
 (global-set-key (kbd "<C-mouse-5>") 'text-scale-increase)
@@ -202,5 +203,16 @@
 ;; don't accidentally tap suspend-frame
 (global-unset-key (kbd "C-x C-z"))
 (global-unset-key (kbd "C-z"))
+
+;; https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+(setq display-time-world-list '(("Asia/Tokyo" "Tokyo")
+                                ("Australia/Adelaide" "Adelaide")
+                                ("Australia/Brisbane" "Brisbane")
+                                ("Australia/Canberra" "Canberra")
+                                ("Australia/Darwin" "Darwin")
+                                ("Australia/Hobart" "Hobart")
+                                ("Australia/Melbourne" "Melbourne")
+                                ("Australia/Perth" "Perth")
+                                ("Australia/Sydney" "Sydney")))
 
 (provide 'eqyiel-defaults)

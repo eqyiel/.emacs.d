@@ -2,17 +2,6 @@
 ;; Most of these are taken from other people.  Where possible, a link to the
 ;; original author precedes the function.
 
-;; http://www.emacswiki.org/emacs/LoadingLispFiles
-
-(defmacro with-library (symbol &rest body)
-  `(condition-case nil
-       (progn
-         (require ',symbol)
-         ,@body)
-     (error (message (format "I guess we don't have %s available." ',symbol))
-            nil)))
-(put 'with-library 'lisp-indent-function 1)
-
 ;; http://david.rothlis.net/emacs/ergonomics.html
 
 (defun kill-region-or-backward-kill-word (&optional arg region)
@@ -52,21 +41,6 @@
   (interactive)
   (insert (format-time-string "%c" (current-time))))
 
-(defun turn-on-paredit-nonlisp ()
-  "Turn on paredit mode for non-lisps."
-  (set (make-local-variable 'paredit-space-delimiter-chars)
-       (list ?\"))
-  (paredit-mode 1))
-
-;; http://www.emacswiki.org/emacs/FullScreen#toc22
-
-(defun toggle-fullscreen ()
-  "Depends on community/wmctrl"
-  (interactive)
-  (shell-command "wmctrl -r :ACTIVE: -btoggle,fullscreen"))
-
-(global-set-key [f11] 'toggle-fullscreen)
-
 ;; http://whattheemacsd.com/editing-defuns.el-01.html
 
 (defun open-line-below ()
@@ -104,32 +78,6 @@
           (lambda ()
             (define-key inferior-python-mode-map
               (kbd "C-d") 'comint-delchar-or-eof-or-kill-buffer)))
-
-;; http://stackoverflow.com/a/14992483/2204400
-
-(defun my-toggle-fill-paragraph ()
-  ;; Based on http://xahlee.org/emacs/modernization_fill-paragraph.html
-  "Fill or unfill the current paragraph, depending upon the current line length.
-When there is a text selection, act on the region.
-See `fill-paragraph' and `fill-region'."
-  (interactive)
-  ;; We set a property 'currently-filled-p on this command's symbol
-  ;; (i.e. on 'my-toggle-fill-paragraph), thus avoiding the need to
-  ;; create a variable for remembering the current fill state.
-  (save-excursion
-    (let* ((deactivate-mark nil)
-           (line-length (- (line-end-position) (line-beginning-position)))
-           (currently-filled (if (eq last-command this-command)
-                                 (get this-command 'currently-filled-p)
-                               (< line-length fill-column)))
-           (fill-column (if currently-filled
-                            most-positive-fixnum
-                          fill-column)))
-
-      (if (region-active-p)
-          (fill-region (region-beginning) (region-end))
-        (fill-paragraph))
-      (put this-command 'currently-filled-p (not currently-filled)))))
 
 ;; http://whattheemacsd.com/buffer-defuns.el-02.html
 

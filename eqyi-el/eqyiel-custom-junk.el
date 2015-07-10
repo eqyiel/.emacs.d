@@ -20,10 +20,14 @@
      ("tabular")
      ("tabular*")
      ("lstlisting" current-indentation))))
+ '(custom-safe-themes
+   (quote
+    ("8aebf25556399b58091e533e455dd50a6a9cba958cc4ebb0aab175863c25b9a4" default)))
  '(ede-project-directories
    (quote
     ("/home/eqyiel/.emacs.d/eqyi-el" "/home/eqyiel/dev/android")))
  '(magit-use-overlays nil)
+ '(send-mail-function (quote mailclient-send-it))
  '(solarized-distinct-fringe-background t)
  '(solarized-high-contrast-mode-line t)
  '(solarized-use-variable-pitch nil))

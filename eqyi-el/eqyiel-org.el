@@ -4,6 +4,91 @@
   '(setq org-mobile-directory "~/owncloud/org"
          org-mobile-inbox-for-pull "~/doc/org/from-mobile.org"))
 
+
+(defvar rkm.id.au-html-head
+  "<link href='/images/favicon.ico' rel='shortcut icon' type='image/x-icon'>
+<link rel='stylesheet' href='css/site.css?v=2' type='text/css'/>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<script src='/js/Hyphenator.js' type='text/javascript'></script>
+<script src='/js/jquery.js' type='text/javascript'></script>
+<link href='http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css' rel='stylesheet'>")
+
+(defvar rkm.id.au-html-preamble
+  "<div class='intro'>
+<h1><b>Nicolas</b> Petton</h1>
+<p>Software engineer, Smalltalker & Emacs Lisper. Also loves the Web.</p>
+</div>
+<div class='nav'>
+<ul>
+<li><a href='/'>Home</a>/</li>
+<li><a href='/blog/index.html'>Blog</a>/</li>
+<li><a href='http://github.com/NicolasPetton'>GitHub</a>/</li>
+<li><a href='http://twitter.com/NicolasPetton'>Twitter</a>/</li>
+<li><a href='/contact.html'>Contact</a></li>
+</ul>
+</div>
+")
+
+(defvar rkm.id.au-base-directory "~/doc/rkm.id.au/src/")
+(defvar rkm.id.au-publishing-directory "~/doc/rkm.id.au/pub/")
+
+;; return the list of files matched by rkm.id.au-content
+;; (org-publish-get-base-files (cadr org-publish-project-alist))
+
+(eval-after-load "org"
+  '(setq org-publish-project-alist
+         `(("rkm.id.au"
+            :components ("rkm.id.au-content" "rkm.id.au-static" "rkm.id.au-rss"))
+        ("rkm.id.au-content"
+         :auto-sitemap t
+         :auto-index t
+         :index-filename "index.org"
+         :index-title "rkm.id.au"
+         :base-directory ,rkm.id.au-base-directory
+         :base-extension "org"
+         :publishing-directory ,rkm.id.au-publishing-directory
+         :recursive t
+         :publishing-function org-html-publish-to-html
+         :export-with-tags nil
+         :headline-levels 4
+         :toc nil
+         :section-numbers nil
+         :sub-superscript nil
+         :todo-keywords nil
+         :author nil
+         :creator-info nil
+         ;; for only publishing <body>...</body>
+         :body-only t
+         ;; :html-preamble "rkm.id.au"
+         ;; :html-postamble nil
+         :html-html5-fancy t
+         :html-doctype "html5"
+         :html-link-up "https://rkm.id.au/"
+         :html-link-home "https://rkm.id.au/"
+         :style "This is raw html for stylesheet <link>'s"
+         :timestamp t
+         :exclude-tags ("noexport" "todo")
+         :auto-preamble t)
+        ("rkm.id.au-static"
+         :base-directory ,rkm.id.au-base-directory
+         :base-extension "css\\|js\\|png\\|jpg\\|gif\\|pdf\\|mp3\\|ogg\\|otf"
+         :publishing-directory ,rkm.id.au-publishing-directory
+         :recursive t
+         :publishing-function org-publish-attachment)
+        ("rkm.id.au-rss"
+         :base-directory ,rkm.id.au-base-directory
+         :base-extension "org"
+         ;; :rss-image-url "http://lumiere.ens.fr/~guerry/images/faces/15.png"
+         ;; :html-link-home "http://lumiere.ens.fr/~guerry/"
+         :html-link-use-abs-url t
+         :rss-extension "xml"
+         :publishing-directory ,rkm.id.au-publishing-directory
+         :publishing-function (org-rss-publish-to-rss)
+         :section-numbers nil
+         :exclude ".*"            ;; To exclude all files...
+         :include ("sitemap.org")   ;; ... except index.org.
+         :table-of-contents nil))))
+
 (eval-after-load "org"
   '(progn
      (setq
@@ -27,68 +112,17 @@
          (file+headline "~/doc/org/new.org.gpg" "Quote")
          "** %?")
         ("c" "Contacts" entry
-                   (file "~/doc/org/contacts.org.gpg")
-                   "** %(org-contacts-template-name)
+         (file "~/doc/org/contacts.org.gpg")
+         "** %(org-contacts-template-name)
 :PROPERTIES:
 :EMAIL: %(org-contacts-template-email)
 :END:")
-                  ("m" "Add a contact manually" entry
-                   (file "~/doc/org/contacts.org.gpg")
-                   "** %^{Name}
+        ("m" "Add a contact manually" entry
+         (file "~/doc/org/contacts.org.gpg")
+         "** %^{Name}
 :PROPERTIES:
 :EMAIL:
-:END:")
-        )
-      org-publish-project-alist
-      '(("rkm.id.au"
-         :components ("rkm.id.au-content" "rkm.id.au-static" "rkm.id.au-rss"))
-        ("rkm.id.au-content"
-         :auto-sitemap t
-         :auto-index t
-         :index-filename "index.org"
-         :index-title "rkm.id.au"
-         :base-directory "~/doc/blog/src/"
-         :base-extension "org"
-         :publishing-directory "~/doc/blog/pub/"
-         :recursive t
-         :publishing-function org-html-publish-to-html
-         :export-with-tags nil
-         :headline-levels 4
-         :toc nil
-         :section-numbers nil
-         :sub-superscript nil
-         :todo-keywords nil
-         :author nil
-         :creator-info nil
-         ;; :html-preamble "rkm.id.au"
-         ;; :html-postamble nil
-         :html-html5-fancy t
-         :html-doctype "html5"
-         :html-link-up "https://rkm.id.au/"
-         :html-link-home "https://rkm.id.au/"
-         :style "This is raw html for stylesheet <link>'s"
-         :timestamp t
-         :exclude-tags ("noexport" "todo")
-         :auto-preamble t)
-        ("rkm.id.au-static"
-         :base-directory "~/doc/blog/src"
-         :base-extension "css\\|js\\|png\\|jpg\\|gif\\|pdf\\|mp3\\|ogg\\|otf"
-         :publishing-directory "~/doc/blog/pub/"
-         :recursive t
-         :publishing-function org-publish-attachment)
-        ("rkm.id.au-rss"
-         :base-directory "~/doc/blog/src/"
-         :base-extension "org"
-         ;; :rss-image-url "http://lumiere.ens.fr/~guerry/images/faces/15.png"
-         ;; :html-link-home "http://lumiere.ens.fr/~guerry/"
-         :html-link-use-abs-url t
-         :rss-extension "xml"
-         :publishing-directory "~/doc/blog/pub/"
-         :publishing-function (org-rss-publish-to-rss)
-         :section-numbers nil
-         :exclude ".*"            ;; To exclude all files...
-         :include ("sitemap.org")   ;; ... except index.org.
-         :table-of-contents nil)))
+:END:")))
      (add-hook 'org-mode-hook 'turn-on-auto-fill)))
 
 ;; (eval-after-load "org-contacts"

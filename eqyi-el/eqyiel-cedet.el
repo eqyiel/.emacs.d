@@ -2,7 +2,9 @@
 
 ;; Hey, you!  If you're cloning this for the first time make sure to
 ;; $ touch .nosearch
-;; in site-lisp/cedet so that it won't be read by add-subdirs-to-load-path.
+;; in site-lisp/cedet so that it won't be read by
+;; `add-subdirs-to-load-path'. Also, load this early in init.el otherwise the
+;; builtin CEDET will already be loaded.
 
 ;; Load the development version rather than emacs builtin.
 (load-file "~/.emacs.d/site-lisp/cedet/cedet-devel-load.el")

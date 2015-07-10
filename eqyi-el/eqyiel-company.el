@@ -12,7 +12,8 @@
 
 ;; default backends
 (setq company-backends
-      '((company-yasnippet
+      '((company-abbrev
+         company-yasnippet
          company-dabbrev
          company-files
          company-ispell)))
@@ -28,6 +29,12 @@
           company-files
           company-ispell))))
 (add-hook 'emacs-lisp-mode-hook 'eqyiel-company-elisp)
+
+(defun eqyiel-company-circe ()
+  (set (make-local-variable 'company-backends)
+       '((company-dabbrev
+          company-ispell))))
+(add-hook 'circe-mode-hook 'eqyiel-company-circe)
 
 (defun eqyiel-company-java ()
   (gtags-mode t)
@@ -67,8 +74,10 @@
 ;; (global-set-key [tab] 'tab-indent-or-complete)
 
 (eval-after-load "company"
-  '(setq company-minimum-prefix-length 1
-         company-idle-delay 0
-         company-dabbrev-code-everywhere t))
+  '(progn
+     (setq company-minimum-prefix-length 1
+           company-idle-delay 0
+           company-dabbrev-code-everywhere t)
+     (diminish 'company-mode)))
 
 (provide 'eqyiel-company)

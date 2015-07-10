@@ -9,7 +9,7 @@
 (sp-use-paredit-bindings)
 (diminish 'smartparens-mode)
 
-;; don't do this: "\"\""
+;; Don't do this: "\"\""
 (setq sp-autoescape-string-quote nil)
 (setq sp-autoskip-closing-pair 'always)
 
@@ -17,15 +17,15 @@
 
 (eval-after-load "yasnippet"
   '(progn
-     (setq yas-snippet-dirs
-           '("~/.emacs.d/eqyi-el/snippets"
-             "~/.emacs.d/site-lisp/yasnippet/snippets"
-             "~/.emacs.d/site-lisp/elpy/snippets")
-           yas-prompt-functions '(yas-ido-prompt))
+     (add-to-list 'yas-snippet-dirs "~/.emacs.d/eqyi-el/snippets")
+     (setq yas-prompt-functions '(yas-ido-prompt))
      (diminish 'yas-minor-mode)))
 
 (yas-global-mode t)
 (global-set-key (kbd "C-c TAB") 'yas-expand)
+
+(autoload 'er/expand-region "expand-region" nil t)
+(global-set-key (kbd "C-=") 'er/expand-region)
 
 (require 'key-chord)
 (key-chord-mode 1)
@@ -92,9 +92,6 @@
 ;; Rectangular region mode
 (global-set-key (kbd "C-S-SPC") 'set-rectangular-region-anchor)
 
-(autoload 'er/expand-region "expand-region" nil t)
-(global-set-key (kbd "C-=") 'er/expand-region)
-
 (autoload 'column-marker-1 "column-marker" nil t)
 (global-set-key (kbd "C-c m") 'column-marker-1)
 
@@ -103,51 +100,40 @@
 (eval-after-load "highlight-indentation"
   '(diminish 'highlight-indentation-mode))
 
-;; (autoload 'idle-highlight-mode "idle-highlight-mode" nil t)
-;; (add-hook 'prog-mode-hook 'idle-highlight-mode)
+(autoload 'idle-highlight-mode "idle-highlight-mode" nil t)
 
 (autoload 'column-enforce-mode "column-enforce-mode" nil t)
 (add-hook 'prog-mode-hook 'column-enforce-mode)
-(eval-after-load "highlight-indentation"
-  '(diminish 'column-enforce-mode))
+(eval-after-load "column-enforce-mode" '(diminish 'column-enforce-mode))
 
+(autoload 'turn-on-fci-mode "fill-column-indicator" nil t)
+(autoload 'fci-mode "fill-column-indicator" nil t)
+(add-hook 'prog-mode-hook 'turn-on-fci-mode)
 
-;; ;; https://github.com/alpaker/Fill-Column-Indicator
-;; ;; (require 'fill-column-indicator)
-;; (autoload 'turn-on-fci-mode "fill-column-indicator" nil t)
-;; (autoload 'fci-mode "fill-column-indicator" nil t)
-;; (add-hook 'prog-mode-hook 'turn-on-fci-mode)
+;; https://github.com/alpaker/Fill-Column-Indicator/issues/21
+(defvar sanityinc/fci-mode-suppressed nil)
+(defadvice popup-create (before suppress-fci-mode activate)
+  "Suspend fci-mode while popups are visible"
+  (let ((fci-enabled (sanityinc/fci-enabled-p)))
+    (when fci-enabled
+      (set (make-local-variable 'sanityinc/fci-mode-suppressed) fci-enabled)
+      (turn-off-fci-mode))))
+(defadvice popup-delete (after restore-fci-mode activate)
+  "Restore fci-mode when all popups have closed"
+  (when (and sanityinc/fci-mode-suppressed
+             (null popup-instances))
+    (setq sanityinc/fci-mode-suppressed nil)
+    (turn-on-fci-mode)))
 
-;; ;; https://github.com/alpaker/Fill-Column-Indicator/issues/21
-;; (defvar sanityinc/fci-mode-suppressed nil)
-
-;; (defadvice popup-create (before suppress-fci-mode activate)
-;;   "Suspend fci-mode while popups are visible"
-;;   (set (make-local-variable 'sanityinc/fci-mode-suppressed) fci-mode)
-;;   (when fci-mode
-;;     (turn-off-fci-mode)))
-
-;; (defadvice popup-delete (after restore-fci-mode activate)
-;;   "Restore fci-mode when all popups have closed"
-;;   (when (and (not popup-instances) sanityinc/fci-mode-suppressed)
-;;     (setq sanityinc/fci-mode-suppressed nil)
-;;     (turn-on-fci-mode)))
-
-;; this make start up pretty slow when enabled globally
 ;; maybe it would be better hooked into projectile or something?
 (autoload 'git-gutter-mode "git-gutter" nil t)
 (autoload 'global-git-gutter-mode "git-gutter" nil t)
 ;; (global-git-gutter-mode t)
-(eval-after-load "git-gutter"
-  '(diminish 'git-gutter-mode))
+(eval-after-load "git-gutter" '(diminish 'git-gutter-mode))
 
 (autoload 'pkgbuild-mode "pkgbuild-mode.el" "PKGBUILD mode." t)
 (setq auto-mode-alist (append '(("/PKGBUILD$" . pkgbuild-mode))
                               auto-mode-alist))
-
-(autoload 'nethack "nethack" "Play Nethack." t)
-(setq nethack-program "/usr/bin/nethack"
-      nethack-use-tiles t)
 
 (autoload 'legalese "legalese" nil t)
 
@@ -155,25 +141,33 @@
    "Major mode for editing Markdown files" t)
 (add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
 (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
-(add-hook 'markdown-mode-hook (lambda () (longlines-mode t)))
 
-(autoload 'web-mode "web-mode")
-(add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.[gj]sp\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
+(require 'ws-butler)
+(ws-butler-global-mode)
+(diminish 'ws-butler-mode)
 
-(defun eqyiel-web-mode-hook ()
-  (setq web-mode-markup-indent-offset 2
-        web-mode-css-indent-offset 2
-        web-mode-code-indent-offset 2
-        ;; use server-side comment instead of html/css/js
-        web-mode-comment-style 2))
+(require 'dtrt-indent)
+(dtrt-indent-mode)
 
-(add-hook 'web-mode-hook 'eqyiel-web-mode-hook)
+(require 'flycheck)
+(setq flycheck-gcc-pedantic t)
+(add-hook 'prog-mode-hook 'flycheck-mode)
+
+(autoload 'internodeum/usage-summary "internodeum" nil t)
+
+(defadvice internodeum/usage-summary (before eqyiel-internodeum-setup activate)
+  (setq internodeum/credentials
+        (internodeum/make-creds
+         :username "eqyiel"
+         :password (password-store-get "internode"))))
+
+(defadvice internodeum/usage-summary (after eqyiel-internodeum-clear activate)
+  (setf (internodeum/creds-username internodeum/credentials) nil)
+  (setf (internodeum/creds-password internodeum/credentials) nil)
+  (setq internodeum/credentials nil))
+
+;; Together, these make a nice replacement for longlines-mode
+(autoload 'turn-on-visual-line-mode "visual-line-mode" nil t)
+(autoload 'turn-on-visual-fill-column-mode "visual-fill-column" nil t)
 
 (provide 'eqyiel-misc)

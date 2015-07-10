@@ -9,21 +9,27 @@
 (add-subdirs-to-load-path "~/.emacs.d")
 (add-subdirs-to-load-path "~/.local/share/emacs")
 
-(add-to-list 'custom-theme-load-path "~/.emacs.d/site-lisp/themes/zenburn")
-(add-to-list 'custom-theme-load-path "~/.emacs.d/site-lisp/themes/solarized")
+(defmacro with-library (symbol &rest body)
+  "See http://www.emacswiki.org/emacs/LoadingLispFiles"
+  `(condition-case nil
+       (progn
+         (require ',symbol)
+         ,@body)
+     (error (message (format "%s was not available." ',symbol))
+            nil)))
+(put 'with-library 'lisp-indent-function 1)
 
-;; (load-theme 'adwaita t)
-;; (load-theme 'zenburn t)
-;; (load-theme 'solarized-dark t)
-(load-theme 'solarized-light t)
+(with-library solarized
+  (load-theme 'solarized-light t))
 
-(require 'eqyiel-custom-junk)
 (require 'eqyiel-cedet)
+(require 'eqyiel-elpa)
+(require 'eqyiel-custom-junk)
 (require 'eqyiel-defaults)
 (require 'eqyiel-lib)
-(require 'eqyiel-abbrev)
 (require 'eqyiel-company)
 (require 'eqyiel-org)
+(require 'eqyiel-pass)
 (require 'eqyiel-circe)
 (require 'eqyiel-gnus)
 (require 'eqyiel-guide-key)
@@ -39,3 +45,4 @@
 (require 'eqyiel-web)
 (require 'eqyiel-android)
 (require 'eqyiel-semantic)
+;; (require 'eqyiel-helm)

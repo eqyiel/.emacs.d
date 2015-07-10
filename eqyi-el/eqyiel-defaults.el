@@ -23,11 +23,6 @@
  fill-column 80
  tab-width 2)
 
-(eval-after-load "shell-script-mode" ; why don't you respect tab-width
-  '(setq sh-make-vars-local nil
-         sh-basic-offset 2
-         sh-indentation 2))
-
 (defalias 'yes-or-no-p 'y-or-n-p)
 (defvaralias 'c-basic-offset 'tab-width)
 (defvaralias 'cperl-indent-level 'tab-width)
@@ -41,26 +36,20 @@
 
 (set-locale-environment "en_US.UTF-8")
 
-(setq browse-url-browser-function 'browse-url-generic)
-
-(setq browse-url-generic-program "firefox")
-;; (if (executable-find "conkeror")
-;;     (setq browse-url-generic-program "conkeror")
-;;   (setq browse-url-generic-program "firefox"))
+(setq browse-url-browser-function 'browse-url-generic
+      browse-url-generic-program "firefox")
 
 (eval-after-load "warnings"
-  ;; stop warning me about my load path including ~/.emacs.d
+  ;; Stop warning me about my load path including ~/.emacs.d.
   '(setq display-warning-minimum-level :error))
 
-;; stop nagging me to enable these useful commands
-
+;; Stop nagging me to enable these useful commands.
 (dolist (x '(dired-find-alternate-file
              upcase-region
              downcase-region))
   (put x 'disabled nil))
 
-;; don't litter my ~/.emacs.d
-
+;; Don't litter my ~/.emacs.d.
 (setq backup-by-copying t
       backup-directory-alist '(("." . "~/.cache/emacs/backup"))
       delete-old-versions t
@@ -75,7 +64,7 @@
       eshell-directory-name "~/.cache/emacs/eshell"
       custom-file "~/.emacs.d/eqyi-el/eqyiel-custom-junk.el")
 
-;; I mean it
+;; No really.
 (eval-after-load "kkc"
   '(setq kkc-init-file-name "~/.cache/emacs/kkcrc"))
 
@@ -93,14 +82,14 @@
       x-select-enable-primary t
       x-stretch-cursor t)
 
-;; automagically refresh buffers if they are changed on disk
+;; Automagically refresh buffers if they are changed on disk.
 (global-auto-revert-mode)
-;; same for directories, but be quiet about it please
+;; Same for directories, but be quiet about it please.
 (setq global-auto-revert-non-file-buffers t
       auto-revert-verbose nil)
 
-;; highlight isearch matches even when not in isearch, use
-;; lazy-highlight-cleanup to clean up
+;; Highlight isearch matches even when not in isearch, use
+;; `lazy-highlight-cleanup' to clean up.
 (setq lazy-highlight-cleanup nil)
 
 (require 'tramp)
@@ -151,30 +140,16 @@
                                     dir)))
                   (make-directory dir t))))))
 
-
 ;; http://www.emacswiki.org/emacs/DiredReuseDirectoryBuffer#toc1
-;; Reuse same dired buffer when doing dired-up-directory
+;; Reuse same dired buffer when doing `dired-up-directory'.
 (add-hook 'dired-mode-hook
  (lambda ()
   (define-key dired-mode-map (kbd "^")
     (lambda () (interactive) (find-alternate-file "..")))))
 
-;; http://stackoverflow.com/a/12958498/2204400
-;; Makefile headaches.
-;; Try this if the defadvice doesn't work out.
-;; https://github.com/glasserc/ethan-wspace
+(global-set-key [f11] 'toggle-frame-fullscreen)
 
-(defadvice whitespace-cleanup (around whitespace-cleanup-indent-tab
-                                      activate)
-  "Fix whitespace-cleanup indent-tabs-mode bug"
-  (let ((whitespace-indent-tabs-mode indent-tabs-mode)
-        (whitespace-tab-width tab-width))
-    ad-do-it))
-
-(add-hook 'before-save-hook 'whitespace-cleanup)
-;; (remove-hook 'before-save-hook 'whitespace-cleanup)
-
-;; let me use S-SPC to scroll backwards in info mode
+;; Let me use S-SPC to scroll backwards in info mode.
 (eval-after-load "info"
   '(define-key Info-mode-map (kbd "S-SPC") 'Info-scroll-down))
 
@@ -193,16 +168,22 @@
 (global-set-key (kbd "<C-up>") 'text-scale-increase)
 (global-set-key (kbd "<C-down>") 'text-scale-decrease)
 
-;; make isearch gooder
+;; Make isearch gooder
 (global-set-key (kbd "C-s") 'isearch-forward-regexp)
 (global-set-key (kbd "C-r") 'isearch-backward-regexp)
 
-;; make it easy to write about keybindings
+;; Make it easy to write about keybindings
 (global-set-key (kbd "C-c e") 'edmacro-insert-key)
 
-;; don't accidentally tap suspend-frame
+;; Don't accidentally tap `suspend-frame'
 (global-unset-key (kbd "C-x C-z"))
 (global-unset-key (kbd "C-z"))
+
+;; Why don't you respect `tab-width?'
+(eval-after-load "shell-script-mode"
+  '(setq sh-make-vars-local nil
+         sh-basic-offset 2
+         sh-indentation 2))
 
 ;; https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
 (setq display-time-world-list '(("Asia/Tokyo" "Tokyo")
@@ -214,5 +195,15 @@
                                 ("Australia/Melbourne" "Melbourne")
                                 ("Australia/Perth" "Perth")
                                 ("Australia/Sydney" "Sydney")))
+
+(add-hook 'makefile-mode-hook
+          (lambda ()
+            (setq indent-tabs-mode t
+                  tab-width 8)))
+
+;; systemd service files
+(add-to-list 'auto-mode-alist '("\\.service\\'" . conf-unix-mode))
+(add-to-list 'auto-mode-alist '("\\.target\\'" . conf-unix-mode))
+(add-to-list 'auto-mode-alist '("\\.timer\\'" . conf-unix-mode))
 
 (provide 'eqyiel-defaults)

@@ -1,16 +1,11 @@
 ;;; eqyiel-gnus.el
 
-;; requires gnutls!
-
-;; (require 'gnus)
 (autoload 'gnus "gnus" nil t)
 
 ;; init from this file, not ~/.gnus
 (eval-after-load "gnus"
   '(setq gnus-init-file "~/.emacs.d/eqyiel-gnus.el"))
 
-;; I don't need another newsreader, but these might be handy if I accidentally
-;; nuke my el-dingo file
 (eval-after-load "gnus"
   '(setq gnus-startup-file "~/.config/gnus/newsrc" ;; don't pollute my homedir
          gnus-save-newsrc-file t
@@ -79,64 +74,98 @@
 (add-hook 'gnus-select-group-hook 'gnus-group-set-timestamp)
 
 ;; when in message mode, wrap the text according to `fill-column'.
- ;; (add-hook 'message-mode-hook 'turn-on-auto-fill)
-;; actually, could you not?
-;; It doesn't look nice when people are using a proportional font ;___;
+(add-hook 'message-mode-hook 'turn-off-auto-fill)
+(add-hook 'message-mode-hook 'turn-on-visual-line-mode)
+(add-hook 'message-mode-hook 'turn-on-visual-fill-column-mode)
+
+;; allow attaching files from dired
+(add-hook 'dired-mode-hook 'turn-on-gnus-dired-mode)
 
 (eval-after-load "gnus"
-  '(if (string-equal system-name "ayanami")
-       (setq gnus-select-method
-             '(nnimap "dovecot"
-                      (nnimap-address "localhost")
-                      (nnimap-stream network)))
-     (progn
-       (setq gnus-select-method
-             '(nnimap "rkm.id.au"
-                      (nnimap-address "mail.rkm.id.au")
-                      (nnimap-server-port 993)
-                      (nnimap-stream ssl)))
-       (setq gnus-secondary-select-methods
-             '((nnimap "gmail.com"
-                       (nnimap-address "imap.gmail.com")
-                       (nnimap-server-port 993)
-                       (nnimap-stream ssl))
-               (nnimap "internode.on.net"
-                       (nnimap-address "mail.internode.on.net")
-                       (nnimap-server-port 993)
-                       (nnimap-stream ssl))
-               (nnimap "flinders.edu.au"
-                       (nnimap-address "outlook.office365.com")
-                       (nnimap-server-port 993)
-                       (nnimap-stream ssl))
-               (nnimap "huttriverprovince.com.au"
-                       (nnimap-address "huttriverprovince.com.au")
-                       (nnimap-server-port 993)
-                       (nnimap-stream ssl)))))))
+  '(setq gnus-select-method
+         ;; First argument to nnimap should match name of some file in
+         ;; ~/.password-store/.
+         '(nnimap "eqyiel@localhost"
+                  (nnimap-address "localhost")
+                  (nnimap-stream network)
+                  (nnir-search-engine imap))))
+;; (eval-after-load "gnus"
+;;   '(setq gnus-select-method
+;;          ;; First argument to nnimap should match name of some file in
+;;          ;; ~/.password-store/.
+;;          '(nnmaildir ""
+;;                   (directory "/home/eqyiel/nnmaildir/")
+;;                   (nnmaildir-directory "/home/eqyiel/nnmaildir/")
+;;                   (get-new-mail nil)
+;;                   (nnir-search-engine notmuch)
+;;                   )
+;;          nnir-notmuch-remove-prefix "/home/eqyiel/"
+;;          )
+;;   )
 
-;; (setq gnus-secondary-select-methods
-;;              '((nntp "news.internode.on.net")
-;;                (nntp "news.giganews.com")))
+;; (setq gnus-select-method
+;;       '(nnmaildir ""
+;;         (directory "~/Maildir/")
+;;         (get-new-mail nil)
+;;         (nnir-search-engine notmuch))
+;;       nnir-notmuch-remove-prefix "/home/wgg/Maildir/")
+
+;; (defun wg/update-notmuch ()
+;;   (start-process "notmuch-poll" nil "notmuch" "new"))
+;; (add-hook 'gnus-after-getting-new-news-hook 'wg/update-notmuch)
+;; (add-hook 'gnus-summary-exit-hook 'wg/update-notmuch)
+
+
+;; For remote:
+;; (eval-after-load "gnus"
+;;   '(setq gnus-select-method
+;;          '(nnimap "rkm.id.au"
+;;                   (nnimap-address "rkm.id.au")
+;;                   (nnimap-server-port "imaps")
+;;                   (nnimap-stream ssl))
+;;          gnus-secondary-select-methods
+;;          '((nnimap "imap.gmail.com"
+;;                    (nnimap-address "imap.gmail.com")
+;;                    (nnimap-server-port 993)
+;;                    (nnimap-stream ssl))
+;;            (nnimap "mail.internode.on.net"
+;;                    (nnimap-address "mail.internode.on.net")
+;;                    (nnimap-server-port 993)
+;;                    (nnimap-stream ssl))
+;;            (nnimap "outlook.office365.com"
+;;                    (nnimap-address "outlook.office365.com")
+;;                    (nnimap-server-port 993)
+;;                    (nnimap-stream ssl))
+;;            (nnimap "huttriverprovince.com.au"
+;;                    (nnimap-address "huttriverprovince.com.au")
+;;                    (nnimap-server-port 993)
+;;                    (nnimap-stream ssl)))))
+
+;; Don't use NNTP aymore, but for future reference this is how to do it:
+;; (eval-after-load "gnus"
+;;   '(setq gnus-secondary-select-methods
+;;          '((nntp "localhost"))))
 
 (eval-after-load "message"
   '(setq message-kill-buffer-on-exit t
          ;; have the name show up, please.
          message-from-style 'angles
          ;; add Cc and Bcc headers to the message buffer
-         message-default-mail-headers "Cc: \nBcc: \n"))
+         message-default-mail-headers "Cc: \nBcc: \n"
+         message-generate-headers-first t
+         message-default-charset 'utf-8
+         message-cite-function 'message-cite-original-without-signature
+         ))
 
-;; http://www.emacswiki.org/emacs/MultipleSMTPAccounts
-;; Let Gnus change the "From:" line by looking at current group we are in.
-;; For sending via flinders account, must quote the entire address when prompted
-;; for username, and also put the same thing in from field.  Mystifying.
-
+;; Let Gnus change the "From:" line by looking at current group we are in. First
+;; argument to each posting style is the name of a group in Gnus, not the server
+;; itself!
 (eval-after-load "gnus"
   '(setq gnus-posting-styles
-         '(("gmail.com"        (address "eqyiel@gmail.com")
+         '(("gmail.com" (address "eqyiel@gmail.com") (name "Ruben Maher"))
+           ("flinders.edu.au" (address "mahe0054@uni.flinders.edu.au")
             (name "Ruben Maher"))
-           ("flinders.edu.au"  (address "mahe0054@uni.flinders.edu.au")
-            (name "Ruben Maher"))
-           ("rkm.id.au"        (address "r@rkm.id.au")
-            (name "Ruben Maher"))
+           ("rkm.id.au" (address "r@rkm.id.au") (name "Ruben Maher"))
            ("huttriverprovince.com.au" (address "info@huttriverprovince.com.au")
             (name "Hutt River Province"))
            ("internode.on.net" (address "eqyiel@internode.on.net")
@@ -151,17 +180,21 @@
 ;;            "key"
 ;;            "cert")
 
+;; http://www.emacswiki.org/emacs/MultipleSMTPAccounts
 (defvar smtp-accounts
-  '((ssl "eqyiel@gmail.com" "smtp.gmail.com" 587 "eqyiel@gmail.com" nil)
-    (ssl "mahe0054@uni.flinders.edu.au" "smtp.office365.com" 587
+  '((ssl "eqyiel@gmail.com" "imap.gmail.com" 587 "eqyiel@gmail.com" nil)
+    (ssl "mahe0054@uni.flinders.edu.au" "outlook.office365.com" 587
          "mahe0054@uni.flinders.edu.au" nil) ;; flinders now uses office365
     (ssl "r@rkm.id.au" "rkm.id.au" 587 "r@rkm.id.au" nil)
-    (ssl "eqyiel@internode.on.net" "mail.internode.on.net" 25 "eqyiel" nil)
+    (ssl "eqyiel@internode.on.net" "mail.internode.on.net" 25
+         "eqyiel@internode.on.net" nil)
     (ssl "info@huttriverprovince.com.au" "rkm.id.au" 587
          "info@huttriverprovince.com.au" nil)))
 
 (eval-after-load "gnus"
+  ;; http://www.emacswiki.org/emacs/MultipleSMTPAccounts
   '(progn
+     (require 'cl) ; `change-smtp' uses `cl-loop'
      (require 'smtpmail)
      (setq send-mail-function 'smtpmail-send-it
            message-send-mail-function 'smtpmail-send-it
@@ -169,10 +202,10 @@
            smtpmail-debug-info t
            smtpmail-debug-verb t)))
 
-(require 'cl) ; these functions need it
-
+;; http://www.emacswiki.org/emacs/MultipleSMTPAccounts
 (defun set-smtp (mech server port user password)
   "Set related SMTP variables for supplied parameters."
+  (message (concat "from set-smtp " password))
   (setq smtpmail-smtp-server server
         smtpmail-smtp-service port
         smtpmail-auth-credentials (list (list server port user password))
@@ -181,8 +214,10 @@
   (message "Setting SMTP server to `%s:%s' for user `%s'."
            server port user))
 
+;; http://www.emacswiki.org/emacs/MultipleSMTPAccounts
 (defun set-smtp-ssl (server port user password  &optional key cert)
   "Set related SMTP and SSL variables for supplied parameters."
+  (message (concat "from set-smtp-ssl " password))
   (setq starttls-use-gnutls t
         starttls-gnutls-program "gnutls-cli"
         starttls-extra-arguments nil
@@ -194,6 +229,7 @@
    "Setting SMTP server to `%s:%s' for user `%s'. (SSL enabled.)"
    server port user))
 
+;; http://www.emacswiki.org/emacs/MultipleSMTPAccounts
 (defun change-smtp ()
   "Change the SMTP server according to the current from line."
   (save-excursion
@@ -210,6 +246,7 @@
               (t (error "Unrecognized SMTP auth. mechanism: `%s'." auth-mech)))
           finally (error "Cannot infer SMTP information."))))
 
+;; http://www.emacswiki.org/emacs/MultipleSMTPAccounts
 (defadvice smtpmail-via-smtp (before smtpmail-via-smtp-ad-change-smtp
                                      (recipient smtpmail-text-buffer
                                                 &optional ask-for-password))
@@ -247,10 +284,7 @@
    gnus-sum-thread-tree-single-leaf "\u2570\u25ba "
    gnus-sum-thread-tree-vertical "\u2502"))
 
-;; (require 'mm-url)
-;; (require 'mm-decode)
-
-;;; stuff to get images to show inline
+;;; Show images inline
 (eval-after-load "gnus"
   '(progn
      (setq gnus-inhibit-images nil)
@@ -272,82 +306,50 @@
 (eval-after-load "notmuch"
   (setq notmuch-fcc-dirs nil))
 
-;; if the newsrc.eld file gets hosed, drop these in there to avoid having to set
-;; it from scatch again
-;; for home: -------------------------------------------------------------------
-;; (setq gnus-topic-topology
-;;       '(("Gnus" visible)
-;;         (("rkm.id.au" visible nil
-;;           ((gcc-self . "rkm.id.au/Sent"))))
-;;         (("internode.on.net" visible nil
-;;           ((gcc-self . "internode.on.net/Sent"))))
-;;         (("gmail.com" visible nil
-;;           ((gcc-self . "gmail.com/Sent"))))
-;;         (("flinders.edu.au" visible nil
-;;           ((gcc-self . "flinders.edu.au/Sent"))))))
-
-;; (setq gnus-topic-alist
-;;       '(("Gnus")
-;;         ("flinders.edu.au" "flinders.edu.au/Sent" "flinders.edu.au/Spam"
-;;         "flinders.edu.au" "flinders.edu.au/Keep" "flinders.edu.au/New"
-;;         "flinders.edu.au/Bin")
-;;         ("internode.on.net" "internode.on.net/Spam" "internode.on.net/Sent"
-;;         "internode.on.net/Drafts" "internode.on.net/New" "internode.on.net"
-;;         "internode.on.net/Bin")
-;;         ("gmail.com" "gmail.com" "gmail.com/Sent" "gmail.com/Spam"
-;;         "gmail.com/New" "gmail.com/Bin")
-;;         ("rkm.id.au" "rkm.id.au/Sent" "rkm.id.au/RSS" "rkm.id.au"
-;;         "rkm.id.au/Keep" "rkm.id.au/New")))
-
-;; and for remote: -------------------------------------------------------------
-;; (setq gnus-topic-topology
-;;       '(("Gnus" visible)
-;;         (("rkm.id.au" visible nil
-;;           ((gcc-self . "Sent"))))
-;;         (("internode.on.net" visible nil
-;;           ((gcc-self . "nnimap+internode.on.net:Sent"))))
-;;         (("gmail.com" visible nil
-;;           ((gcc-self . ""nnimap+gmail.com:[Gmail]/Sent Mail"))))
-;;         (("flinders.edu.au" visible nil
-;;           ((gcc-self . "nnimap+flinders.edu.au:Sent Items"))))))
-;;
-;; (setq gnus-topic-alist
-;;       '(("Gnus" "nndraft:drafts")
-;;         ("internode.on.net"
-;;          "nnimap+internode.on.net:Drafts"
-;;          "nnimap+internode.on.net:Sent"
-;;          "nnimap+internode.on.net:Trash"
-;;          "nnimap+internode.on.net:Spam"
-;;          "nnimap+internode.on.net:INBOX")
-;;         ("flinders.edu.au"
-;;          "nnimap+flinders.edu.au:Calendar"
-;;          "nnimap+flinders.edu.au:Contacts"
-;;          "nnimap+flinders.edu.au:Deleted Items"
-;;          "nnimap+flinders.edu.au:Drafts"
-;;          "nnimap+flinders.edu.au:INBOX"
-;;          "nnimap+flinders.edu.au:Journal"
-;;          "nnimap+flinders.edu.au:Junk E-Mail"
-;;          "nnimap+flinders.edu.au:Keep"
-;;          "nnimap+flinders.edu.au:Notes"
-;;          "nnimap+flinders.edu.au:Outbox"
-;;          "nnimap+flinders.edu.au:Sent Items"
-;;          "nnimap+flinders.edu.au:Tasks")
-;;         ("gmail.com"
-;;          "nnimap+gmail.com:[Gmail]/Starred"
-;;          "nnimap+gmail.com:[Gmail]"
-;;          "nnimap+gmail.com:[Gmail]/Drafts"
-;;          "nnimap+gmail.com:[Gmail]/Sent Mail"
-;;          "nnimap+gmail.com:[Gmail]/Spam"
-;;          "nnimap+gmail.com:[Gmail]/All Mail"
-;;          "nnimap+gmail.com:[Gmail]/Important"
-;;          "nnimap+gmail.com:INBOX"
-;;          "nnimap+gmail.com:[Gmail]/Bin")
-;;         ("rkm.id.au"
-;;          "INBOX"
-;;          "RSS"
-;;          "Sent"
-;;          "Trash"
-;;          "Drafts"
-;;          "Keep")))
+;; In case I accidentally my newsrc.eld
+;; (eval-after-load "gnus-group"
+;;   '(progn
+;;      (setq gnus-topic-topology
+;;            '(("Gnus" visible nil nil)
+;;              (("rkm.id.au" visible nil ((gcc-self . "rkm.id.au/Sent"))))
+;;              (("internode.on.net" visible nil
+;;                ((gcc-self . "internode.on.net/Sent"))))
+;;              (("flinders.edu.au" visible nil
+;;                ((gcc-self . "flinders.edu.au/Sent"))))
+;;              (("gmail.com" visible nil ((gcc-self . "gmail.com/Sent"))))
+;;              (("huttriverprovince.com.au" visible nil
+;;                ((gcc-self . "huttriverprovince.com.au/Sent")))))
+;;            gnus-topic-alist
+;;            '(("Gnus" "archive" "nndraft:drafts")
+;;              ("flinders.edu.au"
+;;               "flinders.edu.au/Bin"
+;;               "flinders.edu.au/Keep"
+;;               "flinders.edu.au/New"
+;;               "flinders.edu.au/Sent"
+;;               "flinders.edu.au/Spam")
+;;              ("gmail.com"
+;;               "gmail.com/Bin"
+;;               "gmail.com/New"
+;;               "gmail.com/Spam"
+;;               "gmail.com/Sent")
+;;              ("huttriverprovince.com.au"
+;;               "huttriverprovince.com.au/New"
+;;               "huttriverprovince.com.au/Sent"
+;;               "huttriverprovince.com.au/Spam"
+;;               "huttriverprovince.com.au/Trash")
+;;              ("internode.on.net"
+;;               "internode.on.net/Bin"
+;;               "internode.on.net/Drafts"
+;;               "internode.on.net/New"
+;;               "internode.on.net/Sent"
+;;               "internode.on.net/Spam")
+;;              ("rkm.id.au"
+;;               "rkm.id.au/Keep"
+;;               "rkm.id.au/New"
+;;               "rkm.id.au/RSS"
+;;               "rkm.id.au/Sent"
+;;               "rkm.id.au/Spam"
+;;               "rkm.id.au/sa-learn"
+;;               "rkm.id.au/sa-unlearn")))))
 
 (provide 'eqyiel-gnus)

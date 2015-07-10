@@ -1,42 +1,64 @@
 ;;; eqyiel-circe.el
 
-(require 'circe-autoloads)
-
-(if (file-exists-p "~/.private.el.gpg")
-    (load-file "~/.private.el.gpg")
-  (setq eqyiel/freenode-pw nil
-        eqyiel/oftc-pw nil))
-
 (defun irc ()
   "Connect to IRC."
   (interactive)
+  (eqyiel-circe-setup-networks)
   (circe "freenode")
   (circe "oftc"))
+
+(defun eqyiel-circe-reconnect-all () (interactive) (circe-reconnect-all))
+
+(defun eqyiel-circe-setup-networks ()
+  (require 'circe)
+  (setq circe-network-options
+        ;; A list quoted with a backtick is quoted except for the elements
+        ;; prefixed with a comma, which are evaluated before inserting.
+        `(("freenode"
+           :nick "eqyiel"
+           :host "rkm.id.au"
+           :service "7777"
+           :tls t
+           :pass ,(concat "eqyiel/freenode:" (password-store-get "irc/znc")))
+          ("oftc"
+           :nick "eqyiel"
+           :host "rkm.id.au"
+           :service "7777"
+           :tls t
+           :pass ,(concat "eqyiel/oftc:" (password-store-get "irc/znc"))))))
+(advice-add 'circe-reconnect-all :before 'eqyiel-circe-setup-networks)
+
+(defun eqyiel-circe-clear-passwords ()
+  (if (boundp 'circe-network-options)
+      (dolist (network circe-network-options)
+        (plist-put (cdr network) :pass nil))))
+
+(defvar eqyiel-circe-authentications-count 0
+  "Clear passwords after this many authentications have been seen.")
+
+(defun eqyiel-circe-wait-for-authentication ()
+  (setq eqyiel-circe-authentications-count
+        (+ 1 eqyiel-circe-authentications-count))
+  (unless (> (list-length circe-network-options)
+             eqyiel-circe-authentications-count)
+    (progn
+      (eqyiel-circe-clear-passwords)
+      (setq eqyiel-circe-authentications-count 0))))
+(add-hook 'circe-server-connected-hook 'eqyiel-circe-wait-for-authentication)
 
 (eval-after-load 'circe
   '(progn
      (require 'circe-chanop)
      (require 'circe-color-nicks)
-     (setq circe-default-quit-message "( ' ヮ')ノ.・ﾟ*｡・.・ﾟ*｡・.・ﾟ*｡・ヽ(ﾟДﾟ,,)ノ"
-           circe-default-part-message "( ' ヮ')ノ.・ﾟ*｡・.・ﾟ*｡・.・ﾟ*｡・ヽ(ﾟДﾟ,,)ノ"
+     (setq circe-default-quit-message
+           "( ' ヮ')ノ.・ﾟ*｡・.・ﾟ*｡・.・ﾟ*｡・ヽ(ﾟДﾟ,,)ノ"
+           circe-default-part-message
+           "( ' ヮ')ノ.・ﾟ*｡・.・ﾟ*｡・.・ﾟ*｡・ヽ(ﾟДﾟ,,)ノ"
            circe-highlight-nick-type 'all
            circe-reduce-lurker-spam t ;; sometimes, I want to see this
            circe-format-say "<{nick}> {body}"
            circe-format-self-say "<{nick}> {body}"
-           circe-color-nicks-everywhere t
-           circe-network-options
-           `(("freenode"
-              :nick "eqyiel"
-              :host "rkm.id.au"
-              :service "7777"
-              :tls t
-              :pass ,eqyiel/freenode-pw)
-             ("oftc"
-              :nick "eqyiel"
-              :host "rkm.id.au"
-              :service "7777"
-              :tls t
-              :pass ,eqyiel/oftc-pw)))
+           circe-color-nicks-everywhere t)
      (enable-circe-color-nicks)))
 
 (eval-after-load "lui"
@@ -61,16 +83,9 @@
 
 (add-hook 'lui-mode-hook 'eqyiel-circe-set-margin)
 
-;; (setq tls-program '("openssl s_client -connect %h:%p -no_ssl2 -ign_eof
-;;                                       -CAfile ~/.config/certs/znc.crt"
-;;                     "gnutls-cli --insecure -p %p %h"
-;;                     "gnutls-cli --insecure -p %p %h --protocols ssl3"))
-
 (setq tls-program '("openssl s_client -connect %h:%p -no_ssl2 -ign_eof"
                     "gnutls-cli --insecure -p %p %h"
                     "gnutls-cli --insecure -p %p %h --protocols ssl3"))
-
-;; (define-abbrev-table circe-channel-mode-abbrev-table nil)
 
 (autoload 'enable-circe-notifications "circe-notifications" nil t)
 
@@ -81,7 +96,6 @@
          circe-notifications-wait-for 30))
 
 ;; warning: this is very dumb
-
 (defvar eqyiel-circe-znc-notices 0
   "How many notices have we received from ZNC?")
 
@@ -105,11 +119,13 @@ enabling notifications."
       (remove-hook 'circe-receive-message-functions 'eqyiel-circe-wait-for-znc)
       (enable-circe-notifications))))
 
-(defadvice circe-reconnect (before eqyiel-remove-circe-notifications)
+(add-hook 'circe-receive-message-functions 'eqyiel-circe-wait-for-znc)
+
+(defun eqyiel-disable-circe-notifications ()
   (setq eqyiel-circe-znc-notices 0)
   (remove-hook 'circe-receive-message-functions 'circe-notifications)
   (add-hook 'circe-receive-message-functions 'eqyiel-circe-wait-for-znc))
 
-(add-hook 'circe-receive-message-functions 'eqyiel-circe-wait-for-znc)
+(advice-add 'circe-reconnect-all :before 'eqyiel-disable-circe-notifications)
 
 (provide 'eqyiel-circe)

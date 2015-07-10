@@ -13,7 +13,6 @@
          python-check-command "pyflakes"
          python-shell-interpreter "python"))
 
-;; (add-hook 'python-mode-hook (lambda () (elpy-enable t)))
 (add-hook 'python-mode-hook (lambda () (elpy-enable)))
 
 (provide 'eqyiel-python)

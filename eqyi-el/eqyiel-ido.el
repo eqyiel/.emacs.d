@@ -9,6 +9,13 @@ can steal M-p from smex!!"
   (define-key ido-completion-map (kbd "C-n") 'ido-next-match)
   (define-key ido-completion-map (kbd "C-p") 'ido-prev-match))
 
+(eval-after-load "org"
+  '(setq org-completion-use-ido t))
+(eval-after-load "magit"
+    '(setq magit-completing-read-function 'magit-ido-completing-read))
+(eval-after-load "gnus"
+  '(setq gnus-completing-read-function 'gnus-ido-completing-read))
+
 (with-library ido-vertical-mode
   (turn-on-ido-vertical)
   (remove-hook 'ido-setup-hook 'ido-vertical-define-keys)
@@ -33,7 +40,7 @@ can steal M-p from smex!!"
  ido-save-directory-list-file "~/.cache/emacs/ido.last"
  ido-ignore-buffers ;; ignore these guys
  '("\\` " "^\*Mess" "^\*Back" ".*Completion" "^\*Ido" "^\*trace"
-   "^\*compilation" "^\*GTAGS" "^session\.*" "^\*")
+   "^\*compilation" "^\*GTAGS" "^session\.*")
  ido-work-directory-list '("~/" "~/doc" "~/dev" "~/.emacs.d/")
  ido-case-fold t
  ido-enable-last-directory-history t

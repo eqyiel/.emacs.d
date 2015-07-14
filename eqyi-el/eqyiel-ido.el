@@ -2,6 +2,7 @@
 
 (require 'ido)
 (require 'ido-ubiquitous)
+(require 'flx-ido)
 
 (defun eqyiel-ido-vertical-define-keys ()
   "C-n/p may be more intuitive in a vertical layout, but that doesn't mean you
@@ -39,7 +40,7 @@ can steal M-p from smex!!"
 (setq
  ido-save-directory-list-file "~/.cache/emacs/ido.last"
  ido-ignore-buffers ;; ignore these guys
- '("\\` " "^\*Mess" "^\*Back" ".*Completion" "^\*Ido" "^\*trace"
+ '("\\` " "^\*Back" ".*Completion" "^\*Ido" "^\*trace"
    "^\*compilation" "^\*GTAGS" "^session\.*")
  ido-work-directory-list '("~/" "~/doc" "~/dev" "~/.emacs.d/")
  ido-case-fold t
@@ -60,5 +61,10 @@ can steal M-p from smex!!"
 (ido-mode 'both) ;; for buffers and files
 (ido-ubiquitous-mode t)
 (ido-everywhere t)
+(flx-ido-mode)
+(setq ido-enable-flex-matching t)
+
+(eval-after-load "gnus"
+  '(require 'ido-gnus))
 
 (provide 'eqyiel-ido)

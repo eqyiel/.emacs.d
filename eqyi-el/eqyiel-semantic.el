@@ -1,7 +1,6 @@
 ;;; eqyiel-semantic.el
 
 (require 'semantic)
-
 (add-hook 'java-mode-hook (lambda () (require 'semantic/db-javap)))
 
 (add-to-list
@@ -10,7 +9,6 @@
    global-semantic-mru-bookmark-mode
    global-cedet-m3-minor-mode
    global-semantic-highlight-func-mode
-   ;; global-semantic-stickyfunc-mode
    global-semantic-decoration-mode
    global-semantic-idle-local-symbol-highlight-mode
    global-semantic-idle-scheduler-mode

@@ -27,6 +27,9 @@
    (quote
     ("/home/eqyiel/.emacs.d/eqyi-el" "/home/eqyiel/dev/android")))
  '(magit-use-overlays nil)
+ '(org-agenda-files
+   (quote
+    ("~/doc/org/contacts.org.gpg" "~/doc/org/groceries.org" "~/doc/org/minimal-derived-exporter.org" "~/doc/org/todo.org")))
  '(send-mail-function (quote mailclient-send-it))
  '(solarized-distinct-fringe-background t)
  '(solarized-high-contrast-mode-line t)

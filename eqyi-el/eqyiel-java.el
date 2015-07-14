@@ -10,8 +10,7 @@
 
 (eval-after-load "eclim"
   '(setq company-eclim-auto-save nil
-         company-eclim-executable
-         "eclim"))
+         company-eclim-executable "eclim"))
 
 (eval-after-load "eclimd"
   '(progn
@@ -19,14 +18,5 @@
      (define-key eclim-mode-map (kbd "C-c C-c") 'eclim-run-class)
      (define-key eclim-mode-map (kbd "<f5>") 'eclim-project-build)
      (setq eclimd-default-workspace "~/doc/flinders/comp3712_s1_2015/")))
-
-;; (defun eqyiel-java-mode-hook ()
-;;   (company-emacs-eclim-setup))
-
-;; (defun eqyiel-java-mode-hook ()
-;;   (set (make-local-variable 'company-backends) '((company-semantic
-;;                                                   company-yasnippet))))
-
-;; (add-hook 'java-mode-hook 'eqyiel-java-mode-hook)
 
 (provide 'eqyiel-java)

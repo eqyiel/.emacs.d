@@ -10,13 +10,10 @@
 (load-file "~/.emacs.d/site-lisp/cedet/cedet-devel-load.el")
 
 (eval-after-load "semantic"
-  '(progn
-     (unless (file-exists-p "~/.cache/emacs/semanticdb")
-       (make-directory "~/.cache/emacs/semanticdb" t)) ; also create parents
-     (setq semanticdb-default-save-directory "~/.cache/emacs/semanticdb")))
+  '(setq semanticdb-default-save-directory "~/.cache/emacs/semanticdb"))
 
 (eval-after-load "cedet-java"
-  ;; default fails to find openjdk on my system
+  ;; Default fails to find OpenJDK on my system
   '(setq cedet-java-version-regexp "version \"\\([0-9._]+\\)\""))
 
 (provide 'eqyiel-cedet)

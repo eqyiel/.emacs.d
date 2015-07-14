@@ -19,7 +19,7 @@
                ("Programming"
                  (or
                   (mode . prog-mode)
-                  (mode . lisp-interaction-mode)))
+                  (mode . comint-mode)))
                ("IRC"
                 (mode . circe-channel-mode)))))))
 

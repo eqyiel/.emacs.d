@@ -17,8 +17,9 @@
 
 (eval-after-load "yasnippet"
   '(progn
-     (add-to-list 'yas-snippet-dirs "~/.emacs.d/eqyi-el/snippets")
-     (setq yas-prompt-functions '(yas-ido-prompt))
+     (setq yas-snippet-dirs '("~/.emacs.d/eqyi-el/snippets"
+                             yas-installed-snippets-dir)
+           yas-prompt-functions '(yas-ido-prompt))
      (diminish 'yas-minor-mode)))
 
 (yas-global-mode t)
@@ -28,11 +29,13 @@
 (global-set-key (kbd "C-=") 'er/expand-region)
 
 (require 'key-chord)
-(key-chord-mode 1)
+(key-chord-mode t)
 (key-chord-define-global "jk" 'er/expand-region)
+(key-chord-define-global "jo" 'other-window)
 
 (autoload 'magit-status "magit" nil t)
 
+;; Caps lock and Menu keys are bound to Hyper.
 (global-set-key (kbd "H-h") 'windmove-left)
 (global-set-key (kbd "H-j") 'windmove-down)
 (global-set-key (kbd "H-k") 'windmove-up)
@@ -52,10 +55,6 @@
 (global-set-key (kbd "M-H-j") 'buf-move-down)
 (global-set-key (kbd "M-H-k") 'buf-move-up)
 (global-set-key (kbd "M-H-l") 'buf-move-right)
-
-(autoload 'tiling-cycle "tiling" nil t)
-
-(global-set-key (kbd "H-SPC") 'tiling-cycle)
 
 (eval-after-load "smex"
   '(setq smex-save-file "~/.cache/emacs/smex-items"))
@@ -125,15 +124,15 @@
     (setq sanityinc/fci-mode-suppressed nil)
     (turn-on-fci-mode)))
 
-;; maybe it would be better hooked into projectile or something?
 (autoload 'git-gutter-mode "git-gutter" nil t)
 (autoload 'global-git-gutter-mode "git-gutter" nil t)
+;; This makes startup really slow.  Might be better hooked into projectile or
+;; something.
 ;; (global-git-gutter-mode t)
 (eval-after-load "git-gutter" '(diminish 'git-gutter-mode))
 
 (autoload 'pkgbuild-mode "pkgbuild-mode.el" "PKGBUILD mode." t)
-(setq auto-mode-alist (append '(("/PKGBUILD$" . pkgbuild-mode))
-                              auto-mode-alist))
+(add-to-list 'auto-mode-alist '("/PKGBUILD$" . pkgbuild-mode))
 
 (autoload 'legalese "legalese" nil t)
 
@@ -150,7 +149,10 @@
 (dtrt-indent-mode)
 
 (require 'flycheck)
-(setq flycheck-gcc-pedantic t)
+(setq flycheck-gcc-pedantic t
+      flycheck-display-errors-delay 0.1
+      flycheck-completion-system 'ido)
+
 (add-hook 'prog-mode-hook 'flycheck-mode)
 
 (autoload 'internodeum/usage-summary "internodeum" nil t)
@@ -166,7 +168,7 @@
   (setf (internodeum/creds-password internodeum/credentials) nil)
   (setq internodeum/credentials nil))
 
-;; Together, these make a nice replacement for longlines-mode
+;; Together, these make a nice replacement for longlines-mode.
 (autoload 'turn-on-visual-line-mode "visual-line-mode" nil t)
 (autoload 'turn-on-visual-fill-column-mode "visual-fill-column" nil t)
 

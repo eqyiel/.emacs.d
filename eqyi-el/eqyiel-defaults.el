@@ -21,7 +21,8 @@
 (setq-default
  indent-tabs-mode nil
  fill-column 80
- tab-width 2)
+ tab-width 2
+ require-final-newline t)
 
 (defalias 'yes-or-no-p 'y-or-n-p)
 (defvaralias 'c-basic-offset 'tab-width)
@@ -97,15 +98,16 @@
       tramp-auto-save-directory "~/.cache/emacs/backup"
       tramp-default-method "scp")
 
-;; useful for debugging tramp
+;; Useful for debugging `tramp'
 ;; (setq tramp-debug-buffer t
 ;;       tramp-verbose 10)
 
-;; when tramp successfully logs in but hangs, it's probably because
-;; tramp-terminal-prompt-regexp doesn't recognise it:
+;; When `tramp' successfully logs in but hangs, it's probably because
+;; `tramp-terminal-prompt-regexp' doesn't recognise it:
 ;; http://stackoverflow.com/a/8363532
 
-;; uses sudo password, not root password.  no need to allow ssh for root.
+;; Uses sudo password for the user defined in ~/.ssh/config, not root password.
+;; No need to allow ssh for root.
 (add-to-list 'tramp-default-proxies-alist '(".*" "\\`root\\'" "/ssh:%h:"))
 (add-to-list 'tramp-default-proxies-alist '("\\`localhost\\'" "\\`root\\'" nil))
 
@@ -161,7 +163,8 @@
   '(when (executable-find ispell-program-name)
      (setq ispell-dictionary "en_GB"
            ispell-personal-dictionary "~/.aspell.en.pws")
-     (add-hook 'text-mode-hook 'turn-on-flyspell)))
+     (add-hook 'text-mode-hook 'turn-on-flyspell)
+     (add-hook 'prog-mode-hook 'flyspell-prog-mode)))
 
 (global-set-key (kbd "<C-mouse-5>") 'text-scale-increase)
 (global-set-key (kbd "<C-mouse-4>") 'text-scale-decrease)
@@ -201,9 +204,16 @@
             (setq indent-tabs-mode t
                   tab-width 8)))
 
-;; systemd service files
+;; Open systemd service files with an appropriate mode.
 (add-to-list 'auto-mode-alist '("\\.service\\'" . conf-unix-mode))
 (add-to-list 'auto-mode-alist '("\\.target\\'" . conf-unix-mode))
 (add-to-list 'auto-mode-alist '("\\.timer\\'" . conf-unix-mode))
+
+;; Use `eldoc' in `emacs-lisp-mode' buffers.
+(add-hook 'emacs-lisp-mode-hook 'turn-on-eldoc-mode)
+
+(eval-after-load "help-at-pt"
+  '(setq help-at-pt-timer-delay 0.1
+         help-at-pt-display-when-idle t))
 
 (provide 'eqyiel-defaults)

@@ -1,10 +1,13 @@
 ;;; eqyiel-javascript.el
-;; npm config set prefix ~/.local
-;; npm install -g tern
+
 (setenv "NODE_PATH" "~/.local/lib/node_modules")
-;; how the fuck do I use this?
-;; cd to project directory,
-;; create a file .tern_project containing:
+
+;; `tern' cheatsheet:
+;;
+;; $ npm config set prefix ~/.local
+;; $ npm install -g tern
+;;
+;; Create a file .tern_project in the project directory containing:
 ;; {
 ;;     "loadEagerly": [
 ;;         "js/**.js"
@@ -14,9 +17,11 @@
 ;;         }
 ;;     }
 ;; }
-;; where "js/**.js" is the path to the javascript files.
-;; then start the server.
-;; tern --host localhost --port 11111 --persistent
+;;
+;; where "js/**.js" is the path to the .js files.
+;; Then start the server.
+;; $ tern --host localhost --port 11111 --persistent
+;; Now tell emacs where to find it.
 ;; (tern-use-server 11111 "127.0.0.1")
 
 (autoload 'company-tern "company-tern" nil t)

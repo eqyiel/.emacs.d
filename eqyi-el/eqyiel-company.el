@@ -4,7 +4,6 @@
 (autoload 'company-dabbrev-code "company-dabbrev-code" nil t)
 (autoload 'company-elisp "company-elisp" nil t)
 (autoload 'company-gtags "company-gtags" nil t)
-(autoload 'company-ispell "company-ispell" nil t)
 (autoload 'gtags-mode "gtags" nil t)
 
 (add-hook 'after-init-hook 'global-company-mode)
@@ -15,8 +14,7 @@
       '((company-abbrev
          company-yasnippet
          company-dabbrev
-         company-files
-         company-ispell)))
+         company-files)))
 
 ;; emacs lisp
 (defun eqyiel-company-elisp ()
@@ -26,14 +24,12 @@
           company-capf
           company-keywords
           company-dabbrev-code
-          company-files
-          company-ispell))))
+          company-files))))
 (add-hook 'emacs-lisp-mode-hook 'eqyiel-company-elisp)
 
 (defun eqyiel-company-circe ()
   (set (make-local-variable 'company-backends)
-       '((company-dabbrev
-          company-ispell))))
+       '((company-dabbrev))))
 (add-hook 'circe-mode-hook 'eqyiel-company-circe)
 
 (defun eqyiel-company-java ()
@@ -44,34 +40,8 @@
           company-capf
           company-keywords
           company-dabbrev-code
-          company-files
-          ;; company-ispell
-          ))))
+          company-files))))
 (add-hook 'java-mode-hook 'eqyiel-company-java)
-
-;; (defun check-expansion ()
-;;   (save-excursion
-;;     (if (looking-at "\\_>") t
-;;       (backward-char 1)
-;;       (if (looking-at "\\.") t
-;;         (backward-char 1)
-;;         (if (looking-at "->") t nil)))))
-
-;; (defun do-yas-expand ()
-;;   (let ((yas/fallback-behavior 'return-nil))
-;;     (yas/expand)))
-
-;; (defun tab-indent-or-complete ()
-;;   (interactive)
-;;   (if (minibufferp)
-;;       (minibuffer-complete)
-;;     (if (or (not yas/minor-mode)
-;;             (null (do-yas-expand)))
-;;         (if (check-expansion)
-;;             (company-complete-common)
-;;           (indent-for-tab-command)))))
-
-;; (global-set-key [tab] 'tab-indent-or-complete)
 
 (eval-after-load "company"
   '(progn

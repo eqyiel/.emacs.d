@@ -208,6 +208,7 @@
   (message (concat "from set-smtp " password))
   (setq smtpmail-smtp-server server
         smtpmail-smtp-service port
+        smtpmail-smtp-user user
         smtpmail-auth-credentials (list (list server port user password))
         smtpmail-auth-supported (list mech)
         smtpmail-starttls-credentials nil)
@@ -223,6 +224,7 @@
         starttls-extra-arguments nil
         smtpmail-smtp-server server
         smtpmail-smtp-service port
+        smtpmail-smtp-user user
         smtpmail-auth-credentials (list (list server port user password))
         smtpmail-starttls-credentials (list (list server port key cert)))
   (message

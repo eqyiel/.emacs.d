@@ -10,6 +10,7 @@
     column-enforce-mode
     column-marker
     company
+    company-tern
     diminish
     dtrt-indent
     elnode
@@ -20,11 +21,12 @@
     flx-ido
     flycheck
     git-gutter
-    guide-key
     helm
     helm-pydoc
     helm-swoop
     idle-highlight-mode
+    ido-gnus
+    ido-hacks
     ido-ubiquitous
     ido-vertical-mode
     idomenu
@@ -47,6 +49,7 @@
     smartparens
     smex
     solarized-theme
+    sr-speedbar
     unfill
     visual-fill-column
     web-mode

@@ -32,16 +32,13 @@
 (defvar rkm.id.au-base-directory "~/doc/rkm.id.au/src/")
 (defvar rkm.id.au-publishing-directory "~/doc/rkm.id.au/pub/")
 
-;; return the list of files matched by rkm.id.au-content
-;; (org-publish-get-base-files (cadr org-publish-project-alist))
-
 (eval-after-load "org"
   '(setq org-publish-project-alist
          `(("rkm.id.au"
             :components ("rkm.id.au-content" "rkm.id.au-static" "rkm.id.au-rss"))
         ("rkm.id.au-content"
-         :auto-sitemap t
-         :auto-index t
+         :auto-sitemap nil
+         :auto-index nil
          :index-filename "index.org"
          :index-title "rkm.id.au"
          :base-directory ,rkm.id.au-base-directory
@@ -59,7 +56,7 @@
          :creator-info nil
          ;; for only publishing <body>...</body>
          :body-only t
-         ;; :html-preamble "rkm.id.au"
+         ;; :htmlx3-preamble "rkm.id.au"
          ;; :html-postamble nil
          :html-html5-fancy t
          :html-doctype "html5"
@@ -86,7 +83,8 @@
          :publishing-function (org-rss-publish-to-rss)
          :section-numbers nil
          :exclude ".*"            ;; To exclude all files...
-         :include ("sitemap.org")   ;; ... except index.org.
+         ;; :include ("sitemap.org")   ;; ... except index.org.
+         :include ".*"
          :table-of-contents nil))))
 
 (eval-after-load "org"
@@ -182,31 +180,6 @@ URL and title."
          org-caldav-files
          '("~/doc/org/test-calendar-events.org")
          org-icalendar-timezone "Australia/Adelaide"))
-
-;; insert timestamps when an heading is created
-
-(add-hook 'org-insert-heading-hook
-          'tj/insert-heading-inactive-timestamp 'append)
-
-(defvar tj/insert-inactive-timestamp t)
-
-(defun tj/toggle-insert-inactive-timestamp ()
-  (interactive)
-  (setq tj/insert-inactive-timestamp
-        (not tj/insert-inactive-timestamp))
-  (message "Heading timestamps are %s"
-           (if tj/insert-inactive-timestamp "ON" "OFF")))
-
-(defun tj/insert-inactive-timestamp ()
-  (interactive)
-  (org-insert-time-stamp nil t t nil nil nil))
-
-(defun tj/insert-heading-inactive-timestamp ()
-  (save-excursion
-    (when tj/insert-inactive-timestamp
-      (org-return)
-      (org-cycle)
-      (tj/insert-inactive-timestamp))))
 
 ;; switch to calfw buffer at startup
 (defun eqyiel-init-hook ()

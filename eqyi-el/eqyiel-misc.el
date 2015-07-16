@@ -13,6 +13,26 @@
 (setq sp-autoescape-string-quote nil)
 (setq sp-autoskip-closing-pair 'always)
 
+;; Also be smart in the minibuffer
+(setq sp-ignore-modes-list
+      (delete 'minibuffer-inactive-mode sp-ignore-modes-list))
+
+(sp-local-pair 'org-mode "=" "=")
+(sp-local-pair 'org-mode "*" "*")
+(sp-local-pair 'org-mode "_" "_")
+(sp-local-pair 'org-mode "/" "/")
+
+;; (eval-after-load 'comint
+;;  (define-key comint-mode-map (kbd "M-r")
+;;    'comint-history-isearch-backward-regexp))
+;; how the fuck can I override a smartparens binding in just one mode?
+(defun eqyiel-comint-mode-hook ()
+  (set (make-local-variable
+        'sp-override-key-bindings)
+        '(("M-r" . comint-history-isearch-backward-regexp)))
+  (sp--update-override-key-bindings))
+(add-hook 'comint-mode-hook 'eqyiel-comint-mode-hook)
+
 (require 'yasnippet)
 
 (eval-after-load "yasnippet"
@@ -32,6 +52,9 @@
 (key-chord-mode t)
 (key-chord-define-global "jk" 'er/expand-region)
 (key-chord-define-global "jo" 'other-window)
+
+(setq key-chord-one-key-delay 0.01
+      key-chord-two-keys-delay 0.01)
 
 (autoload 'magit-status "magit" nil t)
 
@@ -105,25 +128,6 @@
 (add-hook 'prog-mode-hook 'column-enforce-mode)
 (eval-after-load "column-enforce-mode" '(diminish 'column-enforce-mode))
 
-(autoload 'turn-on-fci-mode "fill-column-indicator" nil t)
-(autoload 'fci-mode "fill-column-indicator" nil t)
-(add-hook 'prog-mode-hook 'turn-on-fci-mode)
-
-;; https://github.com/alpaker/Fill-Column-Indicator/issues/21
-(defvar sanityinc/fci-mode-suppressed nil)
-(defadvice popup-create (before suppress-fci-mode activate)
-  "Suspend fci-mode while popups are visible"
-  (let ((fci-enabled (sanityinc/fci-enabled-p)))
-    (when fci-enabled
-      (set (make-local-variable 'sanityinc/fci-mode-suppressed) fci-enabled)
-      (turn-off-fci-mode))))
-(defadvice popup-delete (after restore-fci-mode activate)
-  "Restore fci-mode when all popups have closed"
-  (when (and sanityinc/fci-mode-suppressed
-             (null popup-instances))
-    (setq sanityinc/fci-mode-suppressed nil)
-    (turn-on-fci-mode)))
-
 (autoload 'git-gutter-mode "git-gutter" nil t)
 (autoload 'global-git-gutter-mode "git-gutter" nil t)
 ;; This makes startup really slow.  Might be better hooked into projectile or
@@ -151,9 +155,12 @@
 (require 'flycheck)
 (setq flycheck-gcc-pedantic t
       flycheck-display-errors-delay 0.1
-      flycheck-completion-system 'ido)
+      flycheck-completion-system 'ido
+      flycheck-error-list-minimum-level 'warning)
 
+(global-set-key (kbd "C-c C-l") 'flycheck-list-errors)
 (add-hook 'prog-mode-hook 'flycheck-mode)
+(add-hook 'latex-mode-hook 'flycheck-mode)
 
 (autoload 'internodeum/usage-summary "internodeum" nil t)
 
@@ -171,5 +178,23 @@
 ;; Together, these make a nice replacement for longlines-mode.
 (autoload 'turn-on-visual-line-mode "visual-line-mode" nil t)
 (autoload 'turn-on-visual-fill-column-mode "visual-fill-column" nil t)
+
+(require 'projectile)
+(projectile-global-mode)
+(global-set-key (kbd "<f5>") 'projectile-compile-project)
+
+(autoload 'run-skewer "skewer-mode" nil t)
+
+(eval-after-load 'skewer-mode
+  '(progn
+     (add-hook 'js2-mode-hook 'skewer-mode)
+     (add-hook 'css-mode-hook 'skewer-css-mode)
+     (add-hook 'html-mode-hook 'skewer-html-mode)))
+
+;;; `grep' doesn't know that GREP_OPTIONS is deprecated
+;; (remove-hook 'grep-setup-hook (lambda () (setenv "GREP_OPTIONS" "")))
+
+(require 'beacon)
+(beacon-mode t)
 
 (provide 'eqyiel-misc)

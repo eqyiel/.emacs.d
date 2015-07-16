@@ -17,8 +17,8 @@
 ;; (setq bibtex-contline-indentation 2)
 ;; (setq bibtex-field-indentation 2)
 
-(load "auctex.el" nil t t)
-(load "preview-latex.el" nil t t)
+;; (load "auctex.el" nil t t)
+;; (load "preview-latex.el" nil t t)
 
 ;; Fill properly when dealing with LaTeX comments and syntax
 (eval-after-load "latex"
@@ -37,5 +37,8 @@
          TeX-PDF-mode t))
 
 (add-hook 'latex-mode-hook (lambda (TeX-PDF-mode-on)))
+
+(eval-after-load 'latex-mode
+  '(add-to-list 'tex-compile-commands '("xdg-open %r.pdf" "%r.pdf")))
 
 (provide 'eqyiel-tex)

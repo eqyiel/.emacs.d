@@ -5,6 +5,10 @@
       mail-host-address "rkm.id.au")
 
 (set-face-attribute 'default nil :height 120 :family "DejaVu Sans Mono")
+;; endlessparentheses.com/manually-choose-a-fallback-font-for-unicode.html
+(set-fontset-font "fontset-default" nil
+                  (font-spec :name "Noto Emoji")) ;; 😹
+;; (font-spec :size 20 :name "Symbola")) ;; 😹
 
 (menu-bar-mode -1)
 (scroll-bar-mode -1)
@@ -22,7 +26,9 @@
  indent-tabs-mode nil
  fill-column 80
  tab-width 2
- require-final-newline t)
+ require-final-newline t
+ sentence-end-double-space t
+ eval-expression-print-length nil)
 
 (defalias 'yes-or-no-p 'y-or-n-p)
 (defvaralias 'c-basic-offset 'tab-width)
@@ -91,7 +97,7 @@
 
 ;; Highlight isearch matches even when not in isearch, use
 ;; `lazy-highlight-cleanup' to clean up.
-(setq lazy-highlight-cleanup nil)
+;; (setq lazy-highlight-cleanup nil)
 
 (require 'tramp)
 (setq tramp-persistency-file-name "~/.cache/emacs/tramp"
@@ -148,6 +154,16 @@
  (lambda ()
   (define-key dired-mode-map (kbd "^")
     (lambda () (interactive) (find-alternate-file "..")))))
+
+(eval-after-load "dired"
+  '(progn
+     (setq dired-dwim-target t
+           dired-recursive-deletes 'top)
+     ;; Let me use ido when renaming/moving files
+     (put 'dired-do-rename 'ido 'find-file)
+     (put 'dired-do-copy 'ido 'find-file)))
+
+(setq delete-by-moving-to-trash t)
 
 (global-set-key [f11] 'toggle-frame-fullscreen)
 
@@ -215,5 +231,9 @@
 (eval-after-load "help-at-pt"
   '(setq help-at-pt-timer-delay 0.1
          help-at-pt-display-when-idle t))
+
+(setq find-function-C-source-directory "~/dev/emacs")
+
+(define-key isearch-mode-map [remap isearch-delete-char] 'isearch-del-char)
 
 (provide 'eqyiel-defaults)

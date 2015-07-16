@@ -9,4 +9,7 @@
 
 (auth-pass-enable)
 
+;; Don't open in DCL mode
+(add-to-list 'auto-mode-alist '("\\.com.gpg$" . fundamental-mode))
+
 (provide 'eqyiel-pass)

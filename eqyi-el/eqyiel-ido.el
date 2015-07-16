@@ -55,6 +55,11 @@ can steal M-p from smex!!"
  ido-create-new-buffer 'always
  ido-auto-merge-work-directories-length nil)
 
+;; `ido-ubiquitous' disables itself if the number of completions exceeds
+;; `ido-ubiquitous-max-items'.  This causes it to be disabled for things like
+;; `insert-char' where there are ~40000 completions available.
+(setq ido-ubiquitous-max-items most-positive-fixnum)
+
 ;; don't ask, just do
 (setq confirm-nonexistent-file-or-buffer nil)
 

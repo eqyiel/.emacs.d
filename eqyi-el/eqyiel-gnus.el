@@ -75,8 +75,8 @@
 
 ;; when in message mode, wrap the text according to `fill-column'.
 (add-hook 'message-mode-hook 'turn-off-auto-fill)
+;; (add-hook 'message-mode-hook 'turn-on-visual-fill-column-mode)
 (add-hook 'message-mode-hook 'turn-on-visual-line-mode)
-(add-hook 'message-mode-hook 'turn-on-visual-fill-column-mode)
 
 ;; allow attaching files from dired
 (add-hook 'dired-mode-hook 'turn-on-gnus-dired-mode)

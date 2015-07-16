@@ -184,7 +184,7 @@ file of a buffer in an external program."
       (kill-new filename)
       (message "Copied buffer file name '%s' to the clipboard." filename))))
 
-(global-set-key (kbd "C-c f") 'eqyiel-copy-file-name-to-clipboard)
+(global-set-key (kbd "C-c w") 'eqyiel-copy-file-name-to-clipboard)
 
 ;; http://whattheemacsd.com/file-defuns.el-01.html
 (defun eqyiel-rename-file-and-buffer ()
@@ -303,5 +303,21 @@ there should be."
     (while (re-search-forward "," (line-end-position) t)
       (setq i (+ i 1)))
     (message "found %s" i)))
+
+(defun eqyiel-copy-rectangle-to-kill-ring (start end)
+  "Saves a rectangle to the normal kill ring."
+  (interactive "r")
+  (let ((lines (extract-rectangle start end)))
+    (with-temp-buffer
+      (while lines
+        (insert-for-yank (car lines))
+        (insert "\n")
+        (setq lines (cdr lines)))
+      (kill-ring-save (point-min) (point-max)))))
+
+(defun eqyiel-parent-directory (dir)
+  (file-name-directory
+      (directory-file-name
+       dir)))
 
 (provide 'eqyiel-lib)

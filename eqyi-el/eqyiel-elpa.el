@@ -4,20 +4,22 @@
 
 (defvar eqyiel-package-list
   '(auth-password-store
+    beacon
     buffer-move
     calfw
     circe
     column-enforce-mode
     column-marker
     company
+    company-emoji
     company-tern
+    company-flx
     diminish
     dtrt-indent
     elnode
     elpy
     emacs-eclim
     expand-region
-    fill-column-indicator
     flx-ido
     flycheck
     git-gutter
@@ -38,14 +40,19 @@
     magit
     markdown-mode
     multiple-cursors
+    nodejs-repl
     notify
-    org-caldav
-    org-plus-contrib
+    ;; org-caldav
+    ;; org-plus-contrib
     pass
     pkgbuild-mode
     popwin
+    processing-mode
+    processing-snippets
+    projectile
     rainbow-mode
     s
+    skewer-mode
     smartparens
     smex
     solarized-theme
@@ -69,14 +76,13 @@
 	     ("melpa-stable" . "http://stable.melpa.org/packages/")
 	     ("org" . "http://orgmode.org/elpa/"))
 	   package-pinned-packages
-	   '((circe . "marmalade")
-	     (elpy . "elpy")
+     '((elpy . "elpy")
 	     (org-plus-contrib . "org")))
      (package-initialize)
      (unless package-archive-contents
        (package-refresh-contents))
      (dolist (package eqyiel-package-list)
        (unless (package-installed-p package)
-	 (package-install package)))))
+         (package-install package)))))
 
 (provide 'eqyiel-elpa)

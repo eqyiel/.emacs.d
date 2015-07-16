@@ -28,17 +28,47 @@
 (autoload 'tern-mode "tern" nil t)
 (autoload 'js2-mode "js2-mode" nil t)
 
-(defun eqyiel-javascript-mode-hook ()
-  (set (make-local-variable 'company-backends) '((company-tern
-                                                  company-files
+(defun eqyiel-company-javascript ()
+  (set (make-local-variable 'company-backends) '((company-files
+                                                  company-tern
                                                   company-yasnippet))))
 
-(add-hook 'js2-mode-hook 'eqyiel-javascript-mode-hook)
+;; (add-hook 'js2-mode-hook 'eqyiel-javascript-mode-hook)
 (add-hook 'js2-mode-hook (lambda () (tern-mode t)))
+
+(eval-after-load 'js2-mode
+  '(progn
+     (setq js2-highlight-level 3
+           js2-idle-timer-delay 3 ;; wait until I'm actually idle
+           js2-include-node-externs t
+           js2-concat-multiline-strings 'eol
+         )
+     (define-key js2-mode-map (kbd "C-c C-c") 'projectile-compile-project)
+     (define-key js2-mode-map (kbd "C-c j") 'js2-jump-to-definition)))
 
 (add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
 
-(eval-after-load "js2-mode"
-  '(setq js2-highlight-level 3))
+(add-hook 'js-mode-hook 'eqyiel-company-javascript)
+(add-hook 'js-mode-hook (lambda () (tern-mode t)))
+;; (add-hook 'js-mode-hook (lambda () (js2-highlight-unused-variables-mode t)))
+
+(eval-after-load 'js
+  '(progn
+     (setq js-indent-level 2)
+     (define-key
+       js-mode-map (kbd "C-c C-c") 'projectile-compile-project)))
+
+(eval-after-load 'flycheck
+  '(setq flycheck-jscsrc "~/.jscsrc"
+         flycheck-hintrc "~/.jshintrc"
+         flycheck-javascript-jscs-executable "jscs"
+         flycheck-javascript-jshint-executable "jshint"))
+
+(flycheck-add-next-checker 'javascript-jshint '(error . javascript-jscs))
+
+(eval-after-load 'tern
+  '(define-key tern-mode-keymap (kbd "C-c C-c") 'projectile-compile-project))
+
+;; (comint-send-string "*nodejs*" "var c = require(`./ColorUtils.js')")
 
 (provide 'eqyiel-javascript)

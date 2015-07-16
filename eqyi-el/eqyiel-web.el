@@ -7,6 +7,19 @@
 (add-to-list 'auto-mode-alist '("\\.jinja\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
 
+(eval-after-load 'web-mode
+  '(setq web-mode-markup-indent-offset 2
+         web-mode-code-indent-offset 2
+         web-mode-css-indent-offset 2
+         web-mode-attr-indent-offset 2
+         web-mode-sql-indent-offset 2))
+
+(eval-after-load 'flycheck
+  '(setq flycheck-html-tidy-executable "tidy"))
+
+(eval-after-load 'flycheck
+   '(flycheck-add-mode 'html-tidy 'web-mode))
+
 (defun eqyiel-css-mode-hook ()
   (setq css-indent-offset 2)
   (rainbow-turn-on))

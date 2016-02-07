@@ -5,7 +5,7 @@
 (eval-after-load "gnus"
   '(progn
      (require 'epg-config)
-     (setq setq gnus-startup-file "~/.config/gnus/newsrc"
+     (setq gnus-startup-file "~/.config/gnus/newsrc"
            gnus-save-newsrc-file t
            gnus-read-newsrc-file t
            gnus-activate-level 5

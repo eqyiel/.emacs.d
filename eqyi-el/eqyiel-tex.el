@@ -34,11 +34,13 @@
 
 (eval-after-load "latex"
   '(setq LaTeX-item-indent 0 ;; indent \item correctly
-         TeX-PDF-mode t))
+         TeX-PDF-mode t
+         latex-noindent-environments '("document" "lstlisting")))
 
 (add-hook 'latex-mode-hook (lambda (TeX-PDF-mode-on)))
 
 (eval-after-load 'latex-mode
   '(add-to-list 'tex-compile-commands '("xdg-open %r.pdf" "%r.pdf")))
+
 
 (provide 'eqyiel-tex)

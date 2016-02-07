@@ -40,6 +40,7 @@
     magit
     markdown-mode
     multiple-cursors
+    nix-mode
     nodejs-repl
     notify
     ;; org-caldav
@@ -47,8 +48,8 @@
     pass
     pkgbuild-mode
     popwin
-    processing-mode
-    processing-snippets
+    ;; processing-mode
+    ;; processing-snippets
     projectile
     rainbow-mode
     s

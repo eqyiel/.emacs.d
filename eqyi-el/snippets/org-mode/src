@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: src
+# key: src
+# --
+#+begin_src `(eqyiel-org-select-src-lang-mode)`
+$0
+#+end_src

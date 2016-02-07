@@ -2,21 +2,23 @@
 
 (autoload 'gnus "gnus" nil t)
 
-;; init from this file, not ~/.gnus
-(eval-after-load "gnus"
-  '(setq gnus-init-file "~/.emacs.d/eqyiel-gnus.el"))
-
-(eval-after-load "gnus"
-  '(setq gnus-startup-file "~/.config/gnus/newsrc" ;; don't pollute my homedir
-         gnus-save-newsrc-file t
-         gnus-read-newsrc-file t))
-
-;; http://www.emacswiki.org/emacs/EasyPG#toc8
-
 (eval-after-load "gnus"
   '(progn
      (require 'epg-config)
-     (setq mml2015-use 'epg
+     (setq setq gnus-startup-file "~/.config/gnus/newsrc"
+           gnus-save-newsrc-file t
+           gnus-read-newsrc-file t
+           gnus-activate-level 5
+           gnus-group-line-format "%M\%S\%p\%P\%5y: %(%-40,40g%) %6,6~(cut 2)d\n"
+           gnus-summary-stop-at-end-of-message t
+           gnus-auto-center-summary t
+           gnus-auto-center-group t
+           gnus-large-newsgroup nil
+           gnus-large-ephemeral-newsgroup nil
+           gnus-save-killed-list nil
+           gnus-subscribe-newsgroup-method 'gnus-subscribe-zombies
+           gnus-gcc-mark-as-read t
+           mml2015-use 'epg
            mml2015-verbose t
            epg-user-id "Ruben Maher"
            mml2015-encrypt-to-self t
@@ -36,126 +38,61 @@
            '("multipart/alternative"
              "multipart/encrypted"
              "multipart/signed")
-           epg-debug t)))
+           epg-debug t)
+     (define-key gnus-summary-mode-map (kbd "S-SPC") 'gnus-summary-prev-page)))
 
 (eval-after-load "mailcap"
   '(if (file-exists-p "~/.config/gnus/mailcap")
       (mailcap-parse-mailcap "~/.config/gnus/mailcap")))
 
-;; oh behave
-(eval-after-load "gnus"
-  '(define-key gnus-summary-mode-map (kbd "S-SPC") 'gnus-summary-prev-page))
-
-(eval-after-load "gnus"
-  '(progn
-     (setq
-      gnus-activate-level 5
-      gnus-group-line-format "%M\%S\%p\%P\%5y: %(%-40,40g%) %6,6~(cut 2)d\n"
-      gnus-summary-stop-at-end-of-message t
-      gnus-auto-center-summary t
-      gnus-auto-center-group t
-      ;; don't ask for confirmation before entering a large newsgroup, just do it
-      gnus-large-newsgroup nil
-      gnus-large-ephemeral-newsgroup nil
-      ;; don't save my killed groups, please, just kill them.
-      gnus-save-killed-list nil
-      ;; don't ask me about every single news group you find on the server
-      gnus-subscribe-newsgroup-method 'gnus-subscribe-zombies
-      gnus-gcc-mark-as-read t)))
-
 (eval-after-load "gnus-start"
-  ;; don't query the server and slow down my startup
   '(setq gnus-check-new-newsgroups 'ask-server))
 
-;; use topic headings for groups, like [ Gnus ], [ misc ], etc.
 (add-hook 'gnus-group-mode-hook 'gnus-topic-mode)
-
-;; show when I last read a group.
 (add-hook 'gnus-select-group-hook 'gnus-group-set-timestamp)
-
-;; when in message mode, wrap the text according to `fill-column'.
 (add-hook 'message-mode-hook 'turn-off-auto-fill)
-;; (add-hook 'message-mode-hook 'turn-on-visual-fill-column-mode)
 (add-hook 'message-mode-hook 'turn-on-visual-line-mode)
-
-;; allow attaching files from dired
 (add-hook 'dired-mode-hook 'turn-on-gnus-dired-mode)
 
 (eval-after-load "gnus"
-  '(setq gnus-select-method
-         ;; First argument to nnimap should match name of some file in
-         ;; ~/.password-store/.
-         '(nnimap "eqyiel@localhost"
-                  (nnimap-address "localhost")
-                  (nnimap-stream network)
-                  (nnir-search-engine imap))))
-;; (eval-after-load "gnus"
-;;   '(setq gnus-select-method
-;;          ;; First argument to nnimap should match name of some file in
-;;          ;; ~/.password-store/.
-;;          '(nnmaildir ""
-;;                   (directory "/home/eqyiel/nnmaildir/")
-;;                   (nnmaildir-directory "/home/eqyiel/nnmaildir/")
-;;                   (get-new-mail nil)
-;;                   (nnir-search-engine notmuch)
-;;                   )
-;;          nnir-notmuch-remove-prefix "/home/eqyiel/"
-;;          )
-;;   )
-
-;; (setq gnus-select-method
-;;       '(nnmaildir ""
-;;         (directory "~/Maildir/")
-;;         (get-new-mail nil)
-;;         (nnir-search-engine notmuch))
-;;       nnir-notmuch-remove-prefix "/home/wgg/Maildir/")
-
-;; (defun wg/update-notmuch ()
-;;   (start-process "notmuch-poll" nil "notmuch" "new"))
-;; (add-hook 'gnus-after-getting-new-news-hook 'wg/update-notmuch)
-;; (add-hook 'gnus-summary-exit-hook 'wg/update-notmuch)
-
-
-;; For remote:
-;; (eval-after-load "gnus"
-;;   '(setq gnus-select-method
-;;          '(nnimap "rkm.id.au"
-;;                   (nnimap-address "rkm.id.au")
-;;                   (nnimap-server-port "imaps")
-;;                   (nnimap-stream ssl))
-;;          gnus-secondary-select-methods
-;;          '((nnimap "imap.gmail.com"
-;;                    (nnimap-address "imap.gmail.com")
-;;                    (nnimap-server-port 993)
-;;                    (nnimap-stream ssl))
-;;            (nnimap "mail.internode.on.net"
-;;                    (nnimap-address "mail.internode.on.net")
-;;                    (nnimap-server-port 993)
-;;                    (nnimap-stream ssl))
-;;            (nnimap "outlook.office365.com"
-;;                    (nnimap-address "outlook.office365.com")
-;;                    (nnimap-server-port 993)
-;;                    (nnimap-stream ssl))
-;;            (nnimap "huttriverprovince.com.au"
-;;                    (nnimap-address "huttriverprovince.com.au")
-;;                    (nnimap-server-port 993)
-;;                    (nnimap-stream ssl)))))
-
-;; Don't use NNTP aymore, but for future reference this is how to do it:
-;; (eval-after-load "gnus"
-;;   '(setq gnus-secondary-select-methods
-;;          '((nntp "localhost"))))
+  '(if (string-equal (system-name) "ayanami")
+       (setq gnus-select-method
+             ;; First argument to nnimap should match name of some file in
+             ;; ~/.password-store/.
+             '(nnimap "eqyiel@localhost"
+                      (nnimap-address "localhost")
+                      (nnimap-stream network)
+                      (nnir-search-engine imap)))
+     (setq gnus-select-method
+           '(nnimap "rkm.id.au"
+                    (nnimap-address "rkm.id.au")
+                    (nnimap-server-port "imaps")
+                    (nnimap-stream ssl))
+           gnus-secondary-select-methods
+           '((nnimap "imap.gmail.com"
+                     (nnimap-address "imap.gmail.com")
+                     (nnimap-server-port 993)
+                     (nnimap-stream ssl))
+             (nnimap "mail.internode.on.net"
+                     (nnimap-address "mail.internode.on.net")
+                     (nnimap-server-port 993)
+                     (nnimap-stream ssl))
+             (nnimap "outlook.office365.com"
+                     (nnimap-address "outlook.office365.com")
+                     (nnimap-server-port 993)
+                     (nnimap-stream ssl))
+             (nnimap "huttriverprovince.com.au"
+                     (nnimap-address "huttriverprovince.com.au")
+                     (nnimap-server-port 993)
+                     (nnimap-stream ssl))))))
 
 (eval-after-load "message"
   '(setq message-kill-buffer-on-exit t
-         ;; have the name show up, please.
          message-from-style 'angles
-         ;; add Cc and Bcc headers to the message buffer
          message-default-mail-headers "Cc: \nBcc: \n"
          message-generate-headers-first t
          message-default-charset 'utf-8
-         message-cite-function 'message-cite-original-without-signature
-         ))
+         message-cite-function 'message-cite-original-without-signature))
 
 ;; Let Gnus change the "From:" line by looking at current group we are in. First
 ;; argument to each posting style is the name of a group in Gnus, not the server
@@ -353,5 +290,83 @@
 ;;               "rkm.id.au/Spam"
 ;;               "rkm.id.au/sa-learn"
 ;;               "rkm.id.au/sa-unlearn")))))
+
+;; example from wgreenhouse, come back to this at some point
+;; ;; Basic gnus nnmaildir config integrating notmuch.
+;; ;;
+;; ;; Out of scope: message retrieval (fetchmail), splitting/filtering (procmail),
+;; ;; sending (message-mode/smtpmail.el + gnus posting styles).
+
+;; (setq gnus-select-method
+;;       `(nnmaildir ""
+;;                   (directory ,(expand-file-name "~/Maildir/")) ;; Top level of your dir-of-maildirs
+;;                   (get-new-mail nil)
+;;                   (nnir-search-engine notmuch))
+;;       gnus-secondary-select-methods
+;;       '((nntp "gmane"
+;;               (nntp-open-connection-function nntp-open-tls-stream)
+;;               (nntp-port-number 563)
+;;               (nntp-address "news.gmane.org"))
+;;         ;; (nntp "aioe"
+;;         ;;       (nntp-prepare-server-hook
+;;         ;;        ((lambda ()
+;;         ;;           (call-process "ssh" nil nil nil
+;;         ;;                         "-L 5630:nntp.aioe.org:563"
+;;         ;;                         "digit"
+;;         ;;                         "-n"))))
+;;         ;;       (nntp-open-connection-function nntp-open-tls-stream)
+;;         ;;       (nntp-port-number 5630)
+;;         ;;       (nntp-address "127.0.0.1"))
+;;         (nntp "eternal-september"
+;;               (nntp-open-connection-function nntp-open-tls-stream)
+;;               (nntp-port-number 443)
+;;               (nntp-address "news.eternal-september.org")))
+;;       gnus-message-archive-group "nnmaildir:mail"
+;;       gnus-parameters
+;;       '((".+"
+;;          (gcc-self . t)))
+;;       nnir-notmuch-remove-prefix
+;;       (expand-file-name "~/Maildir/") ;; This should be the root of your dir-of-maildirs
+;;       gnus-use-full-window nil
+;;       mm-discouraged-alternatives
+;;       '("text/html")
+;;       mm-text-html-renderer 'gnus-w3m
+;;       gnus-inhibit-mime-unbuttonizing t
+;;       gnus-treat-body-boundary nil
+;;       gnus-summary-line-format
+;;       (concat
+;;        "%U%R%z"
+;;        "%-20,20f" ;; name
+;;        "  "
+;;        "%3{│%}" "%-25,25&user-date;" "%3{│%}" ;; date
+;;        "  "
+;;        "%B"
+;;        "%s\n")
+;;       gnus-summary-display-arrow t
+;;       message-send-mail-function 'message-smtpmail-send-it
+;;       mail-user-agent 'gnus-user-agent
+;;       gnus-use-adaptive-scoring t
+;;       gnus-home-score-file "~/.emacs.d/gnus.score"
+;;       gnus-home-adapt-file "~/.emacs.d/gnus.adapt"
+;;       gnus-asynchronous t
+;;       gnus-thread-hide-subtree t
+;;       mml2015-encrypt-to-self t
+;;       gnus-blocked-images ".*")
+
+;; ;; We need this because otherwise notmuch points at nonexistent files
+;; ;; because Gnus moves from new/ to cur/ on start.
+
+;; (add-hook 'gnus-after-getting-new-news-hook
+;;           (lambda
+;;             ()
+;;             (start-process "update-notmuch" nil "notmuch" "new")))
+
+;; ;; Use something like this to track your primary/priority inbox in
+;; ;; display-time-mode. This is especially handy if you use some kind of
+;; ;; asynchronous background mail retrieval (e.g. fetchmail+procmail).
+
+;; (setq display-time-mail-directory (expand-file-name "~/Maildir/mail/new/")
+;;       display-time-use-mail-icon t
+;;       read-mail-command 'gnus)
 
 (provide 'eqyiel-gnus)

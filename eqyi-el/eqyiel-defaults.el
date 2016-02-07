@@ -8,7 +8,8 @@
 ;; endlessparentheses.com/manually-choose-a-fallback-font-for-unicode.html
 (set-fontset-font "fontset-default" nil
                   (font-spec :name "Noto Emoji")) ;; 😹
-;; (font-spec :size 20 :name "Symbola")) ;; 😹
+;; (set-fontset-font "fontset-default" nil (font-spec :size 20 :name "Symbola"))
+;; 😹
 
 (menu-bar-mode -1)
 (scroll-bar-mode -1)
@@ -26,6 +27,7 @@
  indent-tabs-mode nil
  fill-column 80
  tab-width 2
+ standard-indent 2
  require-final-newline t
  sentence-end-double-space t
  eval-expression-print-length nil)
@@ -101,8 +103,7 @@
 
 (require 'tramp)
 (setq tramp-persistency-file-name "~/.cache/emacs/tramp"
-      tramp-auto-save-directory "~/.cache/emacs/backup"
-      tramp-default-method "scp")
+      tramp-auto-save-directory "~/.cache/emacs/backup")
 
 ;; Useful for debugging `tramp'
 ;; (setq tramp-debug-buffer t

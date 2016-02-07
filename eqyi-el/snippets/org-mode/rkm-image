@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: rkm-image
+# key: rkm-image
+# --
+#+attr_html: :class img-responsive center-block :alt $1
+[[file:$2]]$0

@@ -15,10 +15,11 @@
         ;; prefixed with a comma, which are evaluated before inserting.
         `(("freenode"
            :nick "eqyiel"
-           :host "rkm.id.au"
+           :host "znc.rkm.id.au"
            :service "7777"
            :tls t
-           :pass ,(concat "eqyiel/freenode:" (password-store-get "irc/znc")))
+           :pass ,(concat "eqyiel/freenode:"
+                          (password-store-get "www/znc.rkm.id.au")))
           ;; ("oftc"
           ;;  :nick "eqyiel"
           ;;  :host "rkm.id.au"

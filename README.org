@@ -6,6 +6,6 @@
 What?  It's my =emacs= configuration.  If you're checking this out for the first
 time, be sure to to run =setup.sh=.
 
-Requires =git=, =gnutls=, =pass=[fn:0], =notmuch= and GNU Emacs >= 24.4.
+Requires =git=, =gnutls=, =pass=[fn:0] and GNU Emacs >= 24.4.
 
 [fn:0] http://www.passwordstore.org/

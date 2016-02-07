@@ -28,9 +28,7 @@
 (eval-after-load "calendar"
   '(setq calendar-mark-holidays-flag t
          calendar-holidays (append
-                            eqyiel-australian-holidays
-                            solar-holidays
-                            oriental-holidays)))
+                            eqyiel-australian-holidays)))
 
 (defun eqyiel-open-calendar ()
   (interactive)

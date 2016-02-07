@@ -31,9 +31,31 @@
 (defun eqyiel-company-javascript ()
   (set (make-local-variable 'company-backends) '((company-files
                                                   company-tern
-                                                  company-yasnippet))))
+                                                  company-yasnippet)))
+  ;; tern is a bit nicer than gtags for javascript
+  ;; (set (make-local-variable 'company-backends) '(company-gtags))
+  )
+;;  >Actually, tern has tern-find-definition which works not only in a single file.
+;; I haven't been able to make this work outside my current file. Perhaps I'm just configuring tern wrong :(
+;; reply
+;; ibabanov 4 hours ago
+;; This .tern-project config works for me:
+;;   {
+;;     "libs": [
+;;       "browser"
+;;     ],
+;;     "plugins": {
+;;       "node": {},
+;;       "es_modules": {}
+;;     }
+;;   }
+;; Your project files must have "correct" format, e.g. require('relative_path')
+;; for imports and module.exports/exports for exports (or es6 import and
+;; export). Example for AMD format (requireJS) can be found here -
+;; http://ternjs.net/doc/manual.html#configuration
 
-;; (add-hook 'js2-mode-hook 'eqyiel-javascript-mode-hook)
+
+(add-hook 'js2-mode-hook 'eqyiel-company-javascript)
 (add-hook 'js2-mode-hook (lambda () (tern-mode t)))
 
 (eval-after-load 'js2-mode
@@ -47,9 +69,8 @@
      (define-key js2-mode-map (kbd "C-c j") 'js2-jump-to-definition)))
 
 (add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
+(add-to-list 'auto-mode-alist '("\\.jsx$" . js2-jsx-mode))
 
-(add-hook 'js-mode-hook 'eqyiel-company-javascript)
-(add-hook 'js-mode-hook (lambda () (tern-mode t)))
 ;; (add-hook 'js-mode-hook (lambda () (js2-highlight-unused-variables-mode t)))
 
 (eval-after-load 'js

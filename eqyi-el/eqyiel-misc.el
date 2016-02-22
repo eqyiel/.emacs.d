@@ -58,26 +58,41 @@
 
 (autoload 'magit-status "magit" nil t)
 
-;; Caps lock and Menu keys are bound to Hyper.
-(global-set-key (kbd "H-h") 'windmove-left)
-(global-set-key (kbd "H-j") 'windmove-down)
-(global-set-key (kbd "H-k") 'windmove-up)
-(global-set-key (kbd "H-l") 'windmove-right)
-
-(global-set-key (kbd "H-b") 'shrink-window-horizontally)
-(global-set-key (kbd "H-f") 'enlarge-window-horizontally)
-(global-set-key (kbd "H-n") 'shrink-window)
-(global-set-key (kbd "H-p") 'enlarge-window)
-
 (autoload 'buf-move-left "buffer-move" nil t)
 (autoload 'buf-move-down "buffer-move" nil t)
 (autoload 'buf-move-up "buffer-move" nil t)
 (autoload 'buf-move-right "buffer-move" nil t)
 
-(global-set-key (kbd "M-H-h") 'buf-move-left)
-(global-set-key (kbd "M-H-j") 'buf-move-down)
-(global-set-key (kbd "M-H-k") 'buf-move-up)
-(global-set-key (kbd "M-H-l") 'buf-move-right)
+;; Caps lock and Menu keys are bound to Hyper, except on OSX which apparently
+;; can't into Hyper.  Use fake Hyper from Seil/Karabiner instead, which is
+;; really M-s-S-C.
+;; See: http://www.tenshu.net/p/fake-hyper-key-for-osx.html
+(cond ((eq system-type 'darwin)
+       (global-set-key (kbd "M-s-S-C-h") 'windmove-left)
+       (global-set-key (kbd "M-s-S-C-j") 'windmove-down)
+       (global-set-key (kbd "M-s-S-C-k") 'windmove-up)
+       (global-set-key (kbd "M-s-S-C-l") 'windmove-right)
+       (global-set-key (kbd "M-s-S-C-b") 'shrink-window-horizontally)
+       (global-set-key (kbd "M-s-S-C-f") 'enlarge-window-horizontally)
+       (global-set-key (kbd "M-s-S-C-n") 'shrink-window)
+       (global-set-key (kbd "M-s-S-C-p") 'enlarge-window)
+       (global-set-key (kbd "M-s-S-C-h") 'buf-move-left)
+       (global-set-key (kbd "M-s-S-C-j") 'buf-move-down)
+       (global-set-key (kbd "M-s-S-C-k") 'buf-move-up)
+       (global-set-key (kbd "M-s-S-C-l") 'buf-move-right))
+      (t
+       (global-set-key (kbd "H-h") 'windmove-left)
+       (global-set-key (kbd "H-j") 'windmove-down)
+       (global-set-key (kbd "H-k") 'windmove-up)
+       (global-set-key (kbd "H-l") 'windmove-right)
+       (global-set-key (kbd "H-b") 'shrink-window-horizontally)
+       (global-set-key (kbd "H-f") 'enlarge-window-horizontally)
+       (global-set-key (kbd "H-n") 'shrink-window)
+       (global-set-key (kbd "H-p") 'enlarge-window)
+       (global-set-key (kbd "M-H-h") 'buf-move-left)
+       (global-set-key (kbd "M-H-j") 'buf-move-down)
+       (global-set-key (kbd "M-H-k") 'buf-move-up)
+       (global-set-key (kbd "M-H-l") 'buf-move-right)))
 
 (eval-after-load "smex"
   '(setq smex-save-file "~/.cache/emacs/smex-items"))

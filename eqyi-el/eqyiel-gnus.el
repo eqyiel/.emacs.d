@@ -55,7 +55,7 @@
 (add-hook 'dired-mode-hook 'turn-on-gnus-dired-mode)
 
 (eval-after-load "gnus"
-  '(if (string-equal (system-name) "ayanami")
+  '(if (string-equal (system-name) "ayanami.rkm.id.au")
        (setq gnus-select-method
              ;; First argument to nnimap should match name of some file in
              ;; ~/.password-store/.
@@ -106,6 +106,8 @@
            ("huttriverprovince.com.au" (address "info@huttriverprovince.com.au")
             (name "Hutt River Province"))
            ("internode.on.net" (address "eqyiel@internode.on.net")
+            (name "Ruben Maher"))
+           ("mangochutney.com.au" (address "ruben@mangochutney.com.au")
             (name "Ruben Maher")))))
 
 ;; Each component of smtp-accounts has the form
@@ -126,7 +128,9 @@
     (ssl "eqyiel@internode.on.net" "mail.internode.on.net" 25
          "eqyiel@internode.on.net" nil)
     (ssl "info@huttriverprovince.com.au" "rkm.id.au" 587
-         "info@huttriverprovince.com.au" nil)))
+         "info@huttriverprovince.com.au" nil)
+    (ssl "ruben@mangochutney.com.au" "imap.gmail.com" 587
+         "ruben@mangochutney.com.au" nil)))
 
 (eval-after-load "gnus"
   ;; http://www.emacswiki.org/emacs/MultipleSMTPAccounts

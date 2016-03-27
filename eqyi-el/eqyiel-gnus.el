@@ -16,6 +16,7 @@
            gnus-large-newsgroup nil
            gnus-large-ephemeral-newsgroup nil
            gnus-save-killed-list nil
+           gnus-summary-save-parts-default-mime ".*/.*"
            gnus-subscribe-newsgroup-method 'gnus-subscribe-zombies
            gnus-gcc-mark-as-read t
            mml2015-use 'epg
@@ -40,6 +41,15 @@
              "multipart/signed")
            epg-debug t)
      (define-key gnus-summary-mode-map (kbd "S-SPC") 'gnus-summary-prev-page)))
+
+;; Exclude message itself when saving all attachments
+;; http://stackoverflow.com/a/8416710
+(defadvice gnus-summary-save-parts-1
+    (around gnus-summary-save-parts-exclude-self activate)
+  (let ((handle (ad-get-arg 2)))
+    (unless (and (not (stringp (car handle)))
+                 (not (mm-handle-filename handle)))
+      ad-do-it)))
 
 (eval-after-load "mailcap"
   '(if (file-exists-p "~/.config/gnus/mailcap")

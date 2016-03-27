@@ -25,13 +25,13 @@
             nil)))
 (put 'with-library 'lisp-indent-function 1)
 
-;; (with-library solarized
-;;   (setq solarized-scale-org-headlines nil
-;;         solarized-use-variable-pitch nil)
-;;   (load-theme 'solarized-light t))
+(with-library solarized
+  (setq solarized-scale-org-headlines nil
+        solarized-use-variable-pitch nil)
+  (load-theme 'solarized-light t))
 
-(with-library zenburn-theme
-  (load-theme 'zenburn t))
+;; (with-library zenburn-theme
+;;   (load-theme 'zenburn t))
 
 ;; (require 'eqyiel-cedet)
 (require 'eqyiel-elpa)

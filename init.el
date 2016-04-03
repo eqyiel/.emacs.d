@@ -55,3 +55,4 @@
 (require 'eqyiel-android)
 (require 'eqyiel-semantic)
 (require 'eqyiel-scss)
+(require 'eqyiel-flycheck)

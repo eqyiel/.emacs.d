@@ -1,5 +1,11 @@
 ;;; init.el
 
+;; Added by Package.el.  This must come before configurations of
+;; installed packages.  Don't delete this line.  If you don't want it,
+;; just comment it out by adding a semicolon to the start of the line.
+;; You may delete these explanatory comments.
+(package-initialize)
+
 (defun add-subdirs-to-load-path (dir)
   "Recursive add directories to `load-path'."
   (let ((default-directory (file-name-as-directory dir)))
@@ -25,13 +31,13 @@
             nil)))
 (put 'with-library 'lisp-indent-function 1)
 
-;; (with-library solarized
-;;   (setq solarized-scale-org-headlines nil
-;;         solarized-use-variable-pitch nil)
-;;   (load-theme 'solarized-light t))
+(with-library solarized
+  (setq solarized-scale-org-headlines nil
+        solarized-use-variable-pitch nil)
+  (load-theme 'solarized-light t))
 
-(with-library zenburn-theme
-  (load-theme 'zenburn t))
+;; (with-library zenburn-theme
+;;   (load-theme 'zenburn t))
 
 ;; (require 'eqyiel-cedet)
 (require 'eqyiel-elpa)
@@ -39,7 +45,7 @@
 (require 'eqyiel-defaults)
 (require 'eqyiel-lib)
 (require 'eqyiel-company)
-(require 'eqyiel-org)
+;; (require 'eqyiel-org)
 (require 'eqyiel-pass)
 (require 'eqyiel-circe)
 (require 'eqyiel-gnus)
@@ -55,3 +61,5 @@
 (require 'eqyiel-android)
 (require 'eqyiel-semantic)
 (require 'eqyiel-scss)
+(if (eq system-type 'darwin)
+  (require 'eqyiel-osx))

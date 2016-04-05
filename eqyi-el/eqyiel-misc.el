@@ -75,11 +75,7 @@
        (global-set-key (kbd "M-s-S-C-b") 'shrink-window-horizontally)
        (global-set-key (kbd "M-s-S-C-f") 'enlarge-window-horizontally)
        (global-set-key (kbd "M-s-S-C-n") 'shrink-window)
-       (global-set-key (kbd "M-s-S-C-p") 'enlarge-window)
-       (global-set-key (kbd "M-s-S-C-h") 'buf-move-left)
-       (global-set-key (kbd "M-s-S-C-j") 'buf-move-down)
-       (global-set-key (kbd "M-s-S-C-k") 'buf-move-up)
-       (global-set-key (kbd "M-s-S-C-l") 'buf-move-right))
+       (global-set-key (kbd "M-s-S-C-p") 'enlarge-window))
       (t
        (global-set-key (kbd "H-h") 'windmove-left)
        (global-set-key (kbd "H-j") 'windmove-down)

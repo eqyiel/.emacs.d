@@ -5,6 +5,7 @@
 (autoload 'rainbow-turn-on "rainbow-mode")
 
 (add-to-list 'auto-mode-alist '("\\.jinja\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.php?\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
 
 (eval-after-load 'web-mode

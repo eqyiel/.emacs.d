@@ -54,7 +54,6 @@
 ;; export). Example for AMD format (requireJS) can be found here -
 ;; http://ternjs.net/doc/manual.html#configuration
 
-
 (add-hook 'js2-mode-hook 'eqyiel-company-javascript)
 (add-hook 'js2-mode-hook (lambda () (tern-mode t)))
 
@@ -64,9 +63,18 @@
            js2-idle-timer-delay 3 ;; wait until I'm actually idle
            js2-include-node-externs t
            js2-concat-multiline-strings 'eol
+           js2-strict-trailing-comma-warning nil ; cf. airbnb style guide (es6)
+           js2-indent-switch-body t
          )
      (define-key js2-mode-map (kbd "C-c C-c") 'projectile-compile-project)
      (define-key js2-mode-map (kbd "C-c j") 'js2-jump-to-definition)))
+
+(eval-after-load 'json-mode
+  '(add-hook
+    'json-mode-hook
+    (lambda ()
+      (setq js-indent-level 2
+            json-reformat:indent-width 2))))
 
 (add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
 (add-to-list 'auto-mode-alist '("\\.jsx$" . js2-jsx-mode))
@@ -78,14 +86,6 @@
      (setq js-indent-level 2)
      (define-key
        js-mode-map (kbd "C-c C-c") 'projectile-compile-project)))
-
-(eval-after-load 'flycheck
-  '(setq flycheck-jscsrc "~/.jscsrc"
-         flycheck-hintrc "~/.jshintrc"
-         flycheck-javascript-jscs-executable "jscs"
-         flycheck-javascript-jshint-executable "jshint"))
-
-(flycheck-add-next-checker 'javascript-jshint '(error . javascript-jscs))
 
 (eval-after-load 'tern
   '(define-key tern-mode-keymap (kbd "C-c C-c") 'projectile-compile-project))

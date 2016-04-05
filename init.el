@@ -61,5 +61,6 @@
 (require 'eqyiel-android)
 (require 'eqyiel-semantic)
 (require 'eqyiel-scss)
+(require 'eqyiel-flycheck)
 (if (eq system-type 'darwin)
   (require 'eqyiel-osx))

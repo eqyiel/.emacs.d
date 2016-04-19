@@ -21,7 +21,7 @@
 (delete-selection-mode 1)
 (global-subword-mode 1)
 
-(setq
+(setq-default
  indent-tabs-mode nil
  fill-column 80
  tab-width 2

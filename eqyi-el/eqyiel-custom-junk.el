@@ -26,6 +26,7 @@
  '(ede-project-directories
    (quote
     ("/home/eqyiel/.emacs.d/eqyi-el" "/home/eqyiel/dev/android")))
+ '(js2-mode-show-parse-errors nil)
  '(magit-use-overlays nil)
  '(org-agenda-files
    (quote
@@ -33,7 +34,8 @@
  '(package-selected-packages
    (quote
     (php-mode zenburn-theme ws-butler web-mode visual-fill-column unfill tao-theme sr-speedbar solarized-theme smex smartparens smart-mode-line-powerline-theme skewer-mode scss-mode rainbow-mode projectile popwin pkgbuild-mode pass org-plus-contrib notify nodejs-repl nix-mode markdown-mode magit less-css-mode legalese key-chord js2-refactor japanese-holidays idomenu ido-vertical-mode ido-ubiquitous ido-hacks ido-gnus idle-highlight-mode htmlize helm-swoop helm-pydoc helm-gtags haskell-mode git-gutter ggtags flymake-easy flycheck flx-ido expand-region encourage-mode emacs-eclim elpy elnode dtrt-indent diminish crosshairs company-tern company-flx company-emoji column-marker column-enforce-mode circe calfw buffer-move beacon auth-password-store)))
- '(send-mail-function (quote mailclient-send-it)))
+ '(send-mail-function (quote mailclient-send-it))
+ '(web-mode-enable-control-block-indentation nil))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

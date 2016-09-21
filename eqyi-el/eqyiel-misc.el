@@ -208,4 +208,26 @@
 (require 'beacon)
 (beacon-mode t)
 
+(eval-after-load 'flycheck
+  '(flycheck-define-checker swiftlint
+    "Flycheck plugin for Swiftlint"
+    :command ("swiftlint")
+    :error-patterns
+    ((error line-start (file-name) ":" line ":" column ": "
+            "error: " (message) line-end)
+     (warning line-start (file-name) ":" line ":" column ": "
+              "warning: " (message) line-end))
+    :modes swift-mode))
+
+(use-package swift-mode
+  :config (setq swift-indent-offset 2
+                         flycheck-swift-sdk-path
+                         (concat "/Applications/Xcode.app/Contents/Developer"
+                                 "/Platforms/iPhoneOS.platform/Developer/SDKs/"
+                                 "iPhoneOS9.3.sdk"))
+  :init (progn '((add-to-list 'flycheck-checkers 'swift)
+                 (add-to-list 'flycheck-checkers 'swiftlint)
+                 (flycheck-add-next-checker 'swiftlint '(t . swift))))
+  :ensure flycheck)
+
 (provide 'eqyiel-misc)

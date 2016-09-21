@@ -9,17 +9,25 @@
 (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
 
 (eval-after-load 'web-mode
-  '(setq web-mode-markup-indent-offset 2
-         web-mode-code-indent-offset 2
-         web-mode-css-indent-offset 2
-         web-mode-attr-indent-offset 2
-         web-mode-sql-indent-offset 2))
+  '(progn
+     (setq web-mode-markup-indent-offset 2
+           web-mode-code-indent-offset 2
+           web-mode-css-indent-offset 2
+           web-mode-attr-indent-offset 2
+           web-mode-sql-indent-offset 2
+           web-mode-content-types-alist '(("jsx"  . ".*\\.js[x]?\\'")))
+     (add-hook 'web-mode-hook
+               '(lambda ()
+                  (when (equal web-mode-content-type "jsx")
+                    (flycheck-select-checker 'javascript-eslint))))))
 
 (eval-after-load 'flycheck
   '(setq flycheck-html-tidy-executable "tidy"))
 
 (eval-after-load 'flycheck
-   '(flycheck-add-mode 'html-tidy 'web-mode))
+   '(progn
+      (flycheck-add-mode 'html-tidy 'web-mode)
+      (flycheck-add-mode 'javascript-eslint 'web-mode)))
 
 (defun eqyiel-css-mode-hook ()
   (setq css-indent-offset 2)

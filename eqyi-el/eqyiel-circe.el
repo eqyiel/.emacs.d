@@ -91,7 +91,7 @@
   '(progn
      (setq circe-notifications-watch-strings
            '("eqyiel" "versapunk" "nyarlu" "eqyiel1" "fthagn" "forcer")
-           circe-notifications-check-window-focus t
+           circe-notifications-alert-style 'osx-notifier
            circe-notifications-wait-for 30)
      (when (eq system-type 'darwin)
          (setq circe-notifications-backend "osascript"))))

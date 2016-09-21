@@ -3,11 +3,28 @@
 (setq user-full-name "Ruben Maher"
       user-mail-address "r@rkm.id.au"
       mail-host-address "rkm.id.au")
-(if (string-equal (system-name) "ayanami")
-    (progn
-      (set-face-attribute 'default nil :height 120 :family "DejaVu Sans Mono")
-      (set-fontset-font "fontset-default" nil (font-spec :name "Noto Emoji")))
-      (set-face-attribute 'default nil :height 120 :family "Monaco"))
+
+;; (if (eq system-type 'darwin)
+;;     (set-face-attribute 'default nil :height 120 :family "Monaco")
+;;   (progn
+;;     (set-face-attribute 'default nil :height 120 :family "DejaVu Sans Mono")))
+(set-face-attribute 'default nil :height 120 :family "DejaVu Sans Mono")
+
+(defun --set-emoji-font (frame)
+  "Adjust the font settings of FRAME so Emacs can display emoji properly."
+  (if (eq system-type 'darwin)
+      ;; For NS/Cocoa
+      (set-fontset-font t 'symbol (font-spec :family "Apple Color Emoji")
+                        frame 'prepend)
+    ;; For Linux
+    (set-fontset-font t 'symbol (font-spec :family "Noto Emoji")
+                      frame 'prepend)))
+
+;; For when Emacs is started in GUI mode:
+(--set-emoji-font nil)
+;; Hook for when a frame is created with emacsclient
+;; see https://www.gnu.org/software/emacs/manual/html_node/elisp/Creating-Frames.html
+(add-hook 'after-make-frame-functions '--set-emoji-font)
 
 (menu-bar-mode -1)
 (scroll-bar-mode -1)

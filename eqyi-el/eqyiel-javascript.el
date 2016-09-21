@@ -27,6 +27,8 @@
 (autoload 'company-tern "company-tern" nil t)
 (autoload 'tern-mode "tern" nil t)
 (autoload 'js2-mode "js2-mode" nil t)
+(autoload 'js2-jsx-mode "js2-mode" nil t)
+(autoload 'web-mode "web-mode" nil t)
 
 (defun eqyiel-company-javascript ()
   (set (make-local-variable 'company-backends) '((company-files
@@ -67,7 +69,24 @@
            js2-indent-switch-body t
          )
      (define-key js2-mode-map (kbd "C-c C-c") 'projectile-compile-project)
-     (define-key js2-mode-map (kbd "C-c j") 'js2-jump-to-definition)))
+     (define-key js2-mode-map (kbd "C-c j") 'js2-jump-to-definition)
+     (define-key js2-mode-map (kbd "C-M-s-\"")
+       '(lambda ()
+         (interactive)
+         (progn
+           (web-mode)
+           (flycheck-select-checker 'javascript-eslint)
+           (flycheck-mode))))))
+
+(eval-after-load 'web-mode
+  '(progn
+     (define-key web-mode-map (kbd "C-M-s-\"")
+       (lambda ()
+         (interactive)
+         (if (string-equal (file-name-extension buffer-file-name) "jsx")
+             (js2-jsx-mode)
+           (js2-mode))))
+     (define-key web-mode-map (kbd "M-j") 'newline-and-indent)))
 
 (eval-after-load 'json-mode
   '(add-hook
@@ -89,6 +108,9 @@
 
 (eval-after-load 'tern
   '(define-key tern-mode-keymap (kbd "C-c C-c") 'projectile-compile-project))
+
+(eval-after-load 'flycheck
+  '(setq flycheck-eslintrc ".eslintrc.json"))
 
 ;; (comint-send-string "*nodejs*" "var c = require(`./ColorUtils.js')")
 

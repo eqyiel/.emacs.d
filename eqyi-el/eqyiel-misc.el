@@ -230,4 +230,7 @@
                  (flycheck-add-next-checker 'swiftlint '(t . swift))))
   :ensure flycheck)
 
+(use-package yaml-mode
+  :ensure t)
+
 (provide 'eqyiel-misc)

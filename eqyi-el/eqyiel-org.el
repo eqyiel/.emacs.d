@@ -249,6 +249,11 @@ clocked tasks in minutes."
   :config (setq org-download-method 'attach
                 ;; doesn't work on OSX :(
                 ;; org-download-timestamp t
-                ))
+                )
+  :ensure t)
+
+(use-package ox-gfm
+  :ensure t)
+
 
 (provide 'eqyiel-org)

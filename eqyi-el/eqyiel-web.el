@@ -38,4 +38,16 @@
   (rainbow-turn-on))
 (add-hook 'html-mode-hook 'eqyiel-html-mode-hook)
 
+
+(use-package web-mode
+  :config (progn
+          (define-key web-mode-map (kbd "C-M-s-\"")
+            (lambda ()
+              (interactive)
+              (if (string-equal (file-name-extension buffer-file-name) "jsx")
+                  (js2-jsx-mode)
+                (js2-mode))))
+          (define-key web-mode-map (kbd "M-j") 'newline-and-indent))
+  :ensure t)
+
 (provide 'eqyiel-web)

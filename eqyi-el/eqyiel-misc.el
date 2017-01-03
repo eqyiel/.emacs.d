@@ -193,6 +193,8 @@
 (require 'projectile)
 (projectile-global-mode)
 (global-set-key (kbd "<f5>") 'projectile-compile-project)
+(setq projectile-globally-ignored-directories
+      (append '("dist" "node_modules") projectile-globally-ignored-directories))
 
 (autoload 'run-skewer "skewer-mode" nil t)
 

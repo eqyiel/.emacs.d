@@ -56,47 +56,32 @@
 ;; export). Example for AMD format (requireJS) can be found here -
 ;; http://ternjs.net/doc/manual.html#configuration
 
-(add-hook 'js2-mode-hook 'eqyiel-company-javascript)
-(add-hook 'js2-mode-hook (lambda () (tern-mode t)))
-
-(eval-after-load 'js2-mode
-  '(progn
-     (setq js2-highlight-level 3
-           js2-idle-timer-delay 3 ;; wait until I'm actually idle
-           js2-include-node-externs t
-           js2-concat-multiline-strings 'eol
-           js2-strict-trailing-comma-warning nil ; cf. airbnb style guide (es6)
-           js2-indent-switch-body t
-         )
-     (define-key js2-mode-map (kbd "C-c C-c") 'projectile-compile-project)
-     (define-key js2-mode-map (kbd "C-c j") 'js2-jump-to-definition)
-     (define-key js2-mode-map (kbd "C-M-s-\"")
-       '(lambda ()
-         (interactive)
-         (progn
-           (web-mode)
-           (flycheck-select-checker 'javascript-eslint)
-           (flycheck-mode))))))
-
-(eval-after-load 'web-mode
-  '(progn
-     (define-key web-mode-map (kbd "C-M-s-\"")
-       (lambda ()
-         (interactive)
-         (if (string-equal (file-name-extension buffer-file-name) "jsx")
-             (js2-jsx-mode)
-           (js2-mode))))
-     (define-key web-mode-map (kbd "M-j") 'newline-and-indent)))
-
 (eval-after-load 'json-mode
-  '(add-hook
-    'json-mode-hook
-    (lambda ()
-      (setq js-indent-level 2
-            json-reformat:indent-width 2))))
+  '(add-hook 'json-mode-hook (lambda ()
+      (setq js-indent-level 2 json-reformat:indent-width 2))))
 
-(add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
-(add-to-list 'auto-mode-alist '("\\.jsx$" . js2-jsx-mode))
+(use-package js2-mode
+  :config (progn
+            (define-key js2-mode-map (kbd "C-c C-c") 'projectile-compile-project)
+            (define-key js2-mode-map (kbd "C-c j") 'js2-jump-to-definition)
+            (define-key js2-mode-map (kbd "C-M-s-\"")
+              '(lambda ()
+                 (interactive)
+                 (progn
+                   (web-mode)
+                   (flycheck-select-checker 'javascript-eslint)
+                   (flycheck-mode))))
+            (add-hook 'js2-mode-hook 'eqyiel-company-javascript)
+            (add-hook 'js2-mode-hook (lambda () (tern-mode t)))
+            (setq js2-highlight-level 3
+                  js2-idle-timer-delay 3 ;; wait until I'm actually idle
+                  js2-include-node-externs t
+                  js2-concat-multiline-strings 'eol
+                  js2-strict-trailing-comma-warning nil))
+  :init (progn (add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
+               (add-to-list 'auto-mode-alist '("\\.jsx$" . js2-jsx-mode)))
+  :ensure t)
+
 
 ;; (add-hook 'js-mode-hook (lambda () (js2-highlight-unused-variables-mode t)))
 
@@ -111,6 +96,9 @@
 
 (eval-after-load 'flycheck
   '(setq flycheck-eslintrc ".eslintrc.json"))
+
+(use-package eslint-fix
+  :ensure t)
 
 ;; (comint-send-string "*nodejs*" "var c = require(`./ColorUtils.js')")
 

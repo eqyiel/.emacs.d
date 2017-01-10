@@ -4,7 +4,6 @@
 (autoload 'company-complete "company" nil t)
 (autoload 'company-dabbrev-code "company-dabbrev-code" nil t)
 (autoload 'company-elisp "company-elisp" nil t)
-(autoload 'company-emoji "company-emoji" nil t)
 (autoload 'company-gtags "company-gtags" nil t)
 (autoload 'gtags-mode "gtags" nil t)
 (autoload 'company-flx-mode "company-flx")
@@ -78,5 +77,10 @@
            company-idle-delay 0
            company-dabbrev-code-everywhere t)
      (diminish 'company-mode)))
+
+
+(use-package company-emoji
+  :config (add-to-list 'company-backends 'company-emoji)
+  :ensure company)
 
 (provide 'eqyiel-company)

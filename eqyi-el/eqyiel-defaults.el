@@ -4,12 +4,27 @@
       user-mail-address "r@rkm.id.au"
       mail-host-address "rkm.id.au")
 
+;; (if (eq system-type 'darwin)
+;;     (set-face-attribute 'default nil :height 120 :family "Monaco")
+;;   (progn
+;;     (set-face-attribute 'default nil :height 120 :family "DejaVu Sans Mono")))
 (set-face-attribute 'default nil :height 120 :family "DejaVu Sans Mono")
-;; endlessparentheses.com/manually-choose-a-fallback-font-for-unicode.html
-(set-fontset-font "fontset-default" nil
-                  (font-spec :name "Noto Emoji")) ;; 😹
-;; (set-fontset-font "fontset-default" nil (font-spec :size 20 :name "Symbola"))
-;; 😹
+
+(defun --set-emoji-font (frame)
+  "Adjust the font settings of FRAME so Emacs can display emoji properly."
+  (if (eq system-type 'darwin)
+      ;; For NS/Cocoa
+      (set-fontset-font t 'symbol (font-spec :family "Apple Color Emoji")
+                        frame 'prepend)
+    ;; For Linux
+    (set-fontset-font t 'symbol (font-spec :family "Noto Emoji")
+                      frame 'prepend)))
+
+;; For when Emacs is started in GUI mode:
+(--set-emoji-font nil)
+;; Hook for when a frame is created with emacsclient
+;; see https://www.gnu.org/software/emacs/manual/html_node/elisp/Creating-Frames.html
+(add-hook 'after-make-frame-functions '--set-emoji-font)
 
 (menu-bar-mode -1)
 (scroll-bar-mode -1)
@@ -27,6 +42,7 @@
  indent-tabs-mode nil
  fill-column 80
  tab-width 2
+ default-tab-width 2
  standard-indent 2
  require-final-newline t
  sentence-end-double-space t
@@ -35,6 +51,9 @@
 (defalias 'yes-or-no-p 'y-or-n-p)
 (defvaralias 'c-basic-offset 'tab-width)
 (defvaralias 'cperl-indent-level 'tab-width)
+
+;; Give me two spaces everywhere
+(add-hook 'c-mode-common-hook #'(lambda () (setq c-basic-offset tab-width)))
 
 (setq buffer-file-coding-system 'utf-8-unix
       default-file-name-coding-system 'utf-8-unix
@@ -45,8 +64,10 @@
 
 (set-locale-environment "en_US.UTF-8")
 
-(setq browse-url-browser-function 'browse-url-generic
-      browse-url-generic-program "firefox")
+(if (eq system-type 'darwin)
+    (setq browse-url-browser-function 'browse-url-default-macosx-browser)
+  (setq browse-url-browser-function 'browse-url-generic
+        browse-url-generic-program "firefox"))
 
 (eval-after-load "warnings"
   ;; Stop warning me about my load path including ~/.emacs.d.
@@ -67,6 +88,7 @@
       version-control t
       vc-make-backup-files t
       echo-keystrokes 0.1
+      auto-save-default nil
       auto-save-list-file-prefix "~/.cache/emacs/backup/.saves-"
       bookmark-default-file "~/.cache/emacs/emacs.bmk"
       url-cache-directory "~/.cache/emacs/url/cache"
@@ -177,11 +199,14 @@
             (setq Info-additional-directory-list Info-default-directory-list)))
 
 (eval-after-load "ispell"
-  '(when (executable-find ispell-program-name)
-     (setq ispell-dictionary "en_GB"
-           ispell-personal-dictionary "~/.aspell.en.pws")
-     (add-hook 'text-mode-hook 'turn-on-flyspell)
-     (add-hook 'prog-mode-hook 'flyspell-prog-mode)))
+  '(progn
+     (when (executable-find ispell-program-name)
+       (setq ispell-dictionary "en_GB"
+             ispell-personal-dictionary "~/.aspell.en.pws")
+       (add-hook 'text-mode-hook 'turn-on-flyspell)
+       (add-hook 'prog-mode-hook 'flyspell-prog-mode))
+     (when (eq system-type 'darwin)
+       (setenv "DICTIONARY" "en_GB"))))
 
 (global-set-key (kbd "<C-mouse-5>") 'text-scale-increase)
 (global-set-key (kbd "<C-mouse-4>") 'text-scale-decrease)

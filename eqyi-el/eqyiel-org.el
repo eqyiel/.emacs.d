@@ -245,4 +245,15 @@ clocked tasks in minutes."
                 processing python R ruby sass scheme
                 screen sed sh sql sqlite))))
 
+(use-package org-download
+  :config (setq org-download-method 'attach
+                ;; doesn't work on OSX :(
+                ;; org-download-timestamp t
+                )
+  :ensure t)
+
+(use-package ox-gfm
+  :ensure t)
+
+
 (provide 'eqyiel-org)

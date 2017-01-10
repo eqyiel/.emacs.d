@@ -55,8 +55,19 @@
   '(if (file-exists-p "~/.config/gnus/mailcap")
       (mailcap-parse-mailcap "~/.config/gnus/mailcap")))
 
+;; This is the one that is built into emacs
+;; (add-hook 'gnus-after-getting-new-news-hook 'gnus-notifications)
+;; This is the one from melpa
+(require 'gnus-desktop-notify)
+(gnus-desktop-notify-mode)
+(gnus-demon-add-scanmail)
+
 (eval-after-load "gnus-start"
-  '(setq gnus-check-new-newsgroups 'ask-server))
+  '(progn
+     (setq gnus-check-new-newsgroups 'ask-server)
+     (gnus-demon-init)
+     ;; (gnus-demon-add-handler 'gnus-demon-scan-news 1 t)
+     ))
 
 (add-hook 'gnus-group-mode-hook 'gnus-topic-mode)
 (add-hook 'gnus-select-group-hook 'gnus-group-set-timestamp)
@@ -65,7 +76,7 @@
 (add-hook 'dired-mode-hook 'turn-on-gnus-dired-mode)
 
 (eval-after-load "gnus"
-  '(if (string-equal (system-name) "ayanami.rkm.id.au")
+  '(if (string-equal (system-name) "ayanami")
        (setq gnus-select-method
              ;; First argument to nnimap should match name of some file in
              ;; ~/.password-store/.

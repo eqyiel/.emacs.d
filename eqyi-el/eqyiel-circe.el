@@ -89,7 +89,7 @@
 
 (eval-after-load "circe-notifications"
   '(setq circe-notifications-watch-strings
-         '("eqyiel" "versapunk" "nyarlu" "eqyiel1" "fthagn" "forcer")
+         '("versapunk" "nyarlu" "eqyiel1" "fthagn" "forcer")
          circe-notifications-check-window-focus t
          circe-notifications-wait-for 30))
 

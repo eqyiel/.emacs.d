@@ -126,15 +126,14 @@
 (require 'tramp)
 (setq tramp-persistency-file-name "~/.cache/emacs/tramp"
       tramp-auto-save-directory "~/.cache/emacs/backup"
+      ;; When `tramp' successfully logs in but hangs, it's probably because
+      ;; `tramp-terminal-prompt-regexp' doesn't recognise it:
+      ;; http://stackoverflow.com/a/8363532
       tramp-shell-prompt-pattern "\\(?:^\\|\r\\)[^]#$%>\n]*#?[]#$%>].* *\\(^[\\[[0-9;]*[a-zA-Z] *\\)*")
 
 ;; Useful for debugging `tramp'
 ;; (setq tramp-debug-buffer t
 ;;       tramp-verbose 10)
-
-;; When `tramp' successfully logs in but hangs, it's probably because
-;; `tramp-terminal-prompt-regexp' doesn't recognise it:
-;; http://stackoverflow.com/a/8363532
 
 ;; Uses sudo password for the user defined in ~/.ssh/config, not root password.
 ;; No need to allow ssh for root.
@@ -226,7 +225,7 @@
 (global-unset-key (kbd "C-z"))
 
 ;; Why don't you respect `tab-width?'
-(eval-after-load "shell-script-mode"
+(eval-after-load "shell-script"
   '(setq sh-make-vars-local nil
          sh-basic-offset 2
          sh-indentation 2))

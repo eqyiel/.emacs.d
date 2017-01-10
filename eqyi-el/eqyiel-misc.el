@@ -10,15 +10,16 @@
 (diminish 'smartparens-mode)
 
 ;; Don't do this: "\"\""
-(setq sp-autoescape-string-quote nil)
+;; sp-autoescape-string-quote is obsolete
+;; (setq sp-autoescape-string-quote nil)
 (setq sp-autoskip-closing-pair 'always)
 
 ;; Also be smart in the minibuffer
 (setq sp-ignore-modes-list
       (delete 'minibuffer-inactive-mode sp-ignore-modes-list))
 
+(sp-local-pair 'org-mode "~" "~")
 (sp-local-pair 'org-mode "=" "=")
-(sp-local-pair 'org-mode "*" "*")
 (sp-local-pair 'org-mode "_" "_")
 (sp-local-pair 'org-mode "/" "/")
 
@@ -212,8 +213,10 @@
 ;;; `grep' doesn't know that GREP_OPTIONS is deprecated
 ;; (remove-hook 'grep-setup-hook (lambda () (setenv "GREP_OPTIONS" "")))
 
-(require 'beacon)
-(beacon-mode t)
+(use-package beacon
+  :config (beacon-mode t))
+
+(use-package sql-indent)
 
 (eval-after-load 'flycheck
   '(flycheck-define-checker swiftlint

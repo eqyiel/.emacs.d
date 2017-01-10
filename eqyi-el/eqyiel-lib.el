@@ -329,7 +329,16 @@ The variable `sort-fold-case' determines whether alphabetic case affects the
 sort order.
 
 See `sort-regexp-fields'."
-  (interactive "*P\nr")
+  (interactive "P\nr")
   (sort-regexp-fields reverse "\\w+" "\\&" beg end))
+
+(defun eqyiel-sort-lines-or-words (reverse beg end)
+  "Sort lines if active region covers more than one line, otherwise sort words."
+  (interactive "P\nr")
+  (if (> (count-lines beg end) 1)
+      (sort-lines reverse beg end)
+    (eqyiel-sort-words reverse beg end)))
+
+(global-set-key [f9] 'eqyiel-sort-lines-or-words)
 
 (provide 'eqyiel-lib)

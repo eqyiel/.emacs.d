@@ -1,7 +1,5 @@
 ;;; eqyiel-javascript.el
 
-(setenv "NODE_PATH" "~/.local/lib/node_modules")
-
 ;; `tern' cheatsheet:
 ;;
 ;; $ npm config set prefix ~/.local
@@ -82,9 +80,6 @@
                (add-to-list 'auto-mode-alist '("\\.jsx$" . js2-jsx-mode)))
   :ensure t)
 
-
-;; (add-hook 'js-mode-hook (lambda () (js2-highlight-unused-variables-mode t)))
-
 (eval-after-load 'js
   '(progn
      (setq js-indent-level 2)
@@ -99,7 +94,5 @@
 
 (use-package eslint-fix
   :ensure t)
-
-;; (comint-send-string "*nodejs*" "var c = require(`./ColorUtils.js')")
 
 (provide 'eqyiel-javascript)

@@ -1,11 +1,5 @@
 ;;; init.el
 
-;; Added by Package.el.  This must come before configurations of
-;; installed packages.  Don't delete this line.  If you don't want it,
-;; just comment it out by adding a semicolon to the start of the line.
-;; You may delete these explanatory comments.
-(package-initialize)
-
 (defun add-subdirs-to-load-path (dir)
   "Recursive add directories to `load-path'."
   (let ((default-directory (file-name-as-directory dir)))
@@ -45,7 +39,7 @@
 (require 'eqyiel-defaults)
 (require 'eqyiel-lib)
 (require 'eqyiel-company)
-;; (require 'eqyiel-org)
+(require 'eqyiel-org)
 (require 'eqyiel-pass)
 (require 'eqyiel-circe)
 (require 'eqyiel-gnus)
@@ -62,5 +56,6 @@
 (require 'eqyiel-semantic)
 (require 'eqyiel-scss)
 (require 'eqyiel-flycheck)
+(require 'eqyiel-cc)
 (if (eq system-type 'darwin)
   (require 'eqyiel-osx))

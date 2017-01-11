@@ -1,17 +1,14 @@
 ;;; eqyiel-scss.el
 
-(eval-after-load 'scss-mode
-  (setq scss-sass-command "~/.gem/ruby/2.3.0/bin/sass"
+(require 'use-package)
 
-  ))
+(use-package scss-mode
+  :config (add-hook
+           'scss-mode-hook
+           (lambda () ;; use // instead of /* */
+             (set (make-local-variable 'comment-start) "//")
+             (set (make-local-variable 'comment-end) "")
+             (set (make-local-variable 'comment-continue) "//")))
+  :ensure t)
 
-;; use // instead of /* */
-(add-hook 'scss-mode-hook
-          (lambda ()
-            (set (make-local-variable 'comment-start) "//")
-            (set (make-local-variable 'comment-end) "")
-            (set (make-local-variable 'comment-continue) "//")))
-
-
-
-(provide 'eqyiel-scss)
+ (provide 'eqyiel-scss)

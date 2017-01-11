@@ -18,11 +18,12 @@
     dtrt-indent
     elnode
     elpy
-    emacs-eclim
+    ;; emacs-eclim
     expand-region
     flx-ido
     flycheck
     git-gutter
+    gnus-desktop-notify
     helm
     helm-pydoc
     helm-swoop

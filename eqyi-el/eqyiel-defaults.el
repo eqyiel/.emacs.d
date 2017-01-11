@@ -4,11 +4,11 @@
       user-mail-address "r@rkm.id.au"
       mail-host-address "rkm.id.au")
 
-;; (if (eq system-type 'darwin)
-;;     (set-face-attribute 'default nil :height 120 :family "Monaco")
-;;   (progn
-;;     (set-face-attribute 'default nil :height 120 :family "DejaVu Sans Mono")))
-(set-face-attribute 'default nil :height 120 :family "DejaVu Sans Mono")
+(cond
+ ((string-equal system-name "localghost") ;; high dpi
+  (set-face-attribute 'default nil :height 220 :family "DejaVu Sans Mono"))
+ (t
+  (set-face-attribute 'default nil :height 120 :family "DejaVu Sans Mono")))
 
 (defun --set-emoji-font (frame)
   "Adjust the font settings of FRAME so Emacs can display emoji properly."

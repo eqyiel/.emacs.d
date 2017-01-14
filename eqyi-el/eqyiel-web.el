@@ -38,16 +38,23 @@
   (rainbow-turn-on))
 (add-hook 'html-mode-hook 'eqyiel-html-mode-hook)
 
+(defun eqyiel-toggle-web-mode-to-js2-mode ()
+  (interactive)
+  (if (string-equal web-mode-content-type "jsx")
+      (js2-jsx-mode)
+    (js2-mode)))
 
 (use-package web-mode
   :config (progn
-          (define-key web-mode-map (kbd "C-M-s-\"")
-            (lambda ()
-              (interactive)
-              (if (string-equal (file-name-extension buffer-file-name) "jsx")
-                  (js2-jsx-mode)
-                (js2-mode))))
-          (define-key web-mode-map (kbd "M-j") 'newline-and-indent))
+            (define-key web-mode-map (kbd "C-M-s-\"")
+              'eqyiel-toggle-web-mode-to-js2-mode)
+            (define-key web-mode-map (kbd "H-'")
+              'eqyiel-toggle-web-mode-to-js2-mode)
+            (define-key web-mode-map (kbd "M-j")
+              'newline-and-indent)
+            (setq web-mode-content-types-alist
+                  '(("jsx" . "\\.js[x]?\\'"))))
   :ensure t)
 
 (provide 'eqyiel-web)
+

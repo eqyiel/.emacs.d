@@ -2,37 +2,32 @@
 
 (require 'diminish)
 
-(require 'smartparens)
-(require 'smartparens-config)
-
-(smartparens-global-mode t)
-(sp-use-paredit-bindings)
-(diminish 'smartparens-mode)
-
-;; Don't do this: "\"\""
-;; sp-autoescape-string-quote is obsolete
-;; (setq sp-autoescape-string-quote nil)
-(setq sp-autoskip-closing-pair 'always)
-
-;; Also be smart in the minibuffer
-(setq sp-ignore-modes-list
-      (delete 'minibuffer-inactive-mode sp-ignore-modes-list))
-
-(sp-local-pair 'org-mode "~" "~")
-(sp-local-pair 'org-mode "=" "=")
-(sp-local-pair 'org-mode "_" "_")
-(sp-local-pair 'org-mode "/" "/")
-
-;; (eval-after-load 'comint
-;;  (define-key comint-mode-map (kbd "M-r")
-;;    'comint-history-isearch-backward-regexp))
-;; how the fuck can I override a smartparens binding in just one mode?
-(defun eqyiel-comint-mode-hook ()
-  (set (make-local-variable
-        'sp-override-key-bindings)
-        '(("M-r" . comint-history-isearch-backward-regexp)))
-  (sp--update-override-key-bindings))
-(add-hook 'comint-mode-hook 'eqyiel-comint-mode-hook)
+(use-package smartparens
+  :init
+  (progn
+    (advice-add
+     'sp-splice-sexp-killing-around
+     :before-until
+     ;; Don't steal M-r in comint-mode or modes derived from comint-mode.
+     (lambda (&rest whatever)
+       (when (or (eq major-mode 'comint-mode)
+                 (eq (get major-mode 'derived-mode-parent) 'comint-mode))
+         (comint-history-isearch-backward-regexp))))
+    (use-package smartparens-config)
+    (smartparens-global-mode 1))
+  :config
+  (progn
+    (sp-use-paredit-bindings)
+    (setq sp-autoskip-closing-pair 'always)
+    (setq sp-ignore-modes-list  ;; Also be smart in the minibuffer.
+          (delete 'minibuffer-inactive-mode sp-ignore-modes-list))
+    (sp-local-pair 'org-mode "~" "~")
+    (sp-local-pair 'org-mode "=" "=")
+    (sp-local-pair 'org-mode "_" "_")
+    (sp-local-pair 'org-mode "/" "/"))
+  :demand
+  :diminish t
+  :ensure t)
 
 (require 'yasnippet)
 

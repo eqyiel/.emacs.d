@@ -1,34 +1,5 @@
 ;;; eqyiel-misc.el
 
-(require 'diminish)
-
-(use-package smartparens
-  :init
-  (progn
-    (advice-add
-     'sp-splice-sexp-killing-around
-     :before-until
-     ;; Don't steal M-r in comint-mode or modes derived from comint-mode.
-     (lambda (&rest whatever)
-       (when (or (eq major-mode 'comint-mode)
-                 (eq (get major-mode 'derived-mode-parent) 'comint-mode))
-         (comint-history-isearch-backward-regexp))))
-    (use-package smartparens-config)
-    (smartparens-global-mode 1))
-  :config
-  (progn
-    (sp-use-paredit-bindings)
-    (setq sp-autoskip-closing-pair 'always)
-    (setq sp-ignore-modes-list  ;; Also be smart in the minibuffer.
-          (delete 'minibuffer-inactive-mode sp-ignore-modes-list))
-    (sp-local-pair 'org-mode "~" "~")
-    (sp-local-pair 'org-mode "=" "=")
-    (sp-local-pair 'org-mode "_" "_")
-    (sp-local-pair 'org-mode "/" "/"))
-  :demand
-  :diminish t
-  :ensure t)
-
 (require 'yasnippet)
 
 (eval-after-load "yasnippet"

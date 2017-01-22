@@ -59,3 +59,66 @@
 ;; (require 'eqyiel-cc)
 (if (eq system-type 'darwin)
   (require 'eqyiel-osx))
+
+;; `use-package'----------------------------------------------------------------
+
+(require 'package)
+(setq package-enable-at-startup nil)
+(add-to-list 'package-archives
+             '("melpa" . "https://melpa.org/packages/"))
+
+(package-initialize)
+
+;; Bootstrap `use-package' and its dependencies if they are not already
+;; available.
+(unless
+    (seq-reduce
+     (lambda (prev next) (and prev next))
+     (mapcar
+      'package-installed-p
+      '(use-package diminish bind-key))
+     t)
+  (package-refresh-contents)
+  (dolist (package eqyiel-package-list)
+    (unless (package-installed-p package)
+      (package-install package))))
+
+(eval-when-compile
+  (require 'use-package))
+(require 'diminish)
+(require 'bind-key)
+
+;; `smartparens' ---------------------------------------------------------------
+
+(defun eqyiel/get-derived-mode-parents (mode)
+  (when mode
+    (cons mode (derived-mode-parents
+                (get mode 'derived-mode-parent)))))
+
+(use-package smartparens
+  :init
+  (progn
+    (advice-add
+     'sp-splice-sexp-killing-around
+     :before-until
+     ;; Don't steal M-r in comint-mode or modes derived from comint-mode.
+     (lambda (&rest whatever)
+       (when (or (eq major-mode 'comint-mode)
+                 (member 'comint-mode
+                         (eqyiel/get-derived-mode-parents major-mode)))
+         (comint-history-isearch-backward-regexp))))
+    (use-package smartparens-config)
+    (smartparens-global-mode 1))
+  :config
+  (progn
+    (sp-use-paredit-bindings)
+    (setq sp-autoskip-closing-pair 'always)
+    (setq sp-ignore-modes-list  ;; Also be smart in the minibuffer.
+          (delete 'minibuffer-inactive-mode sp-ignore-modes-list))
+    (sp-local-pair 'org-mode "~" "~")
+    (sp-local-pair 'org-mode "=" "=")
+    (sp-local-pair 'org-mode "_" "_")
+    (sp-local-pair 'org-mode "/" "/"))
+  :demand
+  :diminish t
+  :ensure t)

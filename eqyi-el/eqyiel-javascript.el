@@ -58,17 +58,24 @@
   '(add-hook 'json-mode-hook (lambda ()
       (setq js-indent-level 2 json-reformat:indent-width 2))))
 
+(defun eqyiel-toggle-js2-mode-to-web-mode ()
+  (interactive)
+  (progn
+    (web-mode)
+    (when (or (string-equal web-mode-content-type "javascript")
+              (string-equal web-mode-content-type "jsx"))
+        (progn
+          (flycheck-select-checker 'javascript-eslint)
+          (flycheck-mode)))))
+
 (use-package js2-mode
   :config (progn
             (define-key js2-mode-map (kbd "C-c C-c") 'projectile-compile-project)
             (define-key js2-mode-map (kbd "C-c j") 'js2-jump-to-definition)
             (define-key js2-mode-map (kbd "C-M-s-\"")
-              '(lambda ()
-                 (interactive)
-                 (progn
-                   (web-mode)
-                   (flycheck-select-checker 'javascript-eslint)
-                   (flycheck-mode))))
+              'eqyiel-toggle-js2-mode-to-web-mode)
+            (define-key js2-mode-map (kbd "H-'")
+              'eqyiel-toggle-js2-mode-to-web-mode)
             (add-hook 'js2-mode-hook 'eqyiel-company-javascript)
             (add-hook 'js2-mode-hook (lambda () (tern-mode t)))
             (setq js2-highlight-level 3

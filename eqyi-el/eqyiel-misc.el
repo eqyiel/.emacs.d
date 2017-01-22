@@ -243,4 +243,14 @@
 (use-package yaml-mode
   :ensure t)
 
+(use-package magit
+  :ensure t
+  :init (global-set-key [f8] 'magit-status))
+
+;; (use-package git-gutter
+;;   :ensure t
+;;   :init (global-git-gutter-mode t))
+
+(use-package php-mode :ensure t)
+
 (provide 'eqyiel-misc)

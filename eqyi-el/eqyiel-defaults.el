@@ -37,6 +37,7 @@
 (global-hl-line-mode 1)
 (delete-selection-mode 1)
 (global-subword-mode 1)
+(xterm-mouse-mode 1)
 
 (setq-default
  indent-tabs-mode nil

@@ -22,7 +22,6 @@
     expand-region
     flx-ido
     flycheck
-    git-gutter
     gnus-desktop-notify
     helm
     helm-pydoc
@@ -38,7 +37,6 @@
     js2-refactor
     key-chord
     legalese
-    magit
     markdown-mode
     multiple-cursors
     nix-mode

@@ -120,6 +120,7 @@ file."
              (setq i (1+ i)))))))
 
 (global-set-key (kbd "H-<return>") 'eqyiel-rotate-windows)
+(global-set-key (kbd "M-s-S-C-<return>") 'eqyiel-rotate-windows)
 
 ;; http://whattheemacsd.com/buffer-defuns.el-03.html
 
@@ -149,6 +150,7 @@ file."
           (if this-win-2nd (other-window 1))))))
 
 (global-set-key (kbd "H-SPC") 'eqyiel-toggle-window-split)
+(global-set-key (kbd "M-s-S-C-SPC") 'eqyiel-toggle-window-split)
 
 ;; https://github.com/bbatsov/prelude/blob/master/core/prelude-core.el
 

@@ -198,6 +198,6 @@
 (use-package yaml-mode
   :ensure t)
 
-
+(use-package php-mode :ensure t)
 
 (provide 'eqyiel-misc)

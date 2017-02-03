@@ -1,19 +1,13 @@
 ;;; init.el
 
-(defun add-subdirs-to-load-path (dir)
-  "Recursive add directories to `load-path'."
-  (let ((default-directory (file-name-as-directory dir)))
-    (add-to-list 'load-path dir)
-    (normal-top-level-add-subdirs-to-load-path)))
+(let ((default-directory (file-name-as-directory user-emacs-directory)))
+    (normal-top-level-add-subdirs-to-load-path))
 
 (when (not (car (file-attributes "~/.cache/emacs")))
   (make-directory "~/.cache/emacs"))
 
 (when (not (car (file-attributes "~/.local/share/emacs")))
   (make-directory "~/.local/share/emacs"))
-
-(add-subdirs-to-load-path "~/.emacs.d")
-(add-subdirs-to-load-path "~/.local/share/emacs")
 
 (defmacro with-library (symbol &rest body)
   "See http://www.emacswiki.org/emacs/LoadingLispFiles"
@@ -137,17 +131,16 @@
 
 ;; `smartparens' ---------------------------------------------------------------
 
-(defun eqyiel/get-derived-mode-parents (mode)
-  (when (and mode (boundp 'derived-mode-parents))
-    (cons mode (derived-mode-parents (get mode 'derived-mode-parent)))))
-
 (use-package smartparens
   :init
+  (defun eqyiel/get-derived-mode-parents (mode)
+    (when (and mode (boundp 'derived-mode-parents))
+      (cons mode (derived-mode-parents (get mode 'derived-mode-parent)))))
   (advice-add
    'sp-splice-sexp-killing-around
    :before-until
    ;; Don't steal M-r in comint-mode or modes derived from comint-mode.
-   (lambda (&rest whatever)
+   (lambda (&rest args)
      (when (or (eq major-mode 'comint-mode)
                (member 'comint-mode
                        (eqyiel/get-derived-mode-parents major-mode)))
@@ -259,3 +252,78 @@
   :bind (("C-c TAB" . yas-expand))
   :diminish yas-minor-mode
   :demand)
+
+;; `highlight-indentation' -----------------------------------------------------
+
+(use-package highlight-indentation
+  :config (add-hook 'prog-mode-hook 'highlight-indentation-mode)
+  :diminish highlight-indentation-mode)
+
+;; `column-enforce-mode' -------------------------------------------------------
+
+(use-package column-enforce-mode
+  :config (add-hook 'prog-mode-hook 'column-enforce-mode)
+  :diminish column-enforce-mode)
+
+;; `legalese' ------------------------------------------------------------------
+
+(use-package legalese)
+
+;; `pkgbuild-mode' -------------------------------------------------------------
+
+(use-package pkgbuild-mode
+  :config (add-to-list 'auto-mode-alist '("/PKGBUILD$" . pkgbuild-mode)))
+
+;; `markdown-mode' -------------------------------------------------------------
+
+(use-package markdown-mode
+  :config
+  (add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
+  (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode)))
+
+;; `ws-butler' -----------------------------------------------------------------
+
+(use-package ws-butler
+  :config (ws-butler-global-mode)
+  :diminish ws-butler-mode)
+
+;; `dtrt-indent' ---------------------------------------------------------------
+
+(use-package dtrt-indent
+  :config (dtrt-indent-mode))
+
+;; `flycheck' ------------------------------------------------------------------
+
+(use-package flycheck
+  :config
+  (setq flycheck-gcc-pedantic t
+        flycheck-display-errors-delay 0.1
+        flycheck-error-list-minimum-level 'warning)
+  (add-hook 'prog-mode-hook 'flycheck-mode)
+  (add-hook 'latex-mode-hook 'flycheck-mode)
+  :bind ("C-c C-l" . flycheck-list-errors))
+
+;; `internodeum' ---------------------------------------------------------------
+
+(use-package internodeum
+  :load-path "site-lisp/internodeum"
+  :commands internodeum/usage-summary
+  :config
+  (use-package pass)
+  (defun eqyiel/internodeum-set-credentials (&rest args)
+    (setq
+     internodeum/credentials
+     (internodeum/make-creds
+      :username "eqyiel"
+      :password (password-store-get "auth-sources/eqyiel@mail.internode.on.net"))))
+  (defun eqyiel/internodeum-clear-credentials (&rest args)
+    (progn
+      (setf (internodeum/creds-username internodeum/credentials) nil)
+      (setf (internodeum/creds-password internodeum/credentials) nil)
+      (setq internodeum/credentials nil)))
+  (advice-add 'internodeum/usage-summary :before 'eqyiel/internodeum-set-credentials)
+  (advice-add 'internodeum/usage-summary :after 'eqyiel/internodeum-clear-credentials)
+  :ensure nil)
+
+(provide 'init)
+;;; init.el ends here

@@ -1,59 +1,5 @@
 ;;; eqyiel-misc.el
 
-
-(autoload 'idle-highlight-mode "idle-highlight-mode" nil t)
-
-(autoload 'column-enforce-mode "column-enforce-mode" nil t)
-(add-hook 'prog-mode-hook 'column-enforce-mode)
-(eval-after-load "column-enforce-mode" '(diminish 'column-enforce-mode))
-
-(autoload 'git-gutter-mode "git-gutter" nil t)
-(autoload 'global-git-gutter-mode "git-gutter" nil t)
-;; This makes startup really slow.  Might be better hooked into projectile or
-;; something.
-;; (global-git-gutter-mode t)
-(eval-after-load "git-gutter" '(diminish 'git-gutter-mode))
-
-(autoload 'pkgbuild-mode "pkgbuild-mode.el" "PKGBUILD mode." t)
-(add-to-list 'auto-mode-alist '("/PKGBUILD$" . pkgbuild-mode))
-
-(autoload 'legalese "legalese" nil t)
-
-(autoload 'markdown-mode "markdown-mode"
-   "Major mode for editing Markdown files" t)
-(add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
-(add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
-
-(require 'ws-butler)
-(ws-butler-global-mode)
-(diminish 'ws-butler-mode)
-
-(require 'dtrt-indent)
-(dtrt-indent-mode)
-
-(require 'flycheck)
-(setq flycheck-gcc-pedantic t
-      flycheck-display-errors-delay 0.1
-      flycheck-completion-system 'ido
-      flycheck-error-list-minimum-level 'warning)
-
-(global-set-key (kbd "C-c C-l") 'flycheck-list-errors)
-(add-hook 'prog-mode-hook 'flycheck-mode)
-(add-hook 'latex-mode-hook 'flycheck-mode)
-
-(autoload 'internodeum/usage-summary "internodeum" nil t)
-
-(defadvice internodeum/usage-summary (before eqyiel-internodeum-setup activate)
-  (setq internodeum/credentials
-        (internodeum/make-creds
-         :username "eqyiel"
-         :password (password-store-get "internode"))))
-
-(defadvice internodeum/usage-summary (after eqyiel-internodeum-clear activate)
-  (setf (internodeum/creds-username internodeum/credentials) nil)
-  (setf (internodeum/creds-password internodeum/credentials) nil)
-  (setq internodeum/credentials nil))
-
 ;; Together, these make a nice replacement for longlines-mode.
 (autoload 'turn-on-visual-line-mode "visual-line-mode" nil t)
 (autoload 'turn-on-visual-fill-column-mode "visual-fill-column" nil t)

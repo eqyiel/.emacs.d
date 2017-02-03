@@ -5,17 +5,17 @@
 (defvar eqyiel-package-list
   '(auth-password-store
     beacon
-    buffer-move
+    ;; buffer-move
     calfw
     circe
-    column-enforce-mode
+    ;; column-enforce-mode
     ;; column-marker
     company
     company-emoji
     company-tern
     company-flx
-    diminish
-    dtrt-indent
+    ;; diminish
+    ;; dtrt-indent
     elnode
     elpy
     ;; emacs-eclim
@@ -26,7 +26,7 @@
     ;; helm
     ;; helm-pydoc
     ;; helm-swoop
-    idle-highlight-mode
+    ;; idle-highlight-mode
     ido-gnus
     ido-hacks
     ido-ubiquitous
@@ -35,9 +35,9 @@
     japanese-holidays
     js2-mode
     js2-refactor
-    key-chord
-    legalese
-    markdown-mode
+    ;; key-chord
+    ;; legalese
+    ;; markdown-mode
     ;; multiple-cursors
     nix-mode
     nodejs-repl
@@ -45,7 +45,7 @@
     ;; org-caldav
     ;; org-plus-contrib
     pass
-    pkgbuild-mode
+    ;; pkgbuild-mode
     popwin
     ;; processing-mode
     ;; processing-snippets
@@ -53,15 +53,15 @@
     rainbow-mode
     s
     skewer-mode
-    smartparens
-    smex
+    ;; smartparens
+    ;; smex
     solarized-theme
     sr-speedbar
     unfill
     visual-fill-column
     web-mode
-    ws-butler
-    yasnippet
+    ;; ws-butler
+    ;; yasnippet
     zenburn-theme)
   "Packages to pull from `package-archives'.")
 

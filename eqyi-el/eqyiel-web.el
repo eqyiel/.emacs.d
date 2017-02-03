@@ -57,4 +57,3 @@
   :ensure t)
 
 (provide 'eqyiel-web)
-

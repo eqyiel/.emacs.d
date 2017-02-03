@@ -18,12 +18,12 @@
 (require 'key-chord)
 (key-chord-mode t)
 (key-chord-define-global "jk" 'er/expand-region)
+(key-chord-define-global "kj" 'er/expand-region)
 (key-chord-define-global "jo" 'other-window)
+(key-chord-define-global "oj" 'other-window)
 
 (setq key-chord-one-key-delay 0.01
       key-chord-two-keys-delay 0.01)
-
-(autoload 'magit-status "magit" nil t)
 
 (autoload 'buf-move-left "buffer-move" nil t)
 (autoload 'buf-move-down "buffer-move" nil t)
@@ -62,17 +62,6 @@
 (global-set-key (kbd "M-H-k") 'buf-move-up)
 (global-set-key (kbd "M-H-l") 'buf-move-right)
 
-(eval-after-load "smex"
-  '(setq smex-save-file "~/.cache/emacs/smex-items"))
-
-(autoload 'smex "smex" nil t)
-(autoload 'smex-major-mode-commands "smex" nil t)
-(autoload 'execute-extended-command "smex" nil t)
-;; (smex-initialize) ; Can be omitted. This might cause a (minimal) delay
-;;                   ; when Smex is auto-initialized on its first run.
-(global-set-key (kbd "M-x") 'smex)
-(global-set-key (kbd "M-X") 'smex-major-mode-commands)
-(global-set-key (kbd "C-c C-c M-x") 'execute-extended-command)
 
 (autoload 'mc/edit-lines "multiple-cursors" nil t)
 (autoload 'mc/mark-next-like-this "multiple-cursors" nil t)
@@ -208,5 +197,7 @@
 
 (use-package yaml-mode
   :ensure t)
+
+
 
 (provide 'eqyiel-misc)

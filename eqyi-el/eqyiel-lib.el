@@ -341,4 +341,12 @@ See `sort-regexp-fields'."
 
 (global-set-key [f9] 'eqyiel-sort-lines-or-words)
 
+;; Make life better in SSH sessions
+(defun eqyiel/copy-to-clipboard (beg end &optional region)
+  (let ((inhibit-message t))
+    (shell-command-on-region beg end "copy-to-clipboard")))
+
+(advice-add 'kill-region :after 'eqyiel/copy-to-clipboard)
+(advice-add 'copy-region-as-kill :after 'eqyiel/copy-to-clipboard)
+
 (provide 'eqyiel-lib)

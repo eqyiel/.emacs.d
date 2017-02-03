@@ -37,6 +37,7 @@
 (global-hl-line-mode 1)
 (delete-selection-mode 1)
 (global-subword-mode 1)
+(xterm-mouse-mode 1)
 
 (setq-default
  indent-tabs-mode nil
@@ -224,12 +225,6 @@
 (global-unset-key (kbd "C-x C-z"))
 (global-unset-key (kbd "C-z"))
 
-;; Why don't you respect `tab-width?'
-(eval-after-load "shell-script"
-  '(setq sh-make-vars-local nil
-         sh-basic-offset 2
-         sh-indentation 2))
-
 ;; https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
 (setq display-time-world-list '(("Asia/Tokyo" "Tokyo")
                                 ("Australia/Adelaide" "Adelaide")
@@ -257,8 +252,6 @@
 (eval-after-load "help-at-pt"
   '(setq help-at-pt-timer-delay 0.1
          help-at-pt-display-when-idle t))
-
-(setq find-function-C-source-directory "~/dev/emacs")
 
 (define-key isearch-mode-map [remap isearch-delete-char] 'isearch-del-char)
 

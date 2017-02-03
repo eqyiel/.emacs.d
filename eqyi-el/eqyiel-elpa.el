@@ -18,7 +18,7 @@
     dtrt-indent
     elnode
     elpy
-    emacs-eclim
+    ; emacs-eclim
     expand-region
     flx-ido
     flycheck

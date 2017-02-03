@@ -9,7 +9,7 @@
     calfw
     circe
     column-enforce-mode
-    column-marker
+    ;; column-marker
     company
     company-emoji
     company-tern
@@ -23,9 +23,9 @@
     flx-ido
     flycheck
     gnus-desktop-notify
-    helm
-    helm-pydoc
-    helm-swoop
+    ;; helm
+    ;; helm-pydoc
+    ;; helm-swoop
     idle-highlight-mode
     ido-gnus
     ido-hacks
@@ -38,7 +38,7 @@
     key-chord
     legalese
     markdown-mode
-    multiple-cursors
+    ;; multiple-cursors
     nix-mode
     nodejs-repl
     notify

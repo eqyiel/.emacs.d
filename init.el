@@ -93,12 +93,12 @@
 ;; `swiper' and friends --------------------------------------------------------
 
 (use-package smex
-  :config (setq smex-save-file "~/.cache/emacs/smex-items")
+  :init (setq smex-save-file "~/.cache/emacs/smex-items")
   :demand)
 
 (use-package counsel :demand)
 
-(use-package ivy :demand :diminish t)
+(use-package ivy :demand :diminish ivy-mode)
 
 (use-package swiper
   :demand
@@ -163,7 +163,19 @@
   (sp-local-pair 'org-mode "_" "_")
   (sp-local-pair 'org-mode "/" "/")
   :demand
-  :diminish t)
+  :diminish smartparens-mode)
+
+;; `multiple-cursors' ----------------------------------------------------------
+
+(use-package multiple-cursors
+  :init (setq mc/list-file "~/.cache/emacs/mc-lists.el")
+  :bind (("C-S-c C-S-c" . mc/edit-lines)
+         ("C->" . mc/mark-next-like-this)
+         ("C-<" . mc/mark-previous-like-this)
+         ("C-*" . mc/mark-all-like-this)
+         ("C-S-c C-S-c" . mc/edit-lines)
+         ("C-S-c C-e" . mc/edit-ends-of-lines)
+         ("C-S-c C-a" . mc/edit-beginnings-of-lines)))
 
 ;; `magit' ---------------------------------------------------------------------
 
@@ -187,3 +199,63 @@
 ;; `json-mode' -----------------------------------------------------------------
 
 (use-package json-mode)
+
+;; `buffer-move' ---------------------------------------------------------------
+
+(use-package buffer-move  
+  :bind
+  ("H-h" . windmove-left)
+  ("H-j" . windmove-down)
+  ("H-k" . windmove-up)
+  ("H-l" . windmove-right)
+  ("H-b" . shrink-window-horizontally)
+  ("H-f" . enlarge-window-horizontally)
+  ("H-n" . shrink-window)
+  ("H-p" . enlarge-window)
+  ("M-H-h" . buf-move-left)
+  ("M-H-j" . buf-move-down)
+  ("M-H-k" . buf-move-up)
+  ("M-H-l" . buf-move-right)
+  ;; Caps lock and Menu keys are bound to Hyper, except on OSX which apparently
+  ;; can't into Hyper.  Use fake Hyper from Karabiner-elements instead, which is
+  ;; really M-s-S-C.
+  ;;
+  ;; See:
+  ;; http://www.tenshu.net/p/fake-hyper-key-for-osx.html
+  ;; https://github.com/tekezo/Karabiner-Elements/pull/170
+  ("M-s-S-C-h" . windmove-left)
+  ("M-s-S-C-j" . windmove-down)
+  ("M-s-S-C-k" . windmove-up)
+  ("M-s-S-C-l" . windmove-right)
+  ("M-s-S-C-b" . shrink-window-horizontally)
+  ("M-s-S-C-f" . enlarge-window-horizontally)
+  ("M-s-S-C-n" . shrink-window)
+  ("M-s-S-C-p" . enlarge-window))
+
+;; `expand-region` -------------------------------------------------------------
+
+(use-package expand-region
+  :bind (("C-=" . er/expand-region)))
+
+;; `key-chord' -----------------------------------------------------------------
+
+(use-package key-chord
+  :config
+  (key-chord-mode t)
+  (key-chord-define-global "jk" 'er/expand-region)
+  (key-chord-define-global "kj" 'er/expand-region)
+  (key-chord-define-global "jo" 'other-window)
+  (key-chord-define-global "oj" 'other-window)
+  :init (use-package expand-region)
+  :demand)
+
+;; `yasnippet' -----------------------------------------------------------------
+
+(use-package yasnippet
+  :config (yas-global-mode t)
+  :init (setq yas-snippet-dirs '("~/.emacs.d/eqyi-el/snippets"
+                                 yas-installed-snippets-dir)
+              yas-prompt-functions '(yas-ido-prompt))
+  :bind (("C-c TAB" . yas-expand))
+  :diminish yas-minor-mode
+  :demand)

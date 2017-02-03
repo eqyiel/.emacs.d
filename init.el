@@ -323,7 +323,34 @@
       (setq internodeum/credentials nil)))
   (advice-add 'internodeum/usage-summary :before 'eqyiel/internodeum-set-credentials)
   (advice-add 'internodeum/usage-summary :after 'eqyiel/internodeum-clear-credentials)
+  ;; This package is a git submodule.
   :ensure nil)
+
+;; `visual-fill-column' --------------------------------------------------------
+
+(use-package visual-fill-column
+  :config
+  (use-package visual-line-mode
+    :demand
+    ;; This package is built into Emacs.
+    :ensure nil)
+  (defun eqyiel/longlines-mode ()
+    "Replacement for the deprecated `longlines-mode'."
+    (interactive)
+    (let ((state (if (and visual-fill-column-mode visual-line-mode) -1 1)))
+      (progn (visual-fill-column-mode state)
+             (visual-line-mode state))))
+  (defalias 'longlines-mode 'eqyiel/longlines-mode)
+  :demand)
+
+;; `bbdb' ----------------------------------------------------------------------
+
+(use-package bbdb)
+(use-package bbdb-vcard)
+
+;; `gnorb' ---------------------------------------------------------------------
+
+(use-package gnorb)
 
 (provide 'init)
 ;;; init.el ends here

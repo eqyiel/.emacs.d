@@ -1,9 +1,5 @@
 ;;; eqyiel-misc.el
 
-;; Together, these make a nice replacement for longlines-mode.
-(autoload 'turn-on-visual-line-mode "visual-line-mode" nil t)
-(autoload 'turn-on-visual-fill-column-mode "visual-fill-column" nil t)
-
 (require 'projectile)
 (projectile-global-mode)
 (global-set-key (kbd "<f5>") 'projectile-compile-project)

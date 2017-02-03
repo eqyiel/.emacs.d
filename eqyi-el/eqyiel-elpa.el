@@ -58,7 +58,6 @@
     solarized-theme
     sr-speedbar
     unfill
-    visual-fill-column
     web-mode
     ;; ws-butler
     ;; yasnippet

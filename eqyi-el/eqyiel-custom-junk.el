@@ -26,6 +26,7 @@
  '(ede-project-directories
    (quote
     ("/home/eqyiel/.emacs.d/eqyi-el" "/home/eqyiel/dev/android")))
+ '(emojify-composed-text-p nil)
  '(js2-mode-show-parse-errors nil)
  '(magit-use-overlays nil)
  '(org-agenda-files
@@ -33,7 +34,7 @@
     ("~/doc/org/contacts.org.gpg" "~/doc/org/groceries.org" "~/doc/org/minimal-derived-exporter.org" "~/doc/org/todo.org")))
  '(package-selected-packages
    (quote
-    (visual-line-mode bbdb-vcard bbdb gnorb internodeum highlight-indentation highlight-indentation-mode yasnippet multiple-cursors smartparens-config counsel yaml-mode json-mode swiper matrix-client use-package php-mode zenburn-theme ws-butler web-mode visual-fill-column unfill tao-theme sr-speedbar solarized-theme smex smartparens smart-mode-line-powerline-theme skewer-mode scss-mode rainbow-mode projectile popwin pkgbuild-mode pass org-plus-contrib notify nodejs-repl nix-mode markdown-mode magit less-css-mode legalese key-chord js2-refactor japanese-holidays idomenu ido-vertical-mode ido-ubiquitous ido-hacks ido-gnus idle-highlight-mode htmlize helm-swoop helm-pydoc helm-gtags haskell-mode git-gutter ggtags flymake-easy flycheck flx-ido expand-region encourage-mode emacs-eclim elpy elnode dtrt-indent diminish crosshairs company-tern company-flx company-emoji column-marker column-enforce-mode circe calfw buffer-move beacon auth-password-store)))
+    (emojify company-nixos-options company-mode company nixos-options nix-options sql-indent visual-line-mode bbdb-vcard bbdb gnorb internodeum highlight-indentation highlight-indentation-mode yasnippet multiple-cursors smartparens-config counsel yaml-mode json-mode swiper matrix-client use-package php-mode zenburn-theme ws-butler web-mode visual-fill-column unfill tao-theme sr-speedbar solarized-theme smex smartparens smart-mode-line-powerline-theme skewer-mode scss-mode rainbow-mode projectile popwin pkgbuild-mode pass org-plus-contrib notify nodejs-repl nix-mode markdown-mode magit less-css-mode legalese key-chord js2-refactor japanese-holidays idomenu ido-vertical-mode ido-ubiquitous ido-hacks ido-gnus idle-highlight-mode htmlize helm-swoop helm-pydoc helm-gtags haskell-mode git-gutter ggtags flymake-easy flycheck flx-ido expand-region encourage-mode emacs-eclim elpy elnode dtrt-indent diminish crosshairs company-tern company-flx company-emoji column-marker column-enforce-mode circe calfw buffer-move beacon auth-password-store)))
  '(send-mail-function (quote mailclient-send-it))
  '(web-mode-enable-control-block-indentation nil))
 (custom-set-faces

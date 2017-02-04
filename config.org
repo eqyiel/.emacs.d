@@ -1,0 +1,774 @@
+* Variables
+#+begin_src emacs-lisp
+    (defvar eqyiel/xdg-cache-home
+      (or (and (getenv "XDG_CACHE_HOME")
+               (directory-file-name
+                (expand-file-name (getenv "XDG_CACHE_HOME"))))
+          (concat
+           (directory-file-name
+            (expand-file-name default-directory))
+           "/.cache")))
+
+    (defvar eqyiel/xdg-config-home
+      (or (and (getenv "XDG_CONFIG_HOME")
+               (directory-file-name
+                (expand-file-name (getenv "XDG_CONFIG_HOME"))))
+          (concat
+           (directory-file-name
+            (expand-file-name default-directory))
+           "/.config")))
+
+    (defvar eqyiel/xdg-data-home
+      (or (and (getenv "XDG_DATA_HOME")
+               (expand-file-name (getenv "XDG_DATA_HOME")))
+          (concat
+           (directory-file-name
+            (expand-file-name default-directory))
+           "/.local/share")))
+
+  (when (not (car (file-attributes (concat eqyiel/xdg-cache-home "/emacs"))))
+    (make-directory (concat eqyiel/xdg-cache-home "/emacs")))
+
+  (when (not (car (file-attributes (concat eqyiel/xdg-data-home "/emacs"))))
+    (make-directory (concat eqyiel/xdg-data-home "/emacs")))
+#+end_src
+
+* General defaults
+#+begin_src emacs-lisp
+  (setq user-full-name "Ruben Maher"
+        user-mail-address "r@rkm.id.au"
+        mail-host-address "rkm.id.au")
+
+  (menu-bar-mode -1)
+  (scroll-bar-mode -1)
+  (tool-bar-mode -1)
+  (transient-mark-mode 1)
+  (line-number-mode 1)
+  (column-number-mode 1)
+  (show-paren-mode 1)
+  (blink-cursor-mode 1)
+  (global-hl-line-mode 1)
+  (delete-selection-mode 1)
+  (global-subword-mode 1)
+  (xterm-mouse-mode 1)
+
+  (setq-default
+   indent-tabs-mode nil
+   fill-column 80
+   tab-width 2
+   default-tab-width 2
+   standard-indent 2
+   require-final-newline t
+   sentence-end-double-space t
+   eval-expression-print-length nil)
+
+  (defalias 'yes-or-no-p 'y-or-n-p)
+  (defvaralias 'c-basic-offset 'tab-width)
+  (defvaralias 'cperl-indent-level 'tab-width)
+
+  ;; Give me two spaces everywhere
+  (add-hook 'c-mode-common-hook #'(lambda () (setq c-basic-offset tab-width)))
+
+  (set-locale-environment "en_US.UTF-8")
+
+  (setq buffer-file-coding-system 'utf-8-unix
+        default-file-name-coding-system 'utf-8-unix
+        default-keyboard-coding-system 'utf-8-unix
+        default-process-coding-system '(utf-8-unix . utf-8-unix)
+        default-sendmail-coding-system 'utf-8-unix
+        default-terminal-coding-system 'utf-8-unix)
+
+  (eval-after-load "warnings"
+    '(setq display-warning-minimum-level :error))
+
+  (if (eq system-type 'darwin)
+      (setq browse-url-browser-function 'browse-url-default-macosx-browser)
+    (setq browse-url-browser-function 'browse-url-generic
+          browse-url-generic-program "firefox"))
+
+  ;; Stop nagging me to enable these useful commands.
+  (dolist (x '(dired-find-alternate-file
+               upcase-region
+               downcase-region))
+    (put x 'disabled nil))
+
+  ;; Don't litter my ~/.emacs.d.
+  (setq
+   backup-by-copying t
+   backup-directory-alist
+   `(("." . ,(concat eqyiel/xdg-cache-home "/emacs/backup")))
+   delete-old-versions t
+   kept-new-versions 2
+   kept-old-versions 2
+   version-control t
+   vc-make-backup-files t
+   echo-keystrokes 0.1
+   auto-save-default nil
+   auto-save-list-file-prefix
+   (concat eqyiel/xdg-cache-home "/emacs/backup/.saves-")
+   bookmark-default-file
+   (concat eqyiel/xdg-cache-home "/emacs/emacs.bmk")
+   url-cache-directory
+   (concat eqyiel/xdg-cache-home "/emacs/url-cache")
+   eshell-directory-name
+   (concat eqyiel/xdg-cache-home "/emacs/eshell")
+   custom-file
+   (concat
+    (directory-file-name
+     (expand-file-name user-emacs-directory))
+    "/eqyi-el/eqyiel-custom-junk.el"))
+
+  ;; No really.
+  (eval-after-load "kkc"
+    `(setq kkc-init-file-name
+           ,(concat eqyiel/xdg-cache-home "/emacs/kkcrc")))
+
+  (setq apropos-do-all t
+        inhibit-startup-message t
+        ediff-window-setup-function 'ediff-setup-windows-plain
+        read-buffer-completion-ignore-case t
+        read-file-name-completion-ignore-case t
+        scroll-error-top-bottom t
+        scroll-preserve-screen-position 1
+        scroll-step 1
+        save-interprogram-paste-before-kill t
+        frame-title-format '(buffer-file-name "%f" ("%b"))
+        x-select-enable-clipboard t
+        x-select-enable-primary t
+        x-stretch-cursor t)
+
+  ;; Automagically refresh buffers if they are changed on disk.
+  (global-auto-revert-mode)
+  ;; Same for directories, but be quiet about it please.
+  (setq global-auto-revert-non-file-buffers t
+        auto-revert-verbose nil)
+
+  (setq delete-by-moving-to-trash t)
+
+  ;; http://stackoverflow.com/a/6830894/2204400
+  (add-hook
+   'before-save-hook
+   (lambda ()
+     (when buffer-file-name
+       (let ((dir (file-name-directory buffer-file-name)))
+         (when (and (not (file-exists-p dir))
+                    (y-or-n-p
+                     (format "Directory %s does not exist. Create it?"
+                             dir)))
+           (make-directory dir t))))))
+
+  (global-set-key (kbd "<C-mouse-5>") 'text-scale-increase)
+  (global-set-key (kbd "<C-mouse-4>") 'text-scale-decrease)
+  (global-set-key (kbd "<C-up>") 'text-scale-increase)
+  (global-set-key (kbd "<C-down>") 'text-scale-decrease)
+  (global-set-key [f11] 'toggle-frame-fullscreen)
+  ;; Type a keybinding and have it appear
+  (global-set-key (kbd "C-c e") 'edmacro-insert-key)
+  ;; Don't accidentally tap `suspend-frame'
+  (global-unset-key (kbd "C-x C-z"))
+  (global-unset-key (kbd "C-z"))
+
+  ;; Makefiles are very particular about tabs.
+  (add-hook 'makefile-mode-hook
+            (lambda () (setq indent-tabs-mode t tab-width 8)))
+
+  ;; Open systemd service files with an appropriate mode.
+  (add-to-list 'auto-mode-alist '("\\.service\\'" . conf-unix-mode))
+  (add-to-list 'auto-mode-alist '("\\.target\\'" . conf-unix-mode))
+  (add-to-list 'auto-mode-alist '("\\.timer\\'" . conf-unix-mode))
+
+  ;; Use `eldoc' in `emacs-lisp-mode' buffers.
+  (add-hook 'emacs-lisp-mode-hook 'turn-on-eldoc-mode)
+
+#+end_src
+
+* Fonts
+#+begin_src emacs-lisp
+    (cond
+     ((string-equal system-name "localghost") ;; high dpi
+      (set-face-attribute 'default nil :height 220 :family "DejaVu Sans Mono"))
+     (t
+      (set-face-attribute 'default nil :height 120 :family "DejaVu Sans Mono")))
+
+    (defun eqyiel/set-emoji-font (frame)
+      "Adjust the font settings of FRAME so Emacs can display emoji properly."
+      (if (eq system-type 'darwin)
+          ;; NS/Cocoa
+          ;; This doesn't actually work anymore.
+          ;; See:
+          ;; lunaryorn.com/posts/bye-bye-emojis-emacs-hates-macos.html
+          (set-fontset-font t 'symbol (font-spec :family "Apple Color Emoji")
+                            frame 'prepend)
+        ;; GNU/Linux
+        (set-fontset-font t 'symbol (font-spec :family "Noto Emoji")
+                          frame 'prepend)))
+
+    ;; For when Emacs is started in GUI mode:
+    (eqyiel/set-emoji-font nil)
+    ;; Hook for when a frame is created with emacsclient
+    ;; see https://www.gnu.org/software/emacs/manual/html_node/elisp/Creating-Frames.html
+    (add-hook 'after-make-frame-functions 'eqyiel/set-emoji-font)
+#+end_src
+
+* Bootstrap ~use-package~
+#+begin_src emacs-lisp
+     (require 'package)
+     (setq package-enable-at-startup nil
+           package-user-dir "~/.emacs.d/site-lisp/elpa")
+     (add-to-list 'package-archives
+                  '("melpa" . "https://melpa.org/packages/"))
+
+     (package-initialize)
+
+     ;; Bootstrap `use-package' and its dependencies if they are not already
+     ;; available.
+     (let ((dependencies '(use-package diminish bind-key)))
+       (unless (seq-reduce (lambda (prev next) (and prev next))
+                           (mapcar 'package-installed-p dependencies) t)
+         (package-refresh-contents)
+         (dolist (package dependencies)
+           (unless (package-installed-p package)
+             (package-install package)))))
+
+     (eval-when-compile
+       (require 'use-package))
+     (require 'diminish)
+     (require 'bind-key)
+
+     (setq use-package-always-ensure t
+           use-package-always-defer t)
+#+end_src
+
+* Packages
+** ~bbdb~                                                            :melpa:
+#+begin_src emacs-lisp
+  (use-package bbdb)
+  (use-package bbdb-vcard)
+#+end_src
+
+** ~beacon~                                                          :melpa:
+#+begin_src emacs-lisp
+  (use-package beacon
+    :config (beacon-mode t)
+    :diminish beacon-mode)
+#+end_src
+
+** ~buffer-move~                                                     :melpa:
+#+begin_src emacs-lisp
+  (use-package buffer-move
+    :bind
+    ("H-h" . windmove-left)
+    ("H-j" . windmove-down)
+    ("H-k" . windmove-up)
+    ("H-l" . windmove-right)
+    ("H-b" . shrink-window-horizontally)
+    ("H-f" . enlarge-window-horizontally)
+    ("H-n" . shrink-window)
+    ("H-p" . enlarge-window)
+    ("M-H-h" . buf-move-left)
+    ("M-H-j" . buf-move-down)
+    ("M-H-k" . buf-move-up)
+    ("M-H-l" . buf-move-right)
+    ;; Caps lock and Menu keys are bound to Hyper, except on OSX which apparently
+    ;; can't into Hyper.  Use fake Hyper from Karabiner-elements instead, which is
+    ;; really M-s-S-C.
+    ;;
+    ;; See:
+    ;; http://www.tenshu.net/p/fake-hyper-key-for-osx.html
+    ;; https://github.com/tekezo/Karabiner-Elements/pull/170
+    ("M-s-S-C-h" . windmove-left)
+    ("M-s-S-C-j" . windmove-down)
+    ("M-s-S-C-k" . windmove-up)
+    ("M-s-S-C-l" . windmove-right)
+    ("M-s-S-C-b" . shrink-window-horizontally)
+    ("M-s-S-C-f" . enlarge-window-horizontally)
+    ("M-s-S-C-n" . shrink-window)
+    ("M-s-S-C-p" . enlarge-window))
+#+end_src
+
+** ~column-enforce-mode~                                             :melpa:
+#+begin_src emacs-lisp
+  (use-package column-enforce-mode
+    :config (add-hook 'prog-mode-hook 'column-enforce-mode)
+    :diminish column-enforce-mode)
+#+end_src
+
+** ~company~                                                         :melpa:
+#+begin_src emacs-lisp
+  (use-package company
+    :init (global-company-mode))
+#+end_src
+
+** ~dtrt-indent~                                                     :melpa:
+#+begin_src emacs-lisp
+  (use-package dtrt-indent :config (dtrt-indent-mode) :demand)
+#+end_src
+
+** ~emojify~                                                         :melpa:
+#+begin_src emacs-lisp
+    (use-package emojify
+      :config
+      (setq emojify-display-style 'unicode
+            emojify-composed-text-p nil))
+#+end_src
+
+** ~expand-region~                                                   :melpa:
+#+begin_src emacs-lisp
+  (use-package expand-region
+    :bind (("C-=" . er/expand-region)))
+#+end_src
+
+** ~flycheck~                                                        :melpa:
+#+begin_src emacs-lisp
+  (use-package flycheck
+    :config
+    (setq flycheck-gcc-pedantic t
+          flycheck-display-errors-delay 0.1
+          flycheck-error-list-minimum-level 'warning)
+    (add-hook 'prog-mode-hook 'flycheck-mode)
+    (add-hook 'latex-mode-hook 'flycheck-mode)
+    :bind ("C-c C-l" . flycheck-list-errors))
+#+end_src
+
+** ~gnorb~                                                           :melpa:
+#+begin_src emacs-lisp
+  (use-package gnorb)
+#+end_src
+
+** ~help-at-pt~                                                    :builtin:
+#+begin_src emacs-lisp
+  (use-package help-at-pt
+    :init
+    (setq help-at-pt-timer-delay 0.1
+          help-at-pt-display-when-idle t)
+    :ensure nil
+    :demand)
+#+end_src
+** ~highlight-indentation~                                           :melpa:
+#+begin_src emacs-lisp
+  (use-package highlight-indentation
+    :config (add-hook 'prog-mode-hook 'highlight-indentation-mode)
+    :diminish highlight-indentation-mode)
+#+end_src
+
+** ~internodeum~                                                 :submodule:
+#+begin_src emacs-lisp
+  (use-package internodeum
+    :load-path "site-lisp/internodeum"
+    :commands internodeum/usage-summary
+    :config
+    (use-package pass)
+    (defun eqyiel/internodeum-set-credentials (&rest args)
+      (setq
+       internodeum/credentials
+       (internodeum/make-creds
+        :username "eqyiel"
+        :password (password-store-get "auth-sources/eqyiel@mail.internode.on.net"))))
+    (defun eqyiel/internodeum-clear-credentials (&rest args)
+      (progn
+        (setf (internodeum/creds-username internodeum/credentials) nil)
+        (setf (internodeum/creds-password internodeum/credentials) nil)
+        (setq internodeum/credentials nil)))
+    (advice-add 'internodeum/usage-summary :before 'eqyiel/internodeum-set-credentials)
+    (advice-add 'internodeum/usage-summary :after 'eqyiel/internodeum-clear-credentials)
+    ;; This package is a git submodule.
+    :ensure nil)
+#+end_src
+
+** ~json-mode~                                                       :melpa:
+This package adds itself to ~auto-mode-alist~.
+
+#+begin_src emacs-lisp
+  (use-package json-mode)
+#+end_src
+
+** ~key-chord~                                                       :melpa:
+#+begin_src emacs-lisp
+  (use-package key-chord
+    :config
+    (key-chord-mode t)
+    (key-chord-define-global "jk" 'er/expand-region)
+    (key-chord-define-global "kj" 'er/expand-region)
+    :init (use-package expand-region)
+    :demand)
+#+end_src
+
+** ~legalese~                                                        :melpa:
+#+begin_src emacs-lisp
+  (use-package legalese)
+#+end_src
+
+** ~magit~                                                           :melpa:
+#+begin_src emacs-lisp
+  (use-package magit :bind (("<f8>" . magit-status)))
+#+end_src
+
+** ~markdown-mode~                                                   :melpa:
+#+begin_src emacs-lisp
+  (use-package markdown-mode
+    :config
+    (add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
+    (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode)))
+#+end_src
+
+** ~matrix-client~                                                   :melpa:
+#+begin_src emacs-lisp
+  (use-package matrix-client
+    :config
+    (defun eqyiel/launch-matrix-client ()
+      (interactive) (matrix-client "eqyiel"))
+    :init
+    (setq matrix-homeserver-base-url "https://matrix.rkm.id.au"))
+#+end_src
+
+** ~multiple-cursors~                                                :melpa:
+#+begin_src emacs-lisp
+  (use-package multiple-cursors
+    :init (setq mc/list-file "~/.cache/emacs/mc-lists.el")
+    :bind (("C-S-c C-S-c" . mc/edit-lines)
+           ("C->" . mc/mark-next-like-this)
+           ("C-<" . mc/mark-previous-like-this)
+           ("C-*" . mc/mark-all-like-this)
+           ("C-S-c C-S-c" . mc/edit-lines)
+           ("C-S-c C-e" . mc/edit-ends-of-lines)
+           ("C-S-c C-a" . mc/edit-beginnings-of-lines)))
+#+end_src
+
+** ~nix-mode~                                                        :melpa:
+#+begin_src emacs-lisp
+  (use-package nix-mode)
+  (use-package company-nixos-options
+    :config
+    (use-package company
+      :config (add-to-list 'company-backends 'company-nixos-options))
+    :demand)
+#+end_src
+
+** ~org-mode~                                                      :builtin:
+#+begin_src emacs-lisp
+  (use-package org-mode
+    :init
+    (defun eqyiel/org-select-src-lang-mode ()
+      "Select a language's key from the alist of languages org-mode groks."
+      (interactive)
+      (insert
+       (completing-read
+        "Select language: "
+        (seq-reduce
+         (lambda (prev next)
+           (if (not (member next prev))
+               (cons next prev)
+             prev))
+         (mapcar (lambda (arg) (cdr arg)) org-src-lang-modes) '()))))
+    (add-hook 'org-mode-hook (lambda () (org-indent-mode t)))
+    :ensure nil
+    :demand)
+#+end_src
+
+** ~php-mode~                                                        :melpa:
+#+begin_src emacs-lisp
+  (use-package php-mode)
+#+end_src
+
+** ~pkgbuild-mode~                                                   :melpa:
+#+begin_src emacs-lisp
+  (use-package pkgbuild-mode
+    :config (add-to-list 'auto-mode-alist '("/PKGBUILD$" . pkgbuild-mode)))
+#+end_src
+
+** ~projectile~                                                      :melpa:
+#+begin_src emacs-lisp
+  (use-package projectile
+    :config
+    (projectile-global-mode)
+    (setq projectile-globally-ignored-directories
+          (append '("dist" "node_modules")
+                  projectile-globally-ignored-directories))
+    :bind ("<f5>" . projectile-compile-project))
+#+end_src
+
+** ~recentf~                                                       :builtin:
+#+begin_src emacs-lisp
+(use-package recentf)
+(require 'recentf)
+(setq recentf-save-file "~/.cache/emacs/.recentf"
+      recentf-max-saved-items 1000)
+(recentf-mode 1)
+#+end_src
+
+** ~savehist~                                                      :builtin:
+#+begin_src emacs-lisp
+  (use-package savehist
+    :config
+    (savehist-mode 1)
+    (setq savehist-file (concat eqyiel/xdg-cache-home "/emacs/history")
+          history-length 1000)
+    :ensure nil
+    :demand)
+#+end_src
+
+** ~saveplace~                                                     :builtin:
+#+begin_src emacs-lisp
+  (use-package saveplace
+    :config
+    (setq save-place-file (concat eqyiel/xdg-cache-home "/emacs/saveplace"))
+    (setq-default save-place t)
+    :ensure nil
+    :demand)
+#+end_src
+
+** ~shell-script-mode~                                             :builtin:
+#+begin_src emacs-lisp
+  (use-package shell-script-mode
+    :config
+    (defun eqyiel/setup-sh-mode ()
+      (setq sh-basic-offset 2
+            sh-indentation 2))
+    (add-hook 'sh-mode-hook 'eqyiel/setup-sh-mode)
+    :ensure nil)
+#+end_src
+
+** ~skewer-mode~                                                     :melpa:
+#+begin_src emacs-lisp
+  (use-package skewer-mode
+    :init
+    (add-hook 'js2-mode-hook 'skewer-mode)
+    (add-hook 'css-mode-hook 'skewer-css-mode)
+    (add-hook 'html-mode-hook 'skewer-html-mode))
+#+end_src
+
+** ~smartparens~                                                     :melpa:
+#+begin_src emacs-lisp
+  (use-package smartparens
+    :init
+    (defun eqyiel/get-derived-mode-parents (mode)
+      (when (and mode (boundp 'derived-mode-parents))
+        (cons mode (derived-mode-parents (get mode 'derived-mode-parent)))))
+    (advice-add
+     'sp-splice-sexp-killing-around
+     :before-until
+     ;; Don't steal M-r in comint-mode or modes derived from comint-mode.
+     (lambda (&rest args)
+       (when (or (eq major-mode 'comint-mode)
+                 (member 'comint-mode
+                         (eqyiel/get-derived-mode-parents major-mode)))
+         (comint-history-isearch-backward-regexp))))
+    (smartparens-global-mode 1)
+    :config
+    (sp-use-paredit-bindings)
+    (setq sp-autoskip-closing-pair 'always
+          sp-ignore-modes-list ;; Also be smart in the minibuffer.
+          (delete 'minibuffer-inactive-mode sp-ignore-modes-list))
+    (sp-local-pair 'org-mode "~" "~")
+    (sp-local-pair 'org-mode "=" "=")
+    (sp-local-pair 'org-mode "_" "_")
+    (sp-local-pair 'org-mode "/" "/")
+    :demand
+    :diminish smartparens-mode)
+#+end_src** ~sql-indent~
+#+begin_src emacs-lisp
+  (use-package sql-indent)
+#+end_src
+
+** ~swift-mode~                                                      :melpa:
+#+begin_src emacs-lisp
+  (use-package swift-mode
+    :config
+    (use-package flycheck
+      :init
+      (flycheck-define-checker
+       swiftlint
+       "Flycheck plugin for Swiftlint"
+       :command ("swiftlint")
+       :error-patterns
+       ((error line-start (file-name) ":" line ":" column ": "
+               "error: " (message) line-end)
+        (warning line-start (file-name) ":" line ":" column ": "
+                 "warning: " (message) line-end))
+
+       :modes swift-mode))
+    (setq swift-indent-offset 2
+          flycheck-swift-sdk-path
+          (concat "/Applications/Xcode.app/Contents/Developer"
+                  "/Platforms/iPhoneOS.platform/Developer/SDKs/"
+                  "iPhoneOS9.3.sdk"))
+    :init (progn '((add-to-list 'flycheck-checkers 'swift)
+                   (add-to-list 'flycheck-checkers 'swiftlint)
+                   (flycheck-add-next-checker 'swiftlint '(t . swift))))
+    :ensure flycheck)
+#+end_src
+
+** ~swiper~ and friends                                              :melpa:
+#+begin_src emacs-lisp
+  (use-package smex
+    :init (setq smex-save-file "~/.cache/emacs/smex-items")
+    :demand)
+
+  (use-package counsel :demand)
+
+  (use-package ivy :demand :diminish ivy-mode)
+
+  (use-package swiper
+    :demand
+    :config
+    (ivy-mode 1)
+    (setq ivy-use-virtual-buffers t)
+    :bind (("C-s" . swiper) ;; replace isearch-forward
+           ("C-r" . swiper) ;; replace isearch-backward
+           ("M-x" . counsel-M-x)
+           ("C-x C-f" . counsel-find-file)
+           ("<f1> f" . counsel-describe-function)
+           ("<f1> v" . counsel-describe-variable)
+           ("<f1> l" . counsel-find-library)
+           ("<f2> i" . counsel-info-lookup-symbol)
+           ("<f2> u" . counsel-unicode-char)
+           ("C-c g" . counsel-git)
+           ("C-c j" . counsel-git-grep)
+           ("C-c k" . counsel-ag)
+           ("C-x l" . counsel-locate)
+           ;; be more like `ido-mode' in the minibuffer
+           :map ivy-minibuffer-map
+           ("C-s" . ivy-next-line-or-history)
+           ("C-r" . ivy-previous-line-or-history)
+           :map swiper-map
+           ("C-r" . ivy-previous-line-or-history)
+           ("C-s" . ivy-next-line-or-history)
+           :map counsel-find-file-map
+           ("C-r" . ivy-previous-line)
+           ("C-s" . ivy-next-line)
+           :map counsel-git-grep-map
+           ("C-r" . ivy-previous-line)
+           ("C-s" . ivy-next-line)
+           :map ivy-switch-buffer-map
+           ("C-r" . ivy-previous-line)
+           ("C-s" . ivy-next-line)))
+#+end_src
+
+** ~tramp~                                                         :builtin:
+#+begin_src emacs-lisp
+  (use-package tramp
+    :config
+    (setq
+     ;; Useful for debugging `tramp'
+     ;; tramp-debug-buffer t
+     ;; tramp-verbose 10
+     tramp-persistency-file-name "~/.cache/emacs/tramp"
+     tramp-auto-save-directory "~/.cache/emacs/backup"
+     ;; When `tramp' successfully logs in but hangs, it's probably because
+     ;; `tramp-terminal-prompt-regexp' doesn't recognise it:
+     ;; http://stackoverflow.com/a/8363532
+     tramp-shell-prompt-pattern "\\(?:^\\|\r\\)[^]#$%>\n]*#?[]#$%>].* *\\(^[\\[[0-9;]*[a-zA-Z] *\\)*")
+    ;; Uses sudo password for the user defined in ~/.ssh/config, not root password.
+    ;; No need to allow ssh for root.
+    (add-to-list 'tramp-default-proxies-alist '(".*" "\\`root\\'" "/ssh:%h:"))
+    (add-to-list 'tramp-default-proxies-alist '("\\`localhost\\'" "\\`root\\'" nil)))
+#+end_src
+** ~uniquify~                                                      :builtin:
+#+begin_src emacs-lisp
+  (use-package uniquify
+    :config
+    (setq uniquify-buffer-name-style 'forward)
+    :ensure nil
+    :demand)
+#+end_src
+
+** ~visual-fill-column~ (a replacement for ~longlines~)              :melpa:
+#+begin_src emacs-lisp
+  (use-package visual-fill-column
+    :config
+    (use-package visual-line-mode
+      :demand
+      ;; This package is built into Emacs.
+      :ensure nil)
+    (defun eqyiel/longlines-mode ()
+      "Replacement for the deprecated `longlines-mode'."
+      (interactive)
+      (let ((state (if (and visual-fill-column-mode visual-line-mode) -1 1)))
+        (progn (visual-fill-column-mode state)
+               (visual-line-mode state))))
+    (defalias 'longlines-mode 'eqyiel/longlines-mode)
+    :demand)
+#+end_src
+
+** ~winner~                                                        :builtin:
+#+begin_src emacs-lisp
+  (use-package winner
+    :config (winner-mode t)
+    :ensure nil
+    :demand)
+#+end_src
+
+** ~ws-butler~                                                       :melpa:
+#+begin_src emacs-lisp
+  (use-package ws-butler
+    :config (ws-butler-global-mode)
+    :diminish ws-butler-mode
+    :demand)
+#+end_src
+
+** ~yaml-mode~                                                       :melpa:
+This package adds itself to ~auto-mode-alist~.
+
+#+begin_src emacs-lisp
+  (use-package yaml-mode :ensure t)
+#+end_src
+
+** ~yasnippet~                                                       :melpa:
+#+begin_src emacs-lisp
+  (use-package yasnippet
+    :config (yas-global-mode t)
+    :init (setq yas-snippet-dirs '("~/.emacs.d/eqyi-el/snippets"
+                                   yas-installed-snippets-dir)
+                yas-prompt-functions '(yas-ido-prompt))
+    :bind (("C-c TAB" . yas-expand))
+    :diminish yas-minor-mode
+    :demand)
+#+end_src
+
+** ~dired~                                                         :builtin:
+#+begin_src emacs-lisp
+  (use-package dired
+    :config
+    ;; http://www.emacswiki.org/emacs/DiredReuseDirectoryBuffer#toc1
+    ;; Reuse same dired buffer when doing `dired-up-directory'.
+    (add-hook 'dired-mode-hook
+              (lambda ()
+                (define-key dired-mode-map (kbd "^")
+                  (lambda () (interactive) (find-alternate-file "..")))))
+    :init (setq dired-dwim-target t
+                dired-recursive-deletes 'top)
+    :ensure nil)
+
+#+end_src
+
+** ~info~                                                          :builtin:
+#+begin_src emacs-lisp
+  (use-package info
+    :config
+    (add-hook
+     'Info-mode-hook
+     (lambda ()
+       (setq Info-additional-directory-list
+             Info-default-directory-list)))
+    :bind
+    (:map Info-mode-map
+          ;; Let me use S-SPC to scroll backwards in info mode.
+          ("S-SPC" . Info-scroll-down))
+    :ensure nil)
+#+end_src
+
+** ~ispell~                                                        :builtin:
+#+begin_src emacs-lisp
+  (use-package ispell
+    :config
+    (add-hook 'text-mode-hook 'turn-on-flyspell)
+    (add-hook 'org-mode-hook 'turn-on-flyspell)
+    (add-hook 'prog-mode-hook 'flyspell-prog-mode)
+    :init
+    (when (and (bound-and-true-p ispell-program-name) (executable-find ispell-program-name))
+      (setq ispell-dictionary "en_GB"
+            ispell-personal-dictionary "~/.aspell.en.pws"))
+    (when (eq system-type 'darwin)
+      (setenv "DICTIONARY" "en_GB"))
+    :ensure nil)
+#+end_src

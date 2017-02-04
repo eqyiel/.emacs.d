@@ -232,19 +232,6 @@ clocked tasks in minutes."
     total))
 
 
-(defun eqyiel-org-select-src-lang-mode ()
-  "Select a language's key from the alist of languages org-mode groks."
-  (interactive)
-  (insert
-   (completing-read
-    "Select language: "
-    '(asymptote awk C C++ clojure css d ditaa dot calc
-                emacs-lisp fortran gnuplot haskell java
-                js latex ledger lisp lilypond matlab
-                mscgen ocaml octave org oz perl plantuml
-                processing python R ruby sass scheme
-                screen sed sh sql sqlite))))
-
 (use-package org-download
   :config (setq org-download-method 'attach
                 ;; doesn't work on OSX :(

@@ -45,12 +45,11 @@
   '(progn
      (setq package-user-dir "~/.emacs.d/site-lisp/elpa"
 	   package-archives
-	   '(("elpy" . "http://jorgenschaefer.github.io/packages/")
-	     ("gnu" . "http://elpa.gnu.org/packages/")
+	   '(
+
 	     ("marmalade" . "http://marmalade-repo.org/packages/")
 	     ("melpa" . "http://melpa.org/packages/")
-	     ("melpa-stable" . "http://stable.melpa.org/packages/")
-	     ("org" . "http://orgmode.org/elpa/"))
+	     ("melpa-stable" . "http://stable.melpa.org/packages/"))
 	   package-pinned-packages
      '((elpy . "elpy")
 	     (org-plus-contrib . "org")))

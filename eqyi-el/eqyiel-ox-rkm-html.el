@@ -113,21 +113,21 @@ language, pubdate, last build date and generator respectively."
            (push v values)))) hash-table)
     values))
 
-(defun ox-rkm-html-posts-preparation-function ()
+(defun ox-rkm-html-posts-preparation-function (project-plist)
   "`project-plist' is scoped automagically into this context."
   (advice-add 'org-export-output-file-name :filter-return
               'ox-rkm-html-export-file-name)
   (setq ox-rkm-html-publishing-directory
         (file-name-directory
          (expand-file-name
-         (plist-get project-plist :publishing-directory))))
+          (plist-get project-plist :publishing-directory))))
   ;; (advice-add 'org-html-fontify-code :around 'ox-rkm-html-fontify-code)
   (benchmark-run 1 (ox-rkm-html-refresh-db
                     (org-publish-get-base-files
                      (rassoc project-plist org-publish-project-alist))
                     project-plist)))
 
-(defun ox-rkm-html-posts-completion-function ()
+(defun ox-rkm-html-posts-completion-function (project-plist)
   "`project-plist' is scoped automagically into this context."
   (let ((plists (ox-rkm-html-sort-by-date
                  (ox-rkm-html-get-hash-table-values org-publish-cache))))

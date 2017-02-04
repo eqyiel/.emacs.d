@@ -4,6 +4,6 @@
 [submodule "site-lisp/circe-notifications"]
 	path = site-lisp/circe-notifications
 	url = https://github.com/eqyiel/circe-notifications
-[submodule "site-lisp/cedet"]
-	path = site-lisp/cedet
-	url = http://git.code.sf.net/p/cedet/git
+[submodule "site-lisp/org-mode"]
+	path = site-lisp/org-mode
+	url = git://orgmode.org/org-mode.git

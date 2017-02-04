@@ -227,6 +227,16 @@
 
 (ad-activate 'smtpmail-via-smtp)
 
+(when (string-equal (system-name) "ayanami")
+  (eval-after-load "gnus"
+    '(with-library org-contacts
+       (setq org-contacts-files
+             '("~/doc/org/contacts.org.gpg")
+             org-contacts-icon-use-gravatar nil) ; yuck
+       (org-contacts-gnus-insinuate)
+       (define-key gnus-summary-mode-map (kbd "C-;")
+         (lambda () (interactive) (org-capture nil "c"))))))
+
 (eval-after-load "gnus"
   '(setq starttls-use-gnutls t
          message-directory "~/mail/"

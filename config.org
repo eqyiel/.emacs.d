@@ -1,31 +1,46 @@
 * Variables
 #+begin_src emacs-lisp
-    (defvar eqyiel/xdg-cache-home
-      (or (and (getenv "XDG_CACHE_HOME")
-               (directory-file-name
-                (expand-file-name (getenv "XDG_CACHE_HOME"))))
-          (concat
-           (directory-file-name
-            (expand-file-name default-directory))
-           "/.cache")))
+  (defvar eqyiel/home-directory
+    (or (and (getenv "HOME")
+             (directory-file-name
+              (expand-file-name (getenv "HOME"))))
+        (directory-file-name (expand-file-name "~/"))))
 
-    (defvar eqyiel/xdg-config-home
-      (or (and (getenv "XDG_CONFIG_HOME")
-               (directory-file-name
-                (expand-file-name (getenv "XDG_CONFIG_HOME"))))
-          (concat
-           (directory-file-name
-            (expand-file-name default-directory))
-           "/.config")))
+  (defvar eqyiel/xdg-cache-home
+    (or (and (getenv "XDG_CACHE_HOME")
+             (directory-file-name
+              (expand-file-name (getenv "XDG_CACHE_HOME"))))
+        (concat
+         (directory-file-name
+          (expand-file-name eqyiel/home-directory))
+         "/.cache")))
 
-    (defvar eqyiel/xdg-data-home
-      (or (and (getenv "XDG_DATA_HOME")
-               (expand-file-name (getenv "XDG_DATA_HOME")))
-          (concat
-           (directory-file-name
-            (expand-file-name default-directory))
-           "/.local/share")))
+  (defvar eqyiel/xdg-config-home
+    (or (and (getenv "XDG_CONFIG_HOME")
+             (directory-file-name
+              (expand-file-name (getenv "XDG_CONFIG_HOME"))))
+        (concat
+         (directory-file-name
+          (expand-file-name eqyiel/home-directory))
+         "/.config")))
 
+  (defvar eqyiel/xdg-data-home
+    (or (and (getenv "XDG_DATA_HOME")
+             (expand-file-name (getenv "XDG_DATA_HOME")))
+        (concat
+         (directory-file-name
+          (expand-file-name eqyiel/home-directory))
+         "/.local/share")))
+
+  (defvar eqyiel/org-directory
+    (concat
+     (directory-file-name
+      (expand-file-name eqyiel/home-directory))
+     "/doc/org"))
+#+end_src
+
+* Make cache and data directories if they don't exist
+#+begin_src emacs-lisp
   (when (not (car (file-attributes (concat eqyiel/xdg-cache-home "/emacs"))))
     (make-directory (concat eqyiel/xdg-cache-home "/emacs")))
 
@@ -212,31 +227,33 @@
 
 * Bootstrap ~use-package~
 #+begin_src emacs-lisp
-     (require 'package)
-     (setq package-enable-at-startup nil
-           package-user-dir "~/.emacs.d/site-lisp/elpa")
-     (add-to-list 'package-archives
-                  '("melpa" . "https://melpa.org/packages/"))
+  (require 'package)
+  (setq package-enable-at-startup nil
+        package-user-dir "~/.emacs.d/site-lisp/elpa"
+        package-archives
+        '(("elpy" . "http://jorgenschaefer.github.io/packages/")
+          ("gnu" . "http://elpa.gnu.org/packages/")
+          ("melpa" . "https://melpa.org/packages/")
+          ("org" . "http://orgmode.org/melpa")))
+  (package-initialize)
 
-     (package-initialize)
+  ;; Bootstrap `use-package' and its dependencies if they are not already
+  ;; available.
+  (let ((dependencies '(use-package diminish bind-key)))
+    (unless (seq-reduce (lambda (prev next) (and prev next))
+                        (mapcar 'package-installed-p dependencies) t)
+      (package-refresh-contents)
+      (dolist (package dependencies)
+        (unless (package-installed-p package)
+          (package-install package)))))
 
-     ;; Bootstrap `use-package' and its dependencies if they are not already
-     ;; available.
-     (let ((dependencies '(use-package diminish bind-key)))
-       (unless (seq-reduce (lambda (prev next) (and prev next))
-                           (mapcar 'package-installed-p dependencies) t)
-         (package-refresh-contents)
-         (dolist (package dependencies)
-           (unless (package-installed-p package)
-             (package-install package)))))
+  (eval-when-compile
+    (require 'use-package))
+  (require 'diminish)
+  (require 'bind-key)
 
-     (eval-when-compile
-       (require 'use-package))
-     (require 'diminish)
-     (require 'bind-key)
-
-     (setq use-package-always-ensure t
-           use-package-always-defer t)
+  (setq use-package-always-ensure t
+        use-package-always-defer t)
 #+end_src
 
 * Packages
@@ -286,6 +303,165 @@
     ("M-s-S-C-p" . enlarge-window))
 #+end_src
 
+** ~c++-mode~                                                      :builtin:
+#+begin_src emacs-lisp
+  (use-package c++-mode
+    :config (c-set-offset 'arglist-cont-nonempty '+)
+    :bind (:map c++-mode-map ("C-c C-l" . flycheck-list-errors))
+    :ensure nil)
+#+end_src
+
+** ~calfw~                                                           :melpa:
+#+begin_src emacs-lisp
+  (use-package calfw
+    :config
+    (defun eqyiel/open-calendar ()
+      (interactive)
+      (cfw:open-calendar-buffer
+       :contents-sources
+       (list (cfw:org-create-source))))
+    :init
+    (setq calendar-mark-holidays-flag t))
+#+end_src
+
+** ~circe~                                                           :melpa:
+
+#+begin_src emacs-lisp
+  (use-package circe
+    :config
+    (progn
+      (use-package pass)
+      (defun eqyiel/circe-setup-networks ()
+        (setq
+         circe-network-options
+         `(("freenode"
+            :nick "eqyiel"
+            :host "znc.rkm.id.au"
+            :service "7777"
+            :tls t
+            :pass
+            ,(concat "eqyiel/freenode:"
+                     (password-store-get "www/znc.rkm.id.au"))))))
+
+      (advice-add 'circe-reconnect-all :before 'eqyiel/circe-setup-networks)
+
+      (defun eqyiel/irc ()
+        "Connect to IRC."
+        (interactive)
+        (eqyiel/circe-setup-networks)
+        (circe "freenode"))
+
+      (defun eqyiel/circe-clear-passwords ()
+        (if (boundp 'circe-network-options)
+            (dolist (network circe-network-options)
+              (plist-put (cdr network) :pass nil))))
+
+      (defvar eqyiel/ocirce-authentications-count 0
+        "Clear passwords after this many authentications have been seen.")
+
+      (defun eqyiel/circe-wait-for-authentication ()
+        (setq eqyiel/circe-authentications-count
+              (+ 1 eqyiel/circe-authentications-count))
+        (unless (> (length circe-network-options)
+                   eqyiel/circe-authentications-count)
+          (progn
+            (eqyiel/circe-clear-passwords)
+            (setq eqyiel/circe-authentications-count 0))))
+
+      (add-hook 'circe-server-connected-hook
+                'eqyiel/circe-wait-for-authentication)
+
+      (defun eqyiel/circe-set-margin ()
+        (setq right-margin-width 5))
+
+      (add-hook 'lui-mode-hook 'eqyiel/circe-set-margin))
+    :init
+    (progn
+      (require 'circe-chanop)
+      (require 'circe-color-nicks)
+      (setq circe-default-quit-message
+            "( ' ヮ')ノ.・ﾟ*｡・.・ﾟ*｡・.・ﾟ*｡・ヽ(ﾟДﾟ,,)ノ"
+            circe-default-part-message
+            "( ' ヮ')ノ.・ﾟ*｡・.・ﾟ*｡・.・ﾟ*｡・ヽ(ﾟДﾟ,,)ノ"
+            circe-highlight-nick-type 'all
+            circe-reduce-lurker-spam nil ;; sometimes, I want to see this
+            circe-format-say "<{nick}> {body}"
+            circe-format-self-say "<{nick}> {body}"
+            circe-color-nicks-everywhere t
+            lui-highlight-keywords '("eqyiel")
+            lui-time-stamp-position 'right-margin
+            lui-time-stamp-format "%H:%M"
+            lui-flyspell-p t
+            lui-max-buffer-size 10000
+            lui-fill-column 70
+            lui-fill-type 'variable
+            lui-flyspell-alist '(("." "en_GB")))
+      (add-hook 'circe-channel-mode-hook 'turn-on-flyspell)
+      (enable-circe-color-nicks))
+#+end_src
+
+** ~circe-notifications~                                         :submodule:
+
+#+begin_src emacs-lisp
+  (use-package circe-notifications
+    :load-path "site-lisp/circe-notifications"
+    :after circe
+    :config
+    (progn
+      ;; Warning: this is very dumb
+      ;;
+      ;; ZNC's MOTD is 25 lines.
+      ;; I have two networks defined in `circe-network-options'.
+      ;; So wait to see 50 notices from ZNC before enabling notifications.
+      (defvar eqyiel/circe-znc-notices 0
+        "How many notices have we received from ZNC?")
+
+      (defvar eqyiel/circe-znc-motd-length 25
+        "How many lines are in ZNC's MOTD?")
+
+      (defun eqyiel/circe-znc-count-networks ()
+        "Return the number of networks in `circe-network-options' multiplied by
+  `eqyiel/circe-znc-motd-length', so we can know how many notices to expect before
+  enabling notifications."
+        (* eqyiel/circe-znc-motd-length (length circe-network-options)))
+
+      (defun eqyiel/circe-wait-for-znc (nick userhost _command target text)
+        "If this TEXT from NICK and USERHOST looks like a line of ZNC's MOTD,
+  increment `eqyiel/circe-znc-notices', and enable notifications if there have
+  been at least `eqyiel/circe-znc-count-networks' `eqyiel/circe-znc-notices'."
+        (when (and (string-equal nick "*status")
+                   (string-equal userhost "znc@znc.in"))
+          (setq eqyiel/circe-znc-notices (+ 1 eqyiel/circe-znc-notices))
+          (message "That's %d ..." eqyiel/circe-znc-notices)
+          (when (<= (eqyiel/circe-znc-count-networks) eqyiel/circe-znc-notices)
+            (message "OK.")
+            (advice-remove 'circe-display-NOTICE 'eqyiel/circe-wait-for-znc)
+            (enable-circe-notifications))))
+
+      (defun eqyiel/enable-circe-notifications ()
+        (interactive)
+        (advice-add 'circe-display-NOTICE :after 'eqyiel/circe-wait-for-znc)
+        (advice-add 'circe-reconnect-all :before
+                    'eqyiel/disable-circe-notifications))
+
+      (defun eqyiel/disable-circe-notifications ()
+        (interactive)
+        (disable-circe-notifications)
+        (setq eqyiel/circe-znc-notices 0)
+        (advice-add 'circe-display-NOTICE :after 'eqyiel/circe-wait-for-znc))
+
+        (eqyiel/enable-circe-notifications)))
+    :init
+    (progn
+      (setq circe-notifications-watch-strings
+            '("eqyiel" "versapunk" "nyarlu" "eqyiel1" "fthagn" "forcer")
+            circe-notifications-alert-style 'osx-notifier
+            circe-notifications-wait-for 30)
+      (when (eq system-type 'darwin)
+        (setq circe-notifications-backend "osascript")))
+    :ensure nil)
+#+end_src
+
 ** ~column-enforce-mode~                                             :melpa:
 #+begin_src emacs-lisp
   (use-package column-enforce-mode
@@ -296,7 +472,79 @@
 ** ~company~                                                         :melpa:
 #+begin_src emacs-lisp
   (use-package company
-    :init (global-company-mode))
+    :config
+    (progn
+      (setq company-backends
+            '((company-files
+               company-yasnippet
+               company-emoji)))
+
+      (defun eqyiel/company-elisp ()
+        (set (make-local-variable 'company-backends)
+             '((company-yasnippet
+                company-elisp
+                company-keywords
+                company-dabbrev-code
+                company-files))))
+      (add-hook 'emacs-lisp-mode-hook 'eqyiel/company-elisp)
+
+      (defun eqyiel-company-shell ()
+        (set (make-local-variable 'company-backends)
+             '((company-capf))))
+
+      (add-hook 'shell-mode-hook 'eqyiel-company-shell)
+
+      (add-hook 'circe-channel-mode-hook (lambda () (company-mode -1)))
+
+      (global-company-mode))
+    :init
+    (setq company-minimum-prefix-length 1
+          company-idle-delay 0
+          company-dabbrev-code-everywhere t)
+    :bind (("M-/" . company-complete))
+    :diminish company-mode)
+#+end_src
+
+** ~company-emoji~                                                   :melpa:
+#+begin_src emacs-lisp
+  (use-package company-emoji
+    :after company
+    :config (add-to-list 'company-backends 'company-emoji)
+    :ensure company-emoji)
+#+end_src
+
+** ~company-tern~
+#+begin_src emacs-lisp
+  (use-package company-tern)
+#+end_src
+
+** ~css-mode~                                                      :builtin:
+#+begin_src emacs-lisp
+  (use-package css-mode
+    :config
+    (progn
+      (defun eqyiel/css-mode-hook ()
+        (require 'rainbow-mode)
+        (setq css-indent-offset 2)
+        (rainbow-turn-on))
+      (add-hook 'css-mode-hook 'eqyiel/css-mode-hook))
+    :ensure nil)
+#+end_src
+
+** ~dired~                                                         :builtin:
+#+begin_src emacs-lisp
+  (use-package dired
+    :config
+    ;; http://www.emacswiki.org/emacs/DiredReuseDirectoryBuffer#toc1
+    ;; Reuse same dired buffer when doing `dired-up-directory'.
+    (add-hook 'dired-mode-hook
+              (lambda ()
+                (define-key dired-mode-map (kbd "^")
+                  (lambda () (interactive) (find-alternate-file "..")))))
+    :init (setq dired-dwim-target t
+                dired-recursive-deletes 'top)
+    :ensure nil)
+
 #+end_src
 
 ** ~dtrt-indent~                                                     :melpa:
@@ -310,6 +558,11 @@
       :config
       (setq emojify-display-style 'unicode
             emojify-composed-text-p nil))
+#+end_src
+
+** ~eslint-fix~                                                      :melpa:
+#+begin_src emacs-lisp
+  (use-package eslint-fix :after js-mode js2-mode web-mode)
 #+end_src
 
 ** ~expand-region~                                                   :melpa:
@@ -330,9 +583,33 @@
     :bind ("C-c C-l" . flycheck-list-errors))
 #+end_src
 
+** ~flycheck~                                                        :melpa:
+#+begin_src emacs-lisp
+  (use-package flycheck
+    :config
+    (progn
+      (setq-default
+       flycheck-disabled-checkers
+       (append flycheck-disabled-checkers
+               '(handlebars html-tidy javascript-jshint javascript-jscs php))))
+    :init
+    (progn
+      (global-flycheck-mode)
+      (flycheck-add-mode 'javascript-eslint 'web-mode)
+      (setq flycheck-eslintrc ".eslintrc.json"))
+    :demand
+    :diminish flycheck-mode)
+#+end_src
+
 ** ~gnorb~                                                           :melpa:
 #+begin_src emacs-lisp
   (use-package gnorb)
+#+end_src
+
+** ~google-c-style~                                                  :melpa:
+#+begin_src emacs-lisp
+  (use-package google-c-style
+    :init (add-hook 'c-mode-common-hook 'google-set-c-style))
 #+end_src
 
 ** ~help-at-pt~                                                    :builtin:
@@ -344,11 +621,40 @@
     :ensure nil
     :demand)
 #+end_src
+
 ** ~highlight-indentation~                                           :melpa:
 #+begin_src emacs-lisp
   (use-package highlight-indentation
     :config (add-hook 'prog-mode-hook 'highlight-indentation-mode)
     :diminish highlight-indentation-mode)
+#+end_src
+
+** ~html-mode~                                                     :builtin:
+#+begin_src emacs-lisp
+  (use-package html-mode
+    :config
+    (progn
+      (defun eqyiel/html-mode-hook ()
+        (require 'rainbow-mode)
+        (rainbow-turn-on))
+      (add-hook 'html-mode-hook 'eqyiel/html-mode-hook))
+    :ensure nil)
+#+end_src
+
+** ~info~                                                          :builtin:
+#+begin_src emacs-lisp
+  (use-package info
+    :config
+    (add-hook
+     'Info-mode-hook
+     (lambda ()
+       (setq Info-additional-directory-list
+             Info-default-directory-list)))
+    :bind
+    (:map Info-mode-map
+          ;; Let me use S-SPC to scroll backwards in info mode.
+          ("S-SPC" . Info-scroll-down))
+    :ensure nil)
 #+end_src
 
 ** ~internodeum~                                                 :submodule:
@@ -375,11 +681,82 @@
     :ensure nil)
 #+end_src
 
+** ~ispell~                                                        :builtin:
+#+begin_src emacs-lisp
+  (use-package ispell
+    :config
+    (add-hook 'text-mode-hook 'turn-on-flyspell)
+    (add-hook 'org-mode-hook 'turn-on-flyspell)
+    (add-hook 'prog-mode-hook 'flyspell-prog-mode)
+    :init
+    (when (and (bound-and-true-p ispell-program-name) (executable-find ispell-program-name))
+      (setq ispell-dictionary "en_GB"
+            ispell-personal-dictionary "~/.aspell.en.pws"))
+    (when (eq system-type 'darwin)
+      (setenv "DICTIONARY" "en_GB"))
+    :ensure nil)
+#+end_src
+
+** ~js-mode~                                                       :builtin:
+#+begin_src emacs-lisp
+(use-package js-mode
+  :init (setq js-indent-level 2)
+  :ensure nil)
+#+end_src
+
+** ~js2-mode~                                                        :melpa:
+#+begin_src emacs-lisp
+  (use-package js2-mode
+    :config
+    (progn
+      (use-package tern)
+      (use-package web-mode)
+      (use-package flycheck)
+      (use-package company)
+      (use-package company-tern)
+
+      (add-hook 'js2-mode-hook (lambda () (tern-mode t)))
+
+      (defun eqyiel/toggle-js2-mode-to-web-mode ()
+        (interactive)
+        (web-mode))
+
+      (defun eqyiel/company-javascript ()
+        (require 'copmany-tern)
+        (set (make-local-variable 'company-backends)
+             '((company-files
+                company-tern
+                company-yasnippet))))
+
+      (add-hook 'js2-mode-hook 'eqyiel/company-javascript)
+
+      (setq js2-highlight-level 3
+            js2-idle-timer-delay 3 ;; wait until I'm actually idle
+            js2-include-node-externs t
+            js2-concat-multiline-strings t
+            js2-strict-trailing-comma-warning nil))
+    :init
+    (progn
+      (add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
+      (add-to-list 'auto-mode-alist '("\\.jsx$" . js2-jsx-mode)))
+    :bind
+    (:map js2-mode-map
+          ("C-c j" . js2-jump-to-definition)
+          ("C-M-s-\"" . eqyiel/toggle-js2-mode-to-web-mode)
+          ("H-'" . eqyiel/toggle-js2-mode-to-web-mode)))
+#+end_src
+
 ** ~json-mode~                                                       :melpa:
 This package adds itself to ~auto-mode-alist~.
 
 #+begin_src emacs-lisp
-  (use-package json-mode)
+  (use-package json-mode
+    :config
+    (defun eqyiel/json-mode-hook ()
+      (setq js-indent-level 2
+             json-reformat:indent-width 2))
+    :init
+    (add-hook 'json-mode-hook ''eqyiel/json-mode-hook))
 #+end_src
 
 ** ~key-chord~                                                       :melpa:
@@ -447,6 +824,20 @@ This package adds itself to ~auto-mode-alist~.
 ** ~org-mode~                                                      :builtin:
 #+begin_src emacs-lisp
   (use-package org-mode
+    :config
+    (defun eqyiel/org-clock-sum-today ()
+      "Visit each file in `org-agenda-files' and return the total time of today's
+  clocked tasks in minutes."
+      (let ((files (org-agenda-files))
+            (total 0))
+        (org-agenda-prepare-buffers files)
+        (dolist (file files)
+          (with-current-buffer (find-buffer-visiting file)
+            (setq total (+ total (org-clock-sum-today)))))
+        total))
+    (defun eqyiel/org-archive-done-tasks ()
+      (interactive)
+      (org-map-entries 'org-archive-subtree "/DONE" 'file))
     :init
     (defun eqyiel/org-select-src-lang-mode ()
       "Select a language's key from the alist of languages org-mode groks."
@@ -461,8 +852,80 @@ This package adds itself to ~auto-mode-alist~.
              prev))
          (mapcar (lambda (arg) (cdr arg)) org-src-lang-modes) '()))))
     (add-hook 'org-mode-hook (lambda () (org-indent-mode t)))
+    (org-babel-do-load-languages
+     'org-babel-load-languages
+     '((js . t)
+       (emacs-lisp . t)
+       (sh . t)))
+    (setq
+     org-image-actual-width '(400)
+     org-directory eqyiel/org-directory
+     org-log-done 'time
+     org-agenda-files
+     (file-expand-wildcards
+      (concat eqyiel/org-directory "/*.org*"))
+     org-descriptive-links nil
+     org-src-tab-acts-natively t
+     org-src-preserve-indentation nil
+     org-confirm-babel-evaluate nil
+     org-export-babel-evaluate nil
+     org-export-default-language "en"
+     org-capture-templates
+     '(("t" "Todo" entry
+        (file+headline "~/doc/org/new.org.gpg" "Tasks")
+        "** TODO %?")
+       ("r" "Read" entry
+        (file+headline "~/doc/org/new.org.gpg" "Read")
+        "** %?")
+       ("w" "Watch" entry
+        (file+headline "~/doc/org/new.org.gpg" "Watch")
+        "** %?")
+       ("l" "Listen" entry
+        (file+headline "~/doc/org/new.org.gpg" "Listen")
+        "** %?")
+       ("u" "Quote" entry
+        (file+headline "~/doc/org/new.org.gpg" "Quote")
+        "** %?")
+       ("c" "Contacts" entry
+        (file "~/doc/org/contacts.org.gpg")
+        "** %(org-contacts-template-name)
+    :PROPERTIES:
+    :EMAIL: %(org-contacts-template-email)
+    :END:")
+       ("m" "Add a contact manually" entry
+        (file "~/doc/org/contacts.org.gpg")
+        "** %^{Name}
+    :PROPERTIES:
+    :EMAIL:
+    :END:")))
+    (add-hook 'org-mode-hook 'turn-on-auto-fill)
+    :bind ("<f12>" . org-capture)
     :ensure nil
+    :load-path "site-lisp/org-mode"
     :demand)
+
+  (use-package org-download
+    :config (setq org-download-method 'attach)
+    :ensure t)
+
+  (use-package ox-gfm
+    :ensure t)
+
+  (use-package org-caldav
+    :init
+    (setq
+     org-caldav-save-directory (concat eqyiel/xdg-cache-home "/emacs")
+     org-caldav-url "http://cloud.rkm.id.au/remote.php/caldav/calendars/eqyiel"
+     org-caldav-calendar-id "test" ; name of calendar in owncloud
+     org-caldav-inbox "~/doc/org/caldav-test.org"
+     org-caldav-files '("~/doc/org/test-calendar-events.org")
+     org-icalendar-timezone "Australia/Adelaide"))
+
+  (use-package org-mobile
+    :config
+    (setq org-mobile-directory "~/owncloud/org"
+          org-mobile-inbox-for-pull "~/doc/org/from-mobile.org")
+    :ensure org-plus-contrib)
 #+end_src
 
 ** ~php-mode~                                                        :melpa:
@@ -485,6 +948,11 @@ This package adds itself to ~auto-mode-alist~.
           (append '("dist" "node_modules")
                   projectile-globally-ignored-directories))
     :bind ("<f5>" . projectile-compile-project))
+#+end_src
+
+** ~rainbow-mode~                                                     :elpa:
+#+begin_src emacs-lisp
+  (use-package rainbow-mode :pin gnu)
 #+end_src
 
 ** ~recentf~                                                       :builtin:
@@ -517,6 +985,18 @@ This package adds itself to ~auto-mode-alist~.
     :demand)
 #+end_src
 
+** ~scss-mode~                                                       :melpa:
+#+begin_src emacs-lisp
+  (use-package scss-mode
+    :config
+    (add-hook
+     'scss-mode-hook
+     (lambda () ;; use // instead of /* */
+       (set (make-local-variable 'comment-start) "//")
+       (set (make-local-variable 'comment-end) "")
+       (set (make-local-variable 'comment-continue) "//"))))
+#+end_src
+
 ** ~shell-script-mode~                                             :builtin:
 #+begin_src emacs-lisp
   (use-package shell-script-mode
@@ -530,11 +1010,7 @@ This package adds itself to ~auto-mode-alist~.
 
 ** ~skewer-mode~                                                     :melpa:
 #+begin_src emacs-lisp
-  (use-package skewer-mode
-    :init
-    (add-hook 'js2-mode-hook 'skewer-mode)
-    (add-hook 'css-mode-hook 'skewer-css-mode)
-    (add-hook 'html-mode-hook 'skewer-html-mode))
+  (use-package skewer-mode)
 #+end_src
 
 ** ~smartparens~                                                     :melpa:
@@ -565,7 +1041,9 @@ This package adds itself to ~auto-mode-alist~.
     (sp-local-pair 'org-mode "/" "/")
     :demand
     :diminish smartparens-mode)
-#+end_src** ~sql-indent~
+#+end_src
+
+** ~sql-indent~                                                      :melpa:
 #+begin_src emacs-lisp
   (use-package sql-indent)
 #+end_src
@@ -587,15 +1065,10 @@ This package adds itself to ~auto-mode-alist~.
                  "warning: " (message) line-end))
 
        :modes swift-mode))
-    (setq swift-indent-offset 2
-          flycheck-swift-sdk-path
-          (concat "/Applications/Xcode.app/Contents/Developer"
-                  "/Platforms/iPhoneOS.platform/Developer/SDKs/"
-                  "iPhoneOS9.3.sdk"))
+    (setq swift-indent-offset 2)
     :init (progn '((add-to-list 'flycheck-checkers 'swift)
                    (add-to-list 'flycheck-checkers 'swiftlint)
-                   (flycheck-add-next-checker 'swiftlint '(t . swift))))
-    :ensure flycheck)
+                   (flycheck-add-next-checker 'swiftlint '(t . swift)))))
 #+end_src
 
 ** ~swiper~ and friends                                              :melpa:
@@ -627,6 +1100,9 @@ This package adds itself to ~auto-mode-alist~.
            ("C-c k" . counsel-ag)
            ("C-x l" . counsel-locate)
            ;; be more like `ido-mode' in the minibuffer
+           ;; :map ivy-completing-read-map
+           ;; ("C-r" . ivy-previous-line)
+           ;; ("C-s" . ivy-next-line)
            :map ivy-minibuffer-map
            ("C-s" . ivy-next-line-or-history)
            ("C-r" . ivy-previous-line-or-history)
@@ -642,6 +1118,11 @@ This package adds itself to ~auto-mode-alist~.
            :map ivy-switch-buffer-map
            ("C-r" . ivy-previous-line)
            ("C-s" . ivy-next-line)))
+#+end_src
+
+** ~tern~                                                            :melpa:
+#+begin_src emacs-lisp
+  (use-package tern :diminish tern-mode)
 #+end_src
 
 ** ~tramp~                                                         :builtin:
@@ -663,6 +1144,7 @@ This package adds itself to ~auto-mode-alist~.
     (add-to-list 'tramp-default-proxies-alist '(".*" "\\`root\\'" "/ssh:%h:"))
     (add-to-list 'tramp-default-proxies-alist '("\\`localhost\\'" "\\`root\\'" nil)))
 #+end_src
+
 ** ~uniquify~                                                      :builtin:
 #+begin_src emacs-lisp
   (use-package uniquify
@@ -688,6 +1170,46 @@ This package adds itself to ~auto-mode-alist~.
                (visual-line-mode state))))
     (defalias 'longlines-mode 'eqyiel/longlines-mode)
     :demand)
+#+end_src
+
+** ~web-mode~                                                        :melpa:
+#+begin_src emacs-lisp
+  (use-package web-mode
+    :config
+    (progn
+      (use-package js2-mode)
+
+      (defun eqyiel/toggle-web-mode-to-js2-mode ()
+        (require 'js2-mode)
+        (interactive)
+        (if (string-equal web-mode-content-type "jsx")
+            (js2-jsx-mode)
+          (js2-mode)))
+
+      (defun eqyiel/web-mode-hook ()
+        (when (or (string-equal web-mode-content-type "javascript")
+                  (string-equal web-mode-content-type "jsx"))
+          (progn
+            (flycheck-select-checker 'javascript-eslint)
+            (flycheck-mode))))
+
+      (add-hook 'web-mode-hook 'eqyiel/web-mode-hook)
+
+      (setq
+       web-mode-markup-indent-offset 2
+       web-mode-code-indent-offset 2
+       web-mode-css-indent-offset 2
+       web-mode-attr-indent-offset 2
+       web-mode-sql-indent-offset 2
+       web-mode-content-types-alist
+       '(("jsx" . "\\.js[x]?\\'")))
+
+      (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode)))
+    :bind
+    (:map web-mode-map
+          ("C-M-s-\"" . eqyiel/toggle-web-mode-to-js2-mode)
+          ("H-'" . eqyiel/toggle-web-mode-to-js2-mode)
+          ("M-j" . newline-and-indent)))
 #+end_src
 
 ** ~winner~                                                        :builtin:
@@ -723,52 +1245,4 @@ This package adds itself to ~auto-mode-alist~.
     :bind (("C-c TAB" . yas-expand))
     :diminish yas-minor-mode
     :demand)
-#+end_src
-
-** ~dired~                                                         :builtin:
-#+begin_src emacs-lisp
-  (use-package dired
-    :config
-    ;; http://www.emacswiki.org/emacs/DiredReuseDirectoryBuffer#toc1
-    ;; Reuse same dired buffer when doing `dired-up-directory'.
-    (add-hook 'dired-mode-hook
-              (lambda ()
-                (define-key dired-mode-map (kbd "^")
-                  (lambda () (interactive) (find-alternate-file "..")))))
-    :init (setq dired-dwim-target t
-                dired-recursive-deletes 'top)
-    :ensure nil)
-
-#+end_src
-
-** ~info~                                                          :builtin:
-#+begin_src emacs-lisp
-  (use-package info
-    :config
-    (add-hook
-     'Info-mode-hook
-     (lambda ()
-       (setq Info-additional-directory-list
-             Info-default-directory-list)))
-    :bind
-    (:map Info-mode-map
-          ;; Let me use S-SPC to scroll backwards in info mode.
-          ("S-SPC" . Info-scroll-down))
-    :ensure nil)
-#+end_src
-
-** ~ispell~                                                        :builtin:
-#+begin_src emacs-lisp
-  (use-package ispell
-    :config
-    (add-hook 'text-mode-hook 'turn-on-flyspell)
-    (add-hook 'org-mode-hook 'turn-on-flyspell)
-    (add-hook 'prog-mode-hook 'flyspell-prog-mode)
-    :init
-    (when (and (bound-and-true-p ispell-program-name) (executable-find ispell-program-name))
-      (setq ispell-dictionary "en_GB"
-            ispell-personal-dictionary "~/.aspell.en.pws"))
-    (when (eq system-type 'darwin)
-      (setenv "DICTIONARY" "en_GB"))
-    :ensure nil)
 #+end_src

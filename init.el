@@ -6,6 +6,14 @@
 ;; You may delete these explanatory comments.
 (package-initialize)
 
+(defun eqyiel/add-subdirs-to-load-path (dir)
+  "Recursive add directories to `load-path'."
+  (let ((default-directory (file-name-as-directory dir)))
+    (add-to-list 'load-path dir)
+    (normal-top-level-add-subdirs-to-load-path)))
+
+(eqyiel/add-subdirs-to-load-path "~/.emacs.d/site-lisp")
+
 (require 'org)
 (org-babel-load-file
  (expand-file-name "config.org" user-emacs-directory))

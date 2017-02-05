@@ -4,40 +4,39 @@
 
 (defvar eqyiel-package-list
   '(auth-password-store
-    beacon
-    calfw
-    circe
-    company
-    company-emoji
-    company-tern
+    ;; beacon
+    ;; calfw
+    ;; circe
+    ;; company
+    ;; company-emoji
+    ;; company-tern
     company-flx
     elnode
     elpy
-    expand-region
-    flx-ido
-    flycheck
+    ;; expand-region
+    ;; flx-ido
+    ;; flycheck
     gnus-desktop-notify
-    ido-gnus
-    ido-hacks
-    ido-ubiquitous
-    ido-vertical-mode
-    idomenu
+    ;; ido-gnus
+    ;; ido-hacks
+    ;; ido-ubiquitous
+    ;; ido-vertical-mode
+     idomenu
     japanese-holidays
     js2-mode
     js2-refactor
-    nix-mode
     nodejs-repl
     notify
     pass
-    popwin
-    projectile
-    rainbow-mode
-    s
-    skewer-mode
+    ;; popwin
+    ;; projectile
+    ;; rainbow-mode
+    ;; s
+    ;; skewer-mode
     solarized-theme
     sr-speedbar
     unfill
-    web-mode
+    ;; web-mode
     zenburn-theme)
   "Packages to pull from `package-archives'.")
 

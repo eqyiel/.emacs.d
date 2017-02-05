@@ -93,7 +93,6 @@
   (blink-cursor-mode 1)
   (global-hl-line-mode 1)
   (delete-selection-mode 1)
-  (global-subword-mode 1)
   (xterm-mouse-mode 1)
 
   (setq-default
@@ -689,6 +688,21 @@
                    '("\\.com.gpg$" . fundamental-mode)))
     :ensure t
     :demand)
+#+end_src
+** ~auto-fill-mode~                                                :builtin:
+This is here just so it can be diminished.
+
+According to the author of ~diminish.el~:
+
+#+begin_quote
+Mode names typically end in ~-mode~, but for historical reasons ~auto-fill-mode~
+is named by ~auto-fill-function~.
+#+end_quote
+
+So diminish ~auto-fill-function~, not ~auto-fill-mode~.
+
+#+begin_src emacs-lisp
+  (use-package simple :ensure nil :diminish auto-fill-function)
 #+end_src
 
 ** ~bbdb~                                                            :melpa:
@@ -1565,9 +1579,18 @@ MIME viewer]].
     :ensure nil)
 #+end_src
 
+** ~org-indent-mode~                                               :builtin:
+#+begin_src emacs-lisp
+  (use-package org-indent
+    :load-path "site-lisp/org-mode"
+    :diminish org-indent-mode
+    :ensure nil
+    :demand)
+#+end_src
+
 ** ~org-mode~                                                      :builtin:
 #+begin_src emacs-lisp
-  (use-package org-mode
+  (use-package org
     :config
     (setq
      org-image-actual-width '(400)
@@ -1822,6 +1845,15 @@ Export ~org~ files to Github-flavoured markdown.
   (use-package sql-indent :ensure t)
 #+end_src
 
+** ~subword~                                                       :builtin:
+#+begin_src emacs-lisp
+  (use-package subword
+    :init (global-subword-mode 1)
+    :diminish subword-mode
+    :ensure nil
+    :demand)
+#+end_src
+
 ** ~swift-mode~                                                      :melpa:
 #+begin_src emacs-lisp
   (use-package swift-mode
@@ -1967,14 +1999,11 @@ This is a pretty good replacement  for ~longlines-mode~.
       (progn (visual-fill-column-mode state)
              (visual-line-mode state))))
 
+  (defalias 'longlines-mode 'eqyiel/longlines-mode)
+
   (use-package visual-fill-column
     :commands (visual-fill-column-mode)
-    :config
-    (use-package visual-line-mode
-      :demand
-      ;; This package is built into Emacs.
-      :ensure nil)
-    (defalias 'longlines-mode 'eqyiel/longlines-mode)
+    :config (require 'simple)
     :ensure t
     :demand)
 #+end_src

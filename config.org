@@ -54,7 +54,7 @@
     '((ssl "eqyiel@gmail.com" "smtp.gmail.com" 587 "eqyiel@gmail.com" nil)
       (ssl "mahe0054@uni.flinders.edu.au" "outlook.office365.com" 587
            "mahe0054@uni.flinders.edu.au" nil) ;; flinders now uses office365
-      (ssl "r@rkm.id.au" "rkm.id.au" 587 "r@rkm.id.au" nil)
+      (ssl "r@rkm.id.au" "nabiki.rkm.id.au" 587 "r@rkm.id.au" nil)
       (ssl "eqyiel@internode.on.net" "mail.internode.on.net" 25
            "eqyiel@internode.on.net" nil)
       (ssl "info@huttriverprovince.com.au" "rkm.id.au" 587
@@ -358,7 +358,7 @@
     (forward-line -1)
     (indent-for-tab-command))
 
-  (bind-key "C-S-o" 'eqyiel/open-line-above)
+  (bind-key "H-O" 'eqyiel/open-line-above)
 
   (defun eqyiel/comint-delchar-or-eof-or-kill-buffer (arg)
     "C-d on an empty line in the shell terminates the process.
@@ -933,6 +933,16 @@ So diminish ~auto-fill-function~, not ~auto-fill-mode~.
                company-yasnippet
                company-emoji)))
 
+      (defun eqyiel/company-nixos ()
+        (set (make-local-variable 'company-backends)
+             '((company-nixos-options
+                company-yasnippet
+                company-keywords
+                company-dabbrev-code
+                company-files))))
+
+      (add-hook 'nix-mode-hook 'eqyiel/company-nixos)
+
       (defun eqyiel/company-elisp ()
         (set (make-local-variable 'company-backends)
              '((company-yasnippet
@@ -940,11 +950,14 @@ So diminish ~auto-fill-function~, not ~auto-fill-mode~.
                 company-keywords
                 company-dabbrev-code
                 company-files))))
+
       (add-hook 'emacs-lisp-mode-hook 'eqyiel/company-elisp)
 
       (defun eqyiel-company-shell ()
         (set (make-local-variable 'company-backends)
              '((company-capf))))
+
+        :config (add-to-list 'company-backends 'company-emoji)
 
       (add-hook 'shell-mode-hook 'eqyiel-company-shell)
 
@@ -957,24 +970,17 @@ So diminish ~auto-fill-function~, not ~auto-fill-mode~.
 
 ** ~company-emoji~                                                   :melpa:
 #+begin_src emacs-lisp
-  (use-package company-emoji
-    :after company
-    :config (add-to-list 'company-backends 'company-emoji)
-    :ensure company-emoji)
+  (use-package company-emoji :after company :demand :ensure t)
 #+end_src
 
 ** ~company-nixos-options~                                           :melpa:
 #+begin_src emacs-lisp
-  (use-package company-nixos-options
-    :init
-    (use-package company
-      :init (add-to-list 'company-backends 'company-nixos-options))
-    :demand)
+  (use-package company-nixos-options :after company :demand :ensure t)
 #+end_src
 
 ** ~company-tern~                                                    :melpa:
 #+begin_src emacs-lisp
-  (use-package company-tern)
+  (use-package company-tern :after company :demand :ensure t)
 #+end_src
 
 ** ~css-mode~                                                      :builtin:
@@ -992,21 +998,6 @@ So diminish ~auto-fill-function~, not ~auto-fill-mode~.
 
 ** ~dired~                                                         :builtin:
 #+begin_src emacs-lisp
-  (use-package dired
-    :init
-    ;; http://www.emacswiki.org/emacs/DiredReuseDirectoryBuffer#toc1
-    ;; Reuse same dired buffer when doing `dired-up-directory'.
-    (add-hook 'dired-mode-hook
-              (lambda ()
-                (define-key dired-mode-map (kbd "^")
-                  (lambda () (interactive) (find-alternate-file "..")))))
-    :config (setq dired-dwim-target t
-                  dired-recursive-deletes 'top)
-    :ensure nil)
-#+end_src
-
-** ~dired~                                                         :builtin:
-#+begin_src emacs-lisp
   (defun eqyiel/dired-back-to-top ()
     "Taken from: http://whattheemacsd.com/setup-dired.el-02.html"
     (interactive)
@@ -1019,14 +1010,35 @@ So diminish ~auto-fill-function~, not ~auto-fill-mode~.
     (end-of-buffer)
     (dired-next-line -1))
 
+  (defun eqyiel/dired-up-directory ()
+    "Reuse same dired buffer when doing `dired-up-directory'.
+
+  See: http://www.emacswiki.org/emacs/DiredReuseDirectoryBuffer#toc1"
+    (interactive)
+    (find-alternate-file ".."))
+
+  (defun eqyiel/dired-find-alternate-file-or-find-file ()
+    "If the thing at point is a directory, reuse this directory buffer.  Otherwise
+  do normal `dired-find-file'."
+    (interactive)
+    (if (directory-name-p (dired-file-name-at-point))
+        (dired-find-alternate-file)
+      (dired-find-file)))
+
   (use-package dired
+    :init
+    :config (setq dired-dwim-target t
+                  dired-recursive-deletes 'top)
     :bind
     (:map
      dired-mode-map
+     ("RET" . eqyiel/dired-find-alternate-file-or-find-file)
+     ("^" . eqyiel/dired-up-directory)
      ("M-<" . eqyiel/dired-back-to-top)
      ("M->" . eqyiel/dired-jump-to-bottom))
     :ensure nil)
 #+end_src
+
 ** ~dtrt-indent~                                                     :melpa:
 #+begin_src emacs-lisp
   (use-package dtrt-indent :init (dtrt-indent-mode) :demand)
@@ -1103,7 +1115,6 @@ So diminish ~auto-fill-function~, not ~auto-fill-mode~.
        gnus-blocked-images nil
        gnus-buttonized-mime-types '("multipart/alternative" "multipart/encrypted" "multipart/signed")
        gnus-cache-directory eqyiel/news-directory
-       ;; gnus-completing-read-function 'ivy-completing-read
        gnus-directory eqyiel/news-directory
        gnus-fetch-old-headers 'some
        gnus-gcc-mark-as-read t
@@ -1377,7 +1388,9 @@ So diminish ~auto-fill-function~, not ~auto-fill-mode~.
 
       (add-hook 'js2-mode-hook 'eqyiel/company-javascript)
 
-      (setq js2-highlight-level 3
+      (setq js-switch-indent-offset 2
+            js2-basic-offset 2
+            js2-highlight-level 3
             js2-idle-timer-delay 3 ;; wait until I'm actually idle
             js2-include-node-externs t
             js2-concat-multiline-strings t
@@ -1388,7 +1401,6 @@ So diminish ~auto-fill-function~, not ~auto-fill-mode~.
       (add-to-list 'auto-mode-alist '("\\.jsx$" . js2-jsx-mode)))
     :bind
     (:map js2-mode-map
-          ("C-c j" . js2-jump-to-definition)
           ("C-M-s-\"" . eqyiel/toggle-js2-mode-to-web-mode)
           ("H-'" . eqyiel/toggle-js2-mode-to-web-mode)))
 #+end_src
@@ -1523,13 +1535,11 @@ MIME viewer]].
   (use-package multiple-cursors
     :config
     (setq mc/list-file (concat eqyiel/xdg-cache-home "/emacs/mc-lists.el"))
-    :bind (("C-S-c C-S-c" . mc/edit-lines)
-           ("C->" . mc/mark-next-like-this)
-           ("C-<" . mc/mark-previous-like-this)
-           ("C-*" . mc/mark-all-like-this)
-           ("C-S-c C-S-c" . mc/edit-lines)
-           ("C-S-c C-e" . mc/edit-ends-of-lines)
-           ("C-S-c C-a" . mc/edit-beginnings-of-lines)))
+    :bind (("H-m" . mc/edit-lines)
+           ("H->" . mc/mark-next-like-this)
+           ("H-<" . mc/mark-previous-like-this)
+           ("H-8" . mc/mark-all-like-this)
+           ("H-*" . mc/mark-all-like-this)))
 #+end_src
 
 ** ~nix-mode~                                                        :melpa:
@@ -1590,9 +1600,20 @@ MIME viewer]].
 
 ** ~org-mode~                                                      :builtin:
 #+begin_src emacs-lisp
+  (defun eqyiel/org-prev-visible-heading (arg)
+    "Move to the previous visible heading.
+
+  This function wraps `outline-prev-visible-heading' with
+  `org-with-limited-levels' in order to skip over inline tasks and
+  respect customization of `org-odd-levels-only'."
+    (interactive "p")
+    (org-with-limited-levels
+     (outline-previous-visible-heading arg)))
+
   (use-package org
     :config
     (setq
+     org-adapt-indentation t
      org-image-actual-width '(400)
      org-directory eqyiel/org-directory
      org-log-done 'time
@@ -1623,7 +1644,7 @@ MIME viewer]].
         "** %?")
        ("c" "Contacts" entry
         (file "~/doc/org/contacts.org.gpg")
-        "** %(org-contacts-template-name)
+        "** %(org-contact-template-name)
     :PROPERTIES:
     :EMAIL: %(org-contacts-template-email)
     :END:")
@@ -1669,7 +1690,11 @@ MIME viewer]].
          (sh . t)))
 
       (add-hook 'org-mode-hook 'turn-on-auto-fill))
-    :bind ("<f12>" . org-capture)
+    :bind
+    (("<f12>" . org-capture)
+     :map org-mode-map
+     ("M-p" . eqyiel/org-prev-visible-heading)
+     ("M-n" . org-next-visible-heading))
     :ensure nil
     :load-path "site-lisp/org-mode"
     :demand)
@@ -1882,6 +1907,9 @@ Export ~org~ files to Github-flavoured markdown.
 #+end_src
 
 ** ~swiper~ and friends                                              :melpa:
+
+This is a new one for me.  See [[http://oremacs.com/swiper/#key-bindings-for-single-selection-action-then-exit-minibuffer][here]] for more info on key bindings.
+
 #+begin_src emacs-lisp
   (use-package smex
     :config
@@ -1907,6 +1935,8 @@ Export ~org~ files to Github-flavoured markdown.
     :demand
     :ensure t)
 
+  (use-package avy :ensure t :demand)
+
   (use-package ivy
     :config
     (setq ivy-use-virtual-buffers t)
@@ -1917,10 +1947,12 @@ Export ~org~ files to Github-flavoured markdown.
      ("C-s" . ivy-next-line-or-history)
      ("C-r" . ivy-previous-line-or-history)
      ("C-m" . ivy-alt-done)
+     ("C-j" . ivy-immediate-done)
      :map
      swiper-map
      ("C-r" . ivy-previous-line-or-history)
      ("C-s" . ivy-next-line-or-history)
+     ("H-'" . swiper-avy)
      :map
      counsel-find-file-map
      ("C-r" . ivy-previous-line)
@@ -1941,6 +1973,7 @@ Export ~org~ files to Github-flavoured markdown.
     :bind
     (("C-s" . swiper)
      ("C-r" . swiper))
+    :init (add-to-list 'swiper-font-lock-exclude 'nix-mode)
     :demand
     :ensure t)
 #+end_src
@@ -1986,6 +2019,11 @@ Export ~org~ files to Github-flavoured markdown.
     (setq uniquify-buffer-name-style 'forward)
     :ensure nil
     :demand)
+#+end_src
+
+** ~unfill~                                                          :melpa:
+#+begin_src emacs-lisp
+  (use-package unfill :demand t :ensure t :bind ("M-q" . unfill-toggle))
 #+end_src
 
 ** ~visual-fill-column~                                              :melpa:

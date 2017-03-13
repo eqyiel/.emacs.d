@@ -1260,7 +1260,7 @@ So diminish ~auto-fill-function~, not ~auto-fill-mode~.
           (apply orig-fun '(type dir handle reverse))))
 
       (advice-add 'gnus-summary-save-parts :around 'eqyiel/gnus-summary-save-parts-1))
-    :bind ("S-SPC" . gnus-summary-prev-page)
+    :bind (:map gnus-summary-mode-map ("S-SPC" . gnus-summary-prev-page))
     :ensure nil)
 #+end_src
 

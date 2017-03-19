@@ -1,71 +1,54 @@
 * Variables
 #+begin_src emacs-lisp
-  (defvar eqyiel/home-directory
-    (or (and (getenv "HOME")
-             (directory-file-name
-              (expand-file-name (getenv "HOME"))))
-        (directory-file-name (expand-file-name "~/"))))
+    (defvar eqyiel/home-directory
+      (or (and (getenv "HOME")
+               (directory-file-name
+                (expand-file-name (getenv "HOME"))))
+          (directory-file-name (expand-file-name "~/"))))
 
-  (defvar eqyiel/xdg-cache-home
-    (or (and (getenv "XDG_CACHE_HOME")
-             (directory-file-name
-              (expand-file-name (getenv "XDG_CACHE_HOME"))))
-        (concat
-         (directory-file-name
-          (expand-file-name eqyiel/home-directory))
-         "/.cache")))
+    (defvar eqyiel/xdg-cache-home
+      (or (and (getenv "XDG_CACHE_HOME")
+               (directory-file-name
+                (expand-file-name (getenv "XDG_CACHE_HOME"))))
+          (concat
+           (directory-file-name
+            (expand-file-name eqyiel/home-directory))
+           "/.cache")))
 
-  (defvar eqyiel/xdg-config-home
-    (or (and (getenv "XDG_CONFIG_HOME")
-             (directory-file-name
-              (expand-file-name (getenv "XDG_CONFIG_HOME"))))
-        (concat
-         (directory-file-name
-          (expand-file-name eqyiel/home-directory))
-         "/.config")))
+    (defvar eqyiel/xdg-config-home
+      (or (and (getenv "XDG_CONFIG_HOME")
+               (directory-file-name
+                (expand-file-name (getenv "XDG_CONFIG_HOME"))))
+          (concat
+           (directory-file-name
+            (expand-file-name eqyiel/home-directory))
+           "/.config")))
 
-  (defvar eqyiel/xdg-data-home
-    (or (and (getenv "XDG_DATA_HOME")
-             (expand-file-name (getenv "XDG_DATA_HOME")))
-        (concat
-         (directory-file-name
-          (expand-file-name eqyiel/home-directory))
-         "/.local/share")))
+    (defvar eqyiel/xdg-data-home
+      (or (and (getenv "XDG_DATA_HOME")
+               (expand-file-name (getenv "XDG_DATA_HOME")))
+          (concat
+           (directory-file-name
+            (expand-file-name eqyiel/home-directory))
+           "/.local/share")))
 
-  (defvar eqyiel/mail-directory
-    (concat
-     (directory-file-name
-      (expand-file-name eqyiel/home-directory))
-     "/mail"))
+    (defvar eqyiel/mail-directory
+      (concat
+       (directory-file-name
+        (expand-file-name eqyiel/home-directory))
+       "/mail"))
 
-  (defvar eqyiel/news-directory
-    (concat
-     (directory-file-name
-      (expand-file-name eqyiel/home-directory))
-     "/mail"))
+    (defvar eqyiel/news-directory
+      (concat
+       (directory-file-name
+        (expand-file-name eqyiel/home-directory))
+       "/mail"))
 
-  (defvar eqyiel/org-directory
-    (concat
-     (directory-file-name
-      (expand-file-name eqyiel/home-directory))
-     "/doc/org"))
-
-  (defvar eqyiel/smtp-accounts
-    '((ssl "eqyiel@gmail.com" "smtp.gmail.com" 587 "eqyiel@gmail.com" nil)
-      (ssl "mahe0054@uni.flinders.edu.au" "outlook.office365.com" 587
-           "mahe0054@uni.flinders.edu.au" nil) ;; flinders now uses office365
-      (ssl "r@rkm.id.au" "nabiki.rkm.id.au" 587 "r@rkm.id.au" nil)
-      (ssl "eqyiel@internode.on.net" "mail.internode.on.net" 25
-           "eqyiel@internode.on.net" nil)
-      (ssl "info@huttriverprovince.com.au" "rkm.id.au" 587
-           "info@huttriverprovince.com.au" nil)
-      (ssl "ruben@mangochutney.com.au" "imap.gmail.com" 587
-           "ruben@mangochutney.com.au" nil))
-"Each component of `eqyiel/smtp-accounts' has the form
-  PROTOCOL ADDRESS_MATCHED_IN_FROM_FIELD@FOO.COM PROTOCOL.FOO.COM
-    PORT USER@FOO.COM PASSWORD KEY CERT
-
-  See http://www.emacswiki.org/emacs/MultipleSMTPAccounts for more.")
+    (defvar eqyiel/org-directory
+      (concat
+       (directory-file-name
+        (expand-file-name eqyiel/home-directory))
+       "/doc/org"))
 #+end_src
 
 * Make cache and data directories if they don't exist
@@ -610,66 +593,6 @@
 
   (advice-add 'kill-region :after 'eqyiel/copy-to-clipboard)
   (advice-add 'copy-region-as-kill :after 'eqyiel/copy-to-clipboard)
-
-  (defun eqyiel/set-smtp (mech server port user password)
-    "Set related SMTP variables for supplied parameters."
-    (message (concat "from eqyiel/set-smtp " password))
-    (setq smtpmail-smtp-server server
-          smtpmail-smtp-service port
-          smtpmail-smtp-user user
-          smtpmail-auth-credentials (list (list server port user password))
-          smtpmail-auth-supported (list mech)
-          smtpmail-starttls-credentials nil)
-    (message "Setting SMTP server to `%s:%s' for user `%s'."
-             server port user))
-
-  (defun eqyiel/set-smtp-ssl (server port user password  &optional key cert)
-    "Set related SMTP and SSL variables for supplied parameters."
-    (message (concat "from eqyiel/set-smtp-ssl " password))
-    (setq starttls-use-gnutls t
-          starttls-gnutls-program "gnutls-cli"
-          starttls-extra-arguments nil
-          smtpmail-smtp-server server
-          smtpmail-smtp-service port
-          smtpmail-smtp-user user
-          smtpmail-auth-credentials (list (list server port user password))
-          smtpmail-starttls-credentials (list (list server port key cert)))
-    (message
-     "Setting SMTP server to `%s:%s' for user `%s'. (SSL enabled.)"
-     server port user))
-
-  (defun eqyiel/change-smtp ()
-    "Change the SMTP server according to the current from line."
-    (require 'cl)
-    (save-excursion
-      (loop with from = (save-restriction
-                          (message-narrow-to-headers)
-                          (message-fetch-field "from"))
-            for (auth-mech address . auth-spec) in eqyiel/smtp-accounts
-            when (string-match address from)
-            do (cond
-                ((memq auth-mech '(cram-md5 plain login))
-                 (return (apply 'eqyiel/set-smtp (cons auth-mech auth-spec))))
-                ((eql auth-mech 'ssl)
-                 (return (apply 'eqyiel/set-smtp-ssl auth-spec)))
-                (t (error "Unrecognized SMTP auth. mechanism: `%s'." auth-mech)))
-            finally (error "Cannot infer SMTP information."))))
-
-  ;; (defun eqyiel/smtpmail-via-smtp (recipient smtpmail-text-buffer
-  ;;                                            &optional ask-for-password)
-  ;;   "Call `eqyiel/change-smtp' before every `smtpmail-via-smtp'."
-  ;;   (with-current-buffer smtpmail-text-buffer (eqyiel/change-smtp)))
-
-  ;; (advice-add 'smtpmail-via-smtp :before 'eqyiel/smtpmail-via-smtp)
-
-  ;; http://www.emacswiki.org/emacs/MultipleSMTPAccounts
-  (defadvice smtpmail-via-smtp (before smtpmail-via-smtp-ad-change-smtp
-                                       (recipient smtpmail-text-buffer
-                                                  &optional ask-for-password))
-    "Call `change-smtp' before every `smtpmail-via-smtp'."
-    (with-current-buffer smtpmail-text-buffer (eqyiel/change-smtp)))
-
-  (ad-activate 'smtpmail-via-smtp)
 #+end_src
 
 * Packages
@@ -1095,6 +1018,14 @@ So diminish ~auto-fill-function~, not ~auto-fill-mode~.
 #+end_src
 
 ** ~gnus~                                                          :builtin:
+
+Create a new group with ~G m~, ~gnus-group-make-group~.
+
+You can nest it under an nnimap topic, for example to create the folder `Test`
+on server `rkm.id.au` create `rkm.id.au/Test` and ignore the warnings.
+
+Don't forget to add the group to `mbsyncrc`.
+
 #+begin_src emacs-lisp
   (use-package gnus
     :defer t
@@ -1102,8 +1033,10 @@ So diminish ~auto-fill-function~, not ~auto-fill-mode~.
     (progn
       (require 'epg-config)
       (require 'shr)
-      (require 'smtpmail)
       (require 'ivy)
+      (require 'nnir)
+      (require 'notmuch)
+      (require 'org-gnus)
       (setq-default
        epg-debug t
        epg-user-id user-full-name
@@ -1112,6 +1045,7 @@ So diminish ~auto-fill-function~, not ~auto-fill-mode~.
        gnus-article-save-directory eqyiel/news-directory
        gnus-auto-center-group t
        gnus-auto-center-summary t
+       gnus-asynchronous t
        gnus-blocked-images nil
        gnus-buttonized-mime-types '("multipart/alternative" "multipart/encrypted" "multipart/signed")
        gnus-cache-directory eqyiel/news-directory
@@ -1124,14 +1058,15 @@ So diminish ~auto-fill-function~, not ~auto-fill-mode~.
        gnus-kill-files-directory eqyiel/news-directory
        gnus-large-ephemeral-newsgroup nil
        gnus-large-newsgroup nil
+       gnus-permanently-visible-groups ".*"
        gnus-message-replyencrypt t
        gnus-message-replysign t
        gnus-message-replysignencrypted t
-       gnus-read-newsrc-file t
+       gnus-read-newsrc-file nil
+       gnus-save-newsrc-file nil
        gnus-refer-thread-limit t
        gnus-safe-html-newsgroups "\\`nnimap[+:]"
        gnus-save-killed-list nil
-       gnus-save-newsrc-file t
        gnus-startup-file (concat eqyiel/xdg-config-home "/gnus/newsrc")
        gnus-subscribe-newsgroup-method 'gnus-subscribe-zombies
        gnus-sum-thread-tree-false-root ""
@@ -1144,15 +1079,15 @@ So diminish ~auto-fill-function~, not ~auto-fill-mode~.
        gnus-summary-line-format "%U%R%z %(%&user-date;  %-15,15f  %B%s%)\n"
        gnus-summary-save-parts-default-mime ".*/.*"
        gnus-summary-stop-at-end-of-message t
-       gnus-summary-thread-gathering-function 'gnus-gather-threads-by-references
+       gnus-summary-thread-gathering-function 'gnus-gather-threads-by-subject
        gnus-thread-sort-functions '(gnus-thread-sort-by-date)
        gnus-treat-x-pgp-sig t
        gnus-user-date-format-alist '((t . "%Y-%m-%d %H:%M"))
        gnus-uu-be-dangerous t
+       mail-specify-envelope-from t
+       mail-envelope-from 'header
        mail-from-style nil
        mail-source-directory eqyiel/mail-directory
-       message-directory eqyiel/mail-directory
-       message-send-mail-function 'smtpmail-send-it
        mm-decrypt-option 'always
        mm-encrypt-option 'guided
        mm-inline-large-images-proportion 0.5
@@ -1167,66 +1102,130 @@ So diminish ~auto-fill-function~, not ~auto-fill-mode~.
        mml2015-sign-with-sender t
        mml2015-use 'epg
        mml2015-verbose t
-       send-mail-function 'smtpmail-send-it
+       send-mail-function 'message-send-mail-with-sendmail
+       sendmail-program "msmtpq"
        shr-blocked-images nil
-       smtpmail-debug-info t
-       smtpmail-debug-verb t
        starttls-use-gnutls t)
 
-      ;; Let Gnus change the "From:" line by looking at current group we are
-      ;; in. First argument to each posting style is the name of a group in
-      ;; Gnus, not the server itself!
       (setq
-       gnus-posting-styles
-       '(("gmail.com" (address "eqyiel@gmail.com") (name user-full-name))
-         ("flinders.edu.au" (address "mahe0054@uni.flinders.edu.au")
-          (name user-full-name))
-         ("rkm.id.au" (address user-mail-address) (name user-full-name))
-         ("huttriverprovince.com.au" (address "info@huttriverprovince.com.au")
-          (name "Hutt River Province"))
-         ("internode.on.net" (address "eqyiel@internode.on.net")
-          (name user-full-name))
-         ("mangochutney.com.au" (address "ruben@mangochutney.com.au")
-          (name user-full-name))))
+       gnus-parameters
+       '(("rkm.id.au.*"
+          (display . default)
+          (auto-expire . nil)
+          (expiry-wait . immediate)
+          (posting-style
+           (name user-full-name)
+           (address user-mail-address))
+          (gcc-self . ("rkm.id.au/Sent" "rkm.id.au/Inbox"))
+          (expiry-target . "rkm.id.au/Archive"))
+         ("gmail.com.*"
+          (display . default)
+          (auto-expire . nil)
+          (expiry-wait . immediate)
+          (posting-style
+           (name user-full-name)
+           (address "eqyiel@gmail.com"))
+          (gcc-self . ("gmail.com/Sent" "gmail.com/Inbox"))
+          (expiry-target . "gmail.com/Bin"))
+         ("mangochutney.com.au.*"
+          (display . default)
+          (auto-expire . nil)
+          (expiry-wait . immediate)
+          (posting-style
+           (name user-full-name)
+           (organization "Mango Chutney")
+           (address "ruben@mangochutney.com.au"))
+          (gcc-self . ("mangochutney.com.au/Sent" "mangochutney.com.au/Inbox"))
+          (expiry-target . "mangochutney.com.au/Bin"))
+         ("internode.on.net.*"
+          (display . default)
+          (auto-expire . nil)
+          (expiry-wait . immediate)
+          (posting-style
+           (name user-full-name)
+           (address "eqyiel@internode.on.net"))
+          (gcc-self . ("mangochutney.com.au/Sent" "mangochutney.com.au/Inbox"))
+          (expiry-target . "mangochutney.com.au/Bin"))
+         ("flinders.edu.au.*"
+          (display . default)
+          (auto-expire . nil)
+          (expiry-wait . immediate)
+          (posting-style
+           (name user-full-name)
+           (address "mahe0054@flinders.edu.au"))
+          (gcc-self . ("flinders.edu.au/Sent" "flinders.edu.au/Inbox"))
+          (expiry-target . "flinders.edu.au/Bin"))
+         ("huttriverprovince.com.au.*"
+          (display . default)
+          (auto-expire . nil)
+          (expiry-wait . immediate)
+          (posting-style
+           (name user-full-name)
+           (address "info@huttriverprovince.com.au"))
+          (gcc-self . ("huttriverprovince.com.au/Sent"
+                       "huttriverprovince.com.au/Inbox"))
+          (expiry-target . "huttriverprovince.com.au/Bin"))))
 
-      (if (string-equal (system-name) "ayanami")
-          (setq gnus-select-method
-                ;; First argument to nnimap should match name of some file in
-                ;; ~/.password-store/.
-                '(nnimap "eqyiel@localhost"
-                         (nnimap-address "localhost")
-                         (nnimap-stream network)
-                         (nnir-search-engine imap)))
-        (setq gnus-select-method
-              '(nnimap "rkm.id.au"
-                       (nnimap-address "rkm.id.au")
-                       (nnimap-server-port "imaps")
-                       (nnimap-stream ssl))
-              gnus-secondary-select-methods
-              '((nnimap "imap.gmail.com"
-                        (nnimap-address "imap.gmail.com")
-                        (nnimap-server-port 993)
-                        (nnimap-stream ssl))
-                (nnimap "mail.internode.on.net"
-                        (nnimap-address "mail.internode.on.net")
-                        (nnimap-server-port 993)
-                        (nnimap-stream ssl))
-                (nnimap "outlook.office365.com"
-                        (nnimap-address "outlook.office365.com")
-                        (nnimap-server-port 993)
-                        (nnimap-stream ssl))
-                (nnimap "huttriverprovince.com.au"
-                        (nnimap-address "huttriverprovince.com.au")
-                        (nnimap-server-port 993)
-                        (nnimap-stream ssl))
-                (nnimap "huttriverprovince.com.au"
-                        (nnimap-address "huttriverprovince.com.au")
-                        (nnimap-server-port 993)
-                        (nnimap-stream ssl))
-                (nnimap "mangochutney.com.au"
-                        (nnimap-address "imap.gmail.com")
-                        (nnimap-server-port 993)
-                        (nnimap-stream ssl))))))
+      (setq gnus-select-method
+            ;; First argument to nnimap should match name of some file in
+            ;; ~/.password-store/.
+            '(nnimap "eqyiel@localhost"
+                     (nnimap-address "localhost")
+                     (nnimap-stream network)
+                     (nnir-search-engine notmuch)))
+
+      (setq nnir-notmuch-remove-prefix eqyiel/mail-directory)
+
+      (setq gnus-topic-topology
+            '(("Gnus" visible nil nil)
+              (("rkm.id.au" visible nil nil))
+              (("internode.on.net" visible nil nil))
+              (("flinders.edu.au" visible nil nil))
+              (("gmail.com" visible nil nil))
+              (("huttriverprovince.com.au" visible nil nil))
+              (("mangochutney.com.au" visible nil nil))))
+
+      (setq gnus-topic-alist
+            '(("Gnus" "archive" "nndraft:drafts")
+              ("flinders.edu.au"
+               "flinders.edu.au/Bin"
+               "flinders.edu.au/Keep"
+               "flinders.edu.au/Inbox"
+               "flinders.edu.au/Sent"
+               "flinders.edu.au/Spam")
+              ("gmail.com"
+               "gmail.com/Bin"
+               "gmail.com/Inbox"
+               "gmail.com/Spam"
+               "gmail.com/Sent")
+              ("huttriverprovince.com.au"
+               "huttriverprovince.com.au/Inbox"
+               "huttriverprovince.com.au/Sent"
+               "huttriverprovince.com.au/Spam"
+               "huttriverprovince.com.au/Trash")
+              ("internode.on.net"
+               "internode.on.net/Bin"
+               "internode.on.net/Drafts"
+               "internode.on.net/Inbox"
+               "internode.on.net/Sent"
+               "internode.on.net/Spam")
+              ("rkm.id.au"
+               "rkm.id.au/Keep"
+               "rkm.id.au/Inbox"
+               "rkm.id.au/RSS"
+               "rkm.id.au/Sent"
+               "rkm.id.au/Spam"
+               "rkm.id.au/SMS"
+               "rkm.id.au/Archive"
+               "rkm.id.au/Marketing Spam"
+               "rkm.id.au/Trash"
+               "rkm.id.au/sa-learn"
+               "rkm.id.au/sa-unlearn")
+              ("mangochutney.com.au"
+               "mangochutney.com.au/Inbox"
+               "mangochutney.com.au/Sent"
+               "mangochutney.com.au/Spam"
+               "mangochutney.com.au/Bin"))))
     :init
     (progn
       (add-hook 'gnus-group-mode-hook 'gnus-topic-mode)
@@ -1506,6 +1505,8 @@ MIME viewer]].
   (use-package message
     :init
     (setq
+     message-directory eqyiel/mail-directory
+     message-send-mail-function 'message-send-mail-with-sendmail
      message-cite-function 'message-cite-original-without-signature
      message-default-charset 'utf-8
      message-default-mail-headers "Cc: \nBcc: \n"

@@ -588,8 +588,9 @@
 
   ;; Make life better in SSH sessions
   (defun eqyiel/copy-to-clipboard (beg end &optional region)
-    (let ((inhibit-message t))
-      (shell-command-on-region beg end "copy-to-clipboard")))
+    (when (executable-find "copy-to-clipboard")
+      (let ((inhibit-message t))
+        (shell-command-on-region beg end "copy-to-clipboard"))))
 
   (advice-add 'kill-region :after 'eqyiel/copy-to-clipboard)
   (advice-add 'copy-region-as-kill :after 'eqyiel/copy-to-clipboard)

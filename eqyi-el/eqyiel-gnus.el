@@ -11,50 +11,52 @@
 ;;          (lambda () (interactive) (org-capture nil "c"))))))
 
 ;; In case I accidentally my newsrc.eld
-;; (eval-after-load "gnus-group"
-;;   '(progn
-;;      (setq gnus-topic-topology
-;;            '(("Gnus" visible nil nil)
-;;              (("rkm.id.au" visible nil ((gcc-self . "rkm.id.au/Sent"))))
-;;              (("internode.on.net" visible nil
-;;                ((gcc-self . "internode.on.net/Sent"))))
-;;              (("flinders.edu.au" visible nil
-;;                ((gcc-self . "flinders.edu.au/Sent"))))
-;;              (("gmail.com" visible nil ((gcc-self . "gmail.com/Sent"))))
-;;              (("huttriverprovince.com.au" visible nil
-;;                ((gcc-self . "huttriverprovince.com.au/Sent")))))
-;;            gnus-topic-alist
-;;            '(("Gnus" "archive" "nndraft:drafts")
-;;              ("nnimap:flinders.edu.au"
-;;               "nnimap:flinders.edu.au/Bin"
-;;               "nnimap:flinders.edu.au/Keep"
-;;               "nnimap:flinders.edu.au/New"
-;;               "nnimap:flinders.edu.au/Sent"
-;;               "nnimap:flinders.edu.au/Spam")
-;;              ("nnimap:gmail.com"
-;;               "nnimap:gmail.com/Bin"
-;;               "nnimap:gmail.com/New"
-;;               "nnimap:gmail.com/Spam"
-;;               "nnimap:gmail.com/Sent")
-;;              ("nnimap:huttriverprovince.com.au"
-;;               "nnimap:huttriverprovince.com.au/New"
-;;               "nnimap:huttriverprovince.com.au/Sent"
-;;               "nnimap:huttriverprovince.com.au/Spam"
-;;               "nnimap:huttriverprovince.com.au/Trash")
-;;              ("nnimap:internode.on.net"
-;;               "nnimap:internode.on.net/Bin"
-;;               "nnimap:internode.on.net/Drafts"
-;;               "nnimap:internode.on.net/New"
-;;               "nnimap:internode.on.net/Sent"
-;;               "nnimap:internode.on.net/Spam")
-;;              ("nnimap:rkm.id.au"
-;;               "nnimap:rkm.id.au/Keep"
-;;               "nnimap:rkm.id.au/New"
-;;               "nnimap:rkm.id.au/RSS"
-;;               "nnimap:rkm.id.au/Sent"
-;;               "nnimap:rkm.id.au/Spam"
-;;               "nnimap:rkm.id.au/sa-learn"
-;;               "nnimap:rkm.id.au/sa-unlearn")))))
+(eval-after-load "gnus-group"
+  '(progn
+     (setq gnus-topic-topology
+           '(("Gnus" visible nil nil)
+             (("rkm.id.au" visible nil ((gcc-self . "rkm.id.au/Sent"))))
+             (("internode.on.net" visible nil
+               ((gcc-self . "internode.on.net/Sent"))))
+             (("flinders.edu.au" visible nil
+               ((gcc-self . "flinders.edu.au/Sent"))))
+             (("gmail.com" visible nil ((gcc-self . "gmail.com/Sent"))))
+             (("huttriverprovince.com.au" visible nil
+               ((gcc-self . "huttriverprovince.com.au/Sent"))))
+             (("mangochutney.com.au" visible nil
+               ((gcc-self . "mangochutney.com.au/Sent")))))
+           gnus-topic-alist
+           '(("Gnus" "archive" "nndraft:drafts")
+             ("nnimap:flinders.edu.au"
+              "nnimap:flinders.edu.au/Bin"
+              "nnimap:flinders.edu.au/Keep"
+              "nnimap:flinders.edu.au/New"
+              "nnimap:flinders.edu.au/Sent"
+              "nnimap:flinders.edu.au/Spam")
+             ("nnimap:gmail.com"
+              "nnimap:gmail.com/Bin"
+              "nnimap:gmail.com/New"
+              "nnimap:gmail.com/Spam"
+              "nnimap:gmail.com/Sent")
+             ("nnimap:huttriverprovince.com.au"
+              "nnimap:huttriverprovince.com.au/New"
+              "nnimap:huttriverprovince.com.au/Sent"
+              "nnimap:huttriverprovince.com.au/Spam"
+              "nnimap:huttriverprovince.com.au/Trash")
+             ("nnimap:internode.on.net"
+              "nnimap:internode.on.net/Bin"
+              "nnimap:internode.on.net/Drafts"
+              "nnimap:internode.on.net/New"
+              "nnimap:internode.on.net/Sent"
+              "nnimap:internode.on.net/Spam")
+             ("nnimap:rkm.id.au"
+              "nnimap:rkm.id.au/Keep"
+              "nnimap:rkm.id.au/New"
+              "nnimap:rkm.id.au/RSS"
+              "nnimap:rkm.id.au/Sent"
+              "nnimap:rkm.id.au/Spam"
+              "nnimap:rkm.id.au/sa-learn"
+              "nnimap:rkm.id.au/sa-unlearn")))))
 
 ;; example from wgreenhouse, come back to this at some point
 ;; ;; Basic gnus nnmaildir config integrating notmuch.

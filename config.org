@@ -206,13 +206,17 @@
   ;; Use `eldoc' in `emacs-lisp-mode' buffers.
   (add-hook 'emacs-lisp-mode-hook 'turn-on-eldoc-mode)
 
+  ;; Make everything not wrong on macOS
+  (setq mac-option-modifier 'meta
+        mac-command-modifier 'super)
+
 #+end_src
 
 * Fonts
 #+begin_src emacs-lisp
     (cond
-     ((string-equal system-name "localghost") ;; high dpi
-      (set-face-attribute 'default nil :height 220 :family "DejaVu Sans Mono"))
+     ((eq system-type 'darwin) ;; high dpi
+      (set-face-attribute 'default nil :height 140 :family "DejaVu Sans Mono"))
      (t
       (set-face-attribute 'default nil :height 120 :family "DejaVu Sans Mono")))
 
@@ -272,7 +276,7 @@
   (defun eqyiel/kill-region-or-backward-kill-word (&optional arg region)
     "`kill-region' if the region is active, otherwise `backward-kill-word'
 
-    Taken from: http://david.rothlis.net/emacs/ergonomics.html"
+      Taken from: http://david.rothlis.net/emacs/ergonomics.html"
     (interactive
      (list (prefix-numeric-value current-prefix-arg) (use-region-p)))
     (if region (kill-region (region-beginning) (region-end))
@@ -289,10 +293,10 @@
 
   (defun eqyiel/sudo-edit (&optional arg)
     "Edit currently visited file as root.  With a prefix ARG prompt for a file to
-    visit.  Will also prompt for a file to visit if current buffer is not visiting a
-    file.
+      visit.  Will also prompt for a file to visit if current buffer is not visiting a
+      file.
 
-    Taken from: http://emacsredux.com/blog/2013/04/21/edit-files-as-root/"
+      Taken from: http://emacsredux.com/blog/2013/04/21/edit-files-as-root/"
     (interactive "P")
     (if (or arg (not buffer-file-name))
         (find-file (concat "/sudo:root@localhost:"
@@ -302,7 +306,7 @@
   (defun eqyiel/eval-and-replace ()
     "Replace the preceding sexp with its value.
 
-    Taken from: http://emacsredux.com/blog/2013/06/21/eval-and-replace/"
+      Taken from: http://emacsredux.com/blog/2013/06/21/eval-and-replace/"
     (interactive)
     (backward-kill-sexp)
     (condition-case nil
@@ -346,7 +350,7 @@
   (defun eqyiel/comint-delchar-or-eof-or-kill-buffer (arg)
     "C-d on an empty line in the shell terminates the process.
 
-    Taken from: http://whattheemacsd.com/setup-shell.el-01.html"
+      Taken from: http://whattheemacsd.com/setup-shell.el-01.html"
     (interactive "p")
     (if (null (get-buffer-process (current-buffer)))
         (kill-buffer)
@@ -355,7 +359,7 @@
   (defun eqyiel/rotate-windows ()
     "Rotate your windows.
 
-    Taken from: http://whattheemacsd.com/buffer-defuns.el-02.html"
+      Taken from: http://whattheemacsd.com/buffer-defuns.el-02.html"
     (interactive)
     (cond ((not (> (count-windows)1))
            (message "You can't rotate a single window!"))
@@ -413,9 +417,9 @@
 
   (defun eqyiel/open-width ()
     "Simple function that allows us to open the underlying
-    file of a buffer in an external program.
+      file of a buffer in an external program.
 
-    Taken from: https://github.com/bbatsov/prelude/blob/master/core/prelude-core.el"
+      Taken from: https://github.com/bbatsov/prelude/blob/master/core/prelude-core.el"
     (interactive)
     (when buffer-file-name
       (shell-command
@@ -451,7 +455,7 @@
   (defun eqyiel/rename-file-and-buffer ()
     "Renames current buffer and file it is visiting.
 
-    http://whattheemacsd.com/file-defuns.el-01.html"
+      http://whattheemacsd.com/file-defuns.el-01.html"
     (interactive)
     (let ((name (buffer-name))
           (filename (buffer-file-name)))
@@ -472,7 +476,7 @@
   (defun eqyiel/delete-file-and-buffer ()
     "Removes file connected to current buffer and kills buffer.
 
-    http://whattheemacsd.com/file-defuns.el-02.html"
+      http://whattheemacsd.com/file-defuns.el-02.html"
     (interactive)
     (let ((filename (buffer-file-name))
           (buffer (current-buffer))
@@ -488,7 +492,7 @@
 
   (defun eqyiel/sprunge-region ()
     "Send the current region to sprunge.us and save the URL returned to the
-    kill-ring."
+      kill-ring."
     (interactive)
     (if (use-region-p)
         (let ((filename (substring (shell-command-to-string "mktemp") 0 -1)))
@@ -541,7 +545,7 @@
 
   (defun eqyiel-count-commas ()
     "CSV files are a pain to read, use this to see if there are as many commas as
-    there should be."
+      there should be."
     (interactive)
     (let ((i 0))
       (beginning-of-line)
@@ -568,12 +572,12 @@
   ;; https://www.emacswiki.org/emacs/SortWords
   (defun eqyiel/sort-words (reverse beg end)
     "Sort words in region alphabetically, in REVERSE if negative.
-    Prefixed with negative \\[universal-argument], sorts in reverse.
+      Prefixed with negative \\[universal-argument], sorts in reverse.
 
-    The variable `sort-fold-case' determines whether alphabetic case affects the
-    sort order.
+      The variable `sort-fold-case' determines whether alphabetic case affects the
+      sort order.
 
-    See `sort-regexp-fields'."
+      See `sort-regexp-fields'."
     (interactive "P\nr")
     (sort-regexp-fields reverse "\\w+" "\\&" beg end))
 
@@ -1036,7 +1040,6 @@ Don't forget to add the group to `mbsyncrc`.
       (require 'shr)
       (require 'ivy)
       (require 'nnir)
-      (require 'notmuch)
       (require 'org-gnus)
       (setq-default
        epg-debug t
@@ -1117,8 +1120,19 @@ Don't forget to add the group to `mbsyncrc`.
           (posting-style
            (name user-full-name)
            (address user-mail-address))
-          (gcc-self . ("rkm.id.au/Sent" "rkm.id.au/Inbox"))
+          (gcc-self . ("rkm.id.au/Sent"))
           (expiry-target . "rkm.id.au/Archive"))
+         ("rkm.id.au/github/*"
+          (auto-expire . t)
+          (expiry-wait . 28) ;; days
+          (expiry-target . "rkm.id.au/Trash"))
+         ("rkm.id.au/lists/*"
+          (auto-expire . t)
+          (expiry-wait . 28) ;; days
+          (expiry-target . "rkm.id.au/Trash"))
+         ("rkm.id.au/Marketing Spam"
+          (expiry-wait . immediate)
+          (expiry-target . "rkm.id.au/Trash"))
          ("gmail.com.*"
           (display . default)
           (auto-expire . nil)
@@ -1126,7 +1140,7 @@ Don't forget to add the group to `mbsyncrc`.
           (posting-style
            (name user-full-name)
            (address "eqyiel@gmail.com"))
-          (gcc-self . ("gmail.com/Sent" "gmail.com/Inbox"))
+          (gcc-self . ("gmail.com/Sent"))
           (expiry-target . "gmail.com/Bin"))
          ("mangochutney.com.au.*"
           (display . default)
@@ -1136,7 +1150,7 @@ Don't forget to add the group to `mbsyncrc`.
            (name user-full-name)
            (organization "Mango Chutney")
            (address "ruben@mangochutney.com.au"))
-          (gcc-self . ("mangochutney.com.au/Sent" "mangochutney.com.au/Inbox"))
+          (gcc-self . ("mangochutney.com.au/Sent"))
           (expiry-target . "mangochutney.com.au/Bin"))
          ("internode.on.net.*"
           (display . default)
@@ -1145,8 +1159,8 @@ Don't forget to add the group to `mbsyncrc`.
           (posting-style
            (name user-full-name)
            (address "eqyiel@internode.on.net"))
-          (gcc-self . ("mangochutney.com.au/Sent" "mangochutney.com.au/Inbox"))
-          (expiry-target . "mangochutney.com.au/Bin"))
+          (gcc-self . ("internode.on.net/Sent"))
+          (expiry-target . "internode.on.net/Bin"))
          ("flinders.edu.au.*"
           (display . default)
           (auto-expire . nil)
@@ -1154,8 +1168,8 @@ Don't forget to add the group to `mbsyncrc`.
           (posting-style
            (name user-full-name)
            (address "mahe0054@flinders.edu.au"))
-          (gcc-self . ("flinders.edu.au/Sent" "flinders.edu.au/Inbox"))
-          (expiry-target . "flinders.edu.au/Bin"))
+          (gcc-self . ("flinders.edu.au/Sent"))
+          (expiry-target . "flinders.edu.au/Trash"))
          ("huttriverprovince.com.au.*"
           (display . default)
           (auto-expire . nil)
@@ -1163,17 +1177,32 @@ Don't forget to add the group to `mbsyncrc`.
           (posting-style
            (name user-full-name)
            (address "info@huttriverprovince.com.au"))
-          (gcc-self . ("huttriverprovince.com.au/Sent"
-                       "huttriverprovince.com.au/Inbox"))
-          (expiry-target . "huttriverprovince.com.au/Bin"))))
+          (gcc-self . ("huttriverprovince.com.au/Sent"))
+          (expiry-target . "huttriverprovince.com.au/Trash"))))
 
-      (setq gnus-select-method
-            ;; First argument to nnimap should match name of some file in
-            ;; ~/.password-store/.
-            '(nnimap "eqyiel@localhost"
-                     (nnimap-address "localhost")
-                     (nnimap-stream network)
-                     (nnir-search-engine notmuch)))
+      (setq
+       gnus-select-method
+       ;; First argument to nnimap should match name of some file in
+       ;; ~/.password-store/.
+       '(nnimap
+         "eqyiel@localhost"
+         (nnimap-address "localhost")
+         (nnimap-stream network)
+         (nnimap-inbox "rkm.id.au/Inbox")
+         (nnir-search-engine imap)
+         (nnimap-split-methods 'nnmail-split-fancy)
+         (nnimap-split-fancy
+          (|
+           ;; Mailing lists
+           ("List-Id" ".*nix-dev.lists.science.uu.nl.*" "rkm.id.au/lists/nix-dev")
+           (any ".*@github.com.*" "rkm.id.au/github")
+
+           ;; IDK
+           (to ".*adele@rkm.id.au.*" "rkm.id.au/Spam")
+           (to ".*crazydaiz@rkm.id.au.*" "rkm.id.au/Spam")
+           (to ".*rolf@rkm.id.au.*" "rkm.id.au/Spam")
+           (to ".*tarot@rkm.id.au.*" "rkm.id.au/Spam")
+           "rkm.id.au/Inbox"))))
 
       (setq nnir-notmuch-remove-prefix eqyiel/mail-directory)
 
@@ -1188,45 +1217,77 @@ Don't forget to add the group to `mbsyncrc`.
 
       (setq gnus-topic-alist
             '(("Gnus" "archive" "nndraft:drafts")
-              ("flinders.edu.au"
-               "flinders.edu.au/Bin"
-               "flinders.edu.au/Keep"
+              (
+               "flinders.edu.au"
+               "flinders.edu.au/Archive"
+               "flinders.edu.au/Calendar"
+               "flinders.edu.au/Clutter"
+               "flinders.edu.au/Contacts"
+               "flinders.edu.au/Conversation History"
+               "flinders.edu.au/Deleted Items"
+               "flinders.edu.au/Drafts"
                "flinders.edu.au/Inbox"
-               "flinders.edu.au/Sent"
-               "flinders.edu.au/Spam")
-              ("gmail.com"
+               "flinders.edu.au/Journal"
+               "flinders.edu.au/Junk E-Mail"
+               "flinders.edu.au/Keep"
+               "flinders.edu.au/Notes"
+               "flinders.edu.au/Outbox"
+               "flinders.edu.au/Sent Items"
+               "flinders.edu.au/Tasks"
+               "flinders.edu.au/Trash"
+               )
+              (
+               "gmail.com"
                "gmail.com/Bin"
                "gmail.com/Inbox"
+               "gmail.com/Sent"
                "gmail.com/Spam"
-               "gmail.com/Sent")
-              ("huttriverprovince.com.au"
+               )
+              (
+               "huttriverprovince.com.au"
+               "huttriverprovince.com.au/Archive"
+               "huttriverprovince.com.au/Drafts"
                "huttriverprovince.com.au/Inbox"
+               "huttriverprovince.com.au/Marketing Spam"
                "huttriverprovince.com.au/Sent"
                "huttriverprovince.com.au/Spam"
-               "huttriverprovince.com.au/Trash")
-              ("internode.on.net"
+               "huttriverprovince.com.au/Trash"
+               )
+              (
+               "internode.on.net"
                "internode.on.net/Bin"
+               "internode.on.net/Trash"
                "internode.on.net/Drafts"
                "internode.on.net/Inbox"
                "internode.on.net/Sent"
-               "internode.on.net/Spam")
-              ("rkm.id.au"
-               "rkm.id.au/Keep"
+               "internode.on.net/Spam"
+               )
+              (
+               "rkm.id.au"
+               "rkm.id.au/Archive"
+               "rkm.id.au/Call log"
+               "rkm.id.au/Drafts"
                "rkm.id.au/Inbox"
+               "rkm.id.au/Marketing Spam"
                "rkm.id.au/RSS"
+               "rkm.id.au/SMS"
                "rkm.id.au/Sent"
                "rkm.id.au/Spam"
-               "rkm.id.au/SMS"
-               "rkm.id.au/Archive"
-               "rkm.id.au/Marketing Spam"
                "rkm.id.au/Trash"
+               "rkm.id.au/github"
+               "rkm.id.au/lists"
+               "rkm.id.au/lists/nix-dev"
+               "rkm.id.au/receipts"
                "rkm.id.au/sa-learn"
-               "rkm.id.au/sa-unlearn")
-              ("mangochutney.com.au"
+               "rkm.id.au/sa-unlearn"
+               )
+              (
+               "mangochutney.com.au"
+               "mangochutney.com.au/Bin"
                "mangochutney.com.au/Inbox"
                "mangochutney.com.au/Sent"
                "mangochutney.com.au/Spam"
-               "mangochutney.com.au/Bin"))))
+               ))))
     :init
     (progn
       (add-hook 'gnus-group-mode-hook 'gnus-topic-mode)
@@ -1348,10 +1409,13 @@ Don't forget to add the group to `mbsyncrc`.
     :config
     (when (and (bound-and-true-p ispell-program-name)
                (executable-find ispell-program-name))
-      (setq ispell-dictionary "en_GB"
-            ispell-personal-dictionary "~/.aspell.en.pws"))
-    (when (eq system-type 'darwin)
-      (setenv "DICTIONARY" "en_GB"))
+      (setq ispell-dictionary "english"
+            ispell-personal-dictionary "~/.aspell.en.pws"
+            ispell-aspell-data-dir
+            (lambda ()
+              (let ((nix-aspell-dict-dir "/run/current-system/sw/lib/aspell"))
+                (when (file-exists-p (directory-file-name nix-aspell-dict-dir))
+                  nix-aspell-dict-dir)))))
     :ensure nil)
 #+end_src
 
@@ -1537,11 +1601,11 @@ MIME viewer]].
   (use-package multiple-cursors
     :config
     (setq mc/list-file (concat eqyiel/xdg-cache-home "/emacs/mc-lists.el"))
-    :bind (("H-m" . mc/edit-lines)
-           ("H->" . mc/mark-next-like-this)
-           ("H-<" . mc/mark-previous-like-this)
-           ("H-8" . mc/mark-all-like-this)
-           ("H-*" . mc/mark-all-like-this)))
+    :bind (("C-M-*" . mc/edit-lines)
+           ("C->" . mc/mark-next-like-this)
+           ("C-<" . mc/mark-previous-like-this)
+           ("C-8" . mc/mark-all-like-this)
+           ("C-*" . mc/mark-all-like-this)))
 #+end_src
 
 ** ~nix-mode~                                                        :melpa:

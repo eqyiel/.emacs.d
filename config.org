@@ -48,7 +48,7 @@
       (concat
        (directory-file-name
         (expand-file-name eqyiel/home-directory))
-       "/doc/org"))
+       "/org"))
 #+end_src
 
 * Make cache and data directories if they don't exist
@@ -1693,33 +1693,14 @@ MIME viewer]].
      org-export-babel-evaluate nil
      org-export-default-language "en"
      org-capture-templates
-     '(("t" "Todo" entry
-        (file+headline "~/doc/org/new.org.gpg" "Tasks")
-        "** TODO %?")
-       ("r" "Read" entry
-        (file+headline "~/doc/org/new.org.gpg" "Read")
-        "** %?")
-       ("w" "Watch" entry
-        (file+headline "~/doc/org/new.org.gpg" "Watch")
-        "** %?")
-       ("l" "Listen" entry
-        (file+headline "~/doc/org/new.org.gpg" "Listen")
-        "** %?")
-       ("u" "Quote" entry
-        (file+headline "~/doc/org/new.org.gpg" "Quote")
-        "** %?")
-       ("c" "Contacts" entry
-        (file "~/doc/org/contacts.org.gpg")
-        "** %(org-contact-template-name)
-    :PROPERTIES:
-    :EMAIL: %(org-contacts-template-email)
-    :END:")
-       ("m" "Add a contact manually" entry
-        (file "~/doc/org/contacts.org.gpg")
-        "** %^{Name}
-    :PROPERTIES:
-    :EMAIL:
-    :END:")))
+     '(("t" "Todo" entry (file (concat "~/org/todo-" (system-name) ".org"))
+        "* TODO %?\nSCHEDULED: %(org-insert-time-stamp (org-read-date nil t \"+0d\"))"
+        '(:empty-lines 1
+          :kill-buffer t))
+       ("s" "Shopping" entry (file (concat "~/org/shopping-" (system-name) ".org"))
+        "* TODO %?\nSCHEDULED: %(org-insert-time-stamp (org-read-date nil t \"+0d\"))"
+        '(:empty-lines 1
+          :kill-buffer t))))
     :init
     (progn
       (defun eqyiel/org-clock-sum-today ()
@@ -1758,6 +1739,7 @@ MIME viewer]].
       (add-hook 'org-mode-hook 'turn-on-auto-fill))
     :bind
     (("<f12>" . org-capture)
+     ("<f7>" . org-agenda)
      :map org-mode-map
      ("M-p" . eqyiel/org-prev-visible-heading)
      ("M-n" . org-next-visible-heading))

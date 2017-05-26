@@ -1498,10 +1498,15 @@ This package adds itself to ~auto-mode-alist~.
 
 #+begin_src emacs-lisp
   (use-package json-mode
+    :ensure t
+    :config
+    (progn
+      (add-to-list 'auto-mode-alist '("\\.eslintrc.*$" . json-mode))
+      (add-to-list 'auto-mode-alist '("\\.babelrc$" . json-mode)))
     :init
     (defun eqyiel/json-mode-hook ()
       (setq js-indent-level 2
-             json-reformat:indent-width 2))
+            json-reformat:indent-width 2))
     (add-hook 'json-mode-hook ''eqyiel/json-mode-hook))
 #+end_src
 

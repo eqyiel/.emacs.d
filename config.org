@@ -896,6 +896,11 @@ So diminish ~auto-fill-function~, not ~auto-fill-mode~.
     :diminish company-mode)
 #+end_src
 
+** ~company-flow~                                                    :melpa:
+#+begin_src emacs-lisp
+(use-package company-flow :after company :demand :ensure t)
+#+end_src
+
 ** ~company-emoji~                                                   :melpa:
 #+begin_src emacs-lisp
   (use-package company-emoji :after company :demand :ensure t)
@@ -995,6 +1000,7 @@ So diminish ~auto-fill-function~, not ~auto-fill-mode~.
 #+begin_src emacs-lisp
 (use-package flx :ensure t)
 #+end_src
+
 ** ~flycheck~                                                        :melpa:
 #+begin_src emacs-lisp
   (use-package flycheck
@@ -1009,6 +1015,7 @@ So diminish ~auto-fill-function~, not ~auto-fill-mode~.
             flycheck-error-list-minimum-level 'warning))
     :init
     (progn
+      (use-package web-mode)
       (global-flycheck-mode)
       (flycheck-add-mode 'javascript-eslint 'web-mode)
       (setq flycheck-eslintrc ".eslintrc.json"))
@@ -1016,6 +1023,20 @@ So diminish ~auto-fill-function~, not ~auto-fill-mode~.
     :demand
     :diminish flycheck-mode)
 #+end_src
+
+** ~flycheck-flow~                                            :melpa:broken:
+ #+begin_src emacs-lisp
+   (use-package flycheck-flow
+     :ensure t
+     :after flycheck
+     :config
+     (progn
+       (flycheck-add-mode 'javascript-eslint 'web-mode)
+       ;; this is the only way I could get both eslint and flow checker results
+       ;; simultaneously 💩
+       (flycheck-add-next-checker 'javascript-flow '(t . javascript-flow-coverage))
+       (flycheck-add-next-checker 'javascript-flow-coverage '(t . javascript-eslint))))
+ #+end_src
 
 ** ~gnorb~                                                           :melpa:
 #+begin_src emacs-lisp
@@ -1436,6 +1457,7 @@ Don't forget to add the group to `mbsyncrc`.
       (use-package flycheck)
       (use-package company)
       (use-package company-tern)
+      (use-package company-flow)
 
       (add-hook 'js2-mode-hook (lambda () (tern-mode t)))
 
@@ -1447,6 +1469,7 @@ Don't forget to add the group to `mbsyncrc`.
         (require 'company-tern)
         (set (make-local-variable 'company-backends)
              '((company-files
+                company-flow
                 company-tern
                 company-yasnippet))))
 

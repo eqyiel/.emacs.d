@@ -853,7 +853,8 @@ So diminish ~auto-fill-function~, not ~auto-fill-mode~.
     :config
     (setq company-minimum-prefix-length 1
           company-idle-delay 0
-          company-dabbrev-code-everywhere t)
+          company-dabbrev-code-everywhere t
+          company-tooltip-align-annotations t)
     :init
     (progn
       (setq company-backends
@@ -881,13 +882,13 @@ So diminish ~auto-fill-function~, not ~auto-fill-mode~.
 
       (add-hook 'emacs-lisp-mode-hook 'eqyiel/company-elisp)
 
-      (defun eqyiel-company-shell ()
+      (defun eqyiel/company-shell ()
         (set (make-local-variable 'company-backends)
              '((company-capf))))
 
-        :config (add-to-list 'company-backends 'company-emoji)
+      :config (add-to-list 'company-backends 'company-emoji)
 
-      (add-hook 'shell-mode-hook 'eqyiel-company-shell)
+      (add-hook 'shell-mode-hook 'eqyiel/company-shell)
 
       (add-hook 'circe-channel-mode-hook (lambda () (company-mode -1)))
 

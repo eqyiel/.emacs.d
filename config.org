@@ -1202,29 +1202,42 @@ Don't forget to add the group to `mbsyncrc`.
           (gcc-self . ("huttriverprovince.com.au/Sent"))
           (expiry-target . "huttriverprovince.com.au/Trash"))))
 
-      (setq
-       gnus-select-method
-       ;; First argument to nnimap should match name of some file in
-       ;; ~/.password-store/.
-       '(nnimap
-         "eqyiel@localhost"
-         (nnimap-address "localhost")
-         (nnimap-stream network)
-         (nnimap-inbox "rkm.id.au/Inbox")
-         (nnir-search-engine imap)
-         (nnimap-split-methods 'nnmail-split-fancy)
-         (nnimap-split-fancy
-          (|
-           ;; Mailing lists
-           ("List-Id" ".*nix-dev.lists.science.uu.nl.*" "rkm.id.au/lists/nix-dev")
-           (any ".*@github.com.*" "rkm.id.au/github")
+      (if (eq system-type 'darwin)
+          (progn
+            (setq
+             gnus-select-method
+             `(nnmaildir ""
+                         (directory eqyiel/mail-directory)
+                         (get-new-mail nil)
+                         (nnir-search-engine notmuch))
+             nnir-notmuch-remove-prefix (expand-file-name eqyiel/mail-directory))
+            (add-hook
+             'gnus-after-getting-new-news-hook
+             (lambda () (start-process "update-notmuch" nil "notmuch" "new"))))
+        ;; otherwise
+        (setq
+         gnus-select-method
+         ;; First argument to nnimap should match name of some file in
+         ;; ~/.password-store/.
+         '(nnimap
+           "eqyiel@localhost"
+           (nnimap-address "localhost")
+           (nnimap-stream network)
+           (nnimap-inbox "rkm.id.au/Inbox")
+           (nnir-search-engine imap)
+           (nnimap-split-methods 'nnmail-split-fancy)
+           (nnimap-split-fancy
+            (|
+             ;; Mailing lists
+             ("List-Id" ".*nix-dev.lists.science.uu.nl.*" "rkm.id.au/lists/nix-dev")
+             (any ".*@github.com.*" "rkm.id.au/github")
 
-           ;; IDK
-           (to ".*adele@rkm.id.au.*" "rkm.id.au/Spam")
-           (to ".*crazydaiz@rkm.id.au.*" "rkm.id.au/Spam")
-           (to ".*rolf@rkm.id.au.*" "rkm.id.au/Spam")
-           (to ".*tarot@rkm.id.au.*" "rkm.id.au/Spam")
-           "rkm.id.au/Inbox"))))
+             ;; IDK
+             (to ".*adele@rkm.id.au.*" "rkm.id.au/Spam")
+             (to ".*crazydaiz@rkm.id.au.*" "rkm.id.au/Spam")
+             (to ".*rolf@rkm.id.au.*" "rkm.id.au/Spam")
+             (to ".*tarot@rkm.id.au.*" "rkm.id.au/Spam")
+             "rkm.id.au/Inbox")))))
 
       (setq nnir-notmuch-remove-prefix eqyiel/mail-directory)
 

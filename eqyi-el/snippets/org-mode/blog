@@ -2,11 +2,14 @@
 # name: blog
 # key: blog
 # --
-#+title: $1
-#+date: `(format-time-string "<%F %a %T>" (current-time))`
-#+author: Ruben Maher
-#+email: r@rkm.id.au
-#+filetags: ${2::tag1:tag2:}
-#+startup: showall
+#+TITLE: $1
+#+DATE: `(format-time-string "%FT%TZ" (current-time))`
+#+AUTHOR: `user-full-name`
+#+EMAIL: `user-mail-address`
+#+TAGS:
+#+ALIASES:
+#+DESCRIPTION:
+#+DRAFT: true
+#+STARTUP: showall
 
 $0

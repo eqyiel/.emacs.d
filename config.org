@@ -1,54 +1,62 @@
 * Variables
 #+begin_src emacs-lisp
-    (defvar eqyiel/home-directory
-      (or (and (getenv "HOME")
-               (directory-file-name
-                (expand-file-name (getenv "HOME"))))
-          (directory-file-name (expand-file-name "~/"))))
+  (defvar eqyiel/home-directory
+    (or (and (getenv "HOME")
+             (directory-file-name
+              (expand-file-name (getenv "HOME"))))
+        (directory-file-name (expand-file-name "~/"))))
 
-    (defvar eqyiel/xdg-cache-home
-      (or (and (getenv "XDG_CACHE_HOME")
-               (directory-file-name
-                (expand-file-name (getenv "XDG_CACHE_HOME"))))
-          (concat
-           (directory-file-name
-            (expand-file-name eqyiel/home-directory))
-           "/.cache")))
+  (defvar eqyiel/xdg-cache-home
+    (or (and (getenv "XDG_CACHE_HOME")
+             (directory-file-name
+              (expand-file-name (getenv "XDG_CACHE_HOME"))))
+        (concat
+         (directory-file-name
+          (expand-file-name eqyiel/home-directory))
+         "/.cache")))
 
-    (defvar eqyiel/xdg-config-home
-      (or (and (getenv "XDG_CONFIG_HOME")
-               (directory-file-name
-                (expand-file-name (getenv "XDG_CONFIG_HOME"))))
-          (concat
-           (directory-file-name
-            (expand-file-name eqyiel/home-directory))
-           "/.config")))
+  (defvar eqyiel/xdg-config-home
+    (or (and (getenv "XDG_CONFIG_HOME")
+             (directory-file-name
+              (expand-file-name (getenv "XDG_CONFIG_HOME"))))
+        (concat
+         (directory-file-name
+          (expand-file-name eqyiel/home-directory))
+         "/.config")))
 
-    (defvar eqyiel/xdg-data-home
-      (or (and (getenv "XDG_DATA_HOME")
-               (expand-file-name (getenv "XDG_DATA_HOME")))
-          (concat
-           (directory-file-name
-            (expand-file-name eqyiel/home-directory))
-           "/.local/share")))
+  (defvar eqyiel/xdg-data-home
+    (or (and (getenv "XDG_DATA_HOME")
+             (expand-file-name (getenv "XDG_DATA_HOME")))
+        (concat
+         (directory-file-name
+          (expand-file-name eqyiel/home-directory))
+         "/.local/share")))
 
-    (defvar eqyiel/mail-directory
-      (concat
-       (directory-file-name
-        (expand-file-name eqyiel/home-directory))
-       "/mail"))
+  (defvar eqyiel/mail-directory
+    (concat
+     (directory-file-name
+      (expand-file-name eqyiel/home-directory))
+     "/mail"))
 
-    (defvar eqyiel/news-directory
-      (concat
-       (directory-file-name
-        (expand-file-name eqyiel/home-directory))
-       "/mail"))
+  (defvar eqyiel/news-directory
+    (concat
+     (directory-file-name
+      (expand-file-name eqyiel/home-directory))
+     "/mail"))
 
-    (defvar eqyiel/org-directory
-      (concat
-       (directory-file-name
-        (expand-file-name eqyiel/home-directory))
-       "/org"))
+  (defvar eqyiel/downloads-directory
+    (concat
+     (directory-file-name
+      (expand-file-name eqyiel/home-directory))
+     "/downloads"))
+
+  (defvar eqyiel/org-directory
+    (concat
+     (directory-file-name
+      (expand-file-name eqyiel/home-directory))
+     "/org"))
+
+  (defvar eqyiel/timezone "Australia/Adelaide")
 #+end_src
 
 * Make cache and data directories if they don't exist
@@ -87,6 +95,8 @@
    require-final-newline t
    sentence-end-double-space t
    eval-expression-print-length nil)
+
+  (set-language-environment "UTF-8")
 
   (defalias 'yes-or-no-p 'y-or-n-p)
   (defvaralias 'c-basic-offset 'tab-width)
@@ -214,30 +224,32 @@
 
 * Fonts
 #+begin_src emacs-lisp
-    (cond
-     ((eq system-type 'darwin) ;; high dpi
-      (set-face-attribute 'default nil :height 140 :family "DejaVu Sans Mono"))
-     (t
-      (set-face-attribute 'default nil :height 120 :family "DejaVu Sans Mono")))
+  (cond
+   ((eq system-type 'darwin) ;; high dpi
+    (set-face-attribute 'default nil :height 140 :family "DejaVu Sans Mono"))
+   (t
+    (set-face-attribute 'default nil :height 120 :family "DejaVu Sans Mono")))
 
-    (defun eqyiel/set-emoji-font (frame)
-      "Adjust the font settings of FRAME so Emacs can display emoji properly."
-      (if (eq system-type 'darwin)
-          ;; NS/Cocoa
-          ;; This doesn't actually work anymore.
-          ;; See:
-          ;; lunaryorn.com/posts/bye-bye-emojis-emacs-hates-macos.html
-          (set-fontset-font t 'symbol (font-spec :family "Apple Color Emoji")
-                            frame 'prepend)
-        ;; GNU/Linux
+  (defun eqyiel/set-emoji-font (frame)
+    "Adjust the font settings of FRAME so Emacs can display emoji properly."
+    (if (eq system-type 'darwin)
+        ;; NS/Cocoa
+        ;; This doesn't actually work anymore.
+        ;; See:
+        ;; lunaryorn.com/posts/bye-bye-emojis-emacs-hates-macos.html
+        ;; (set-fontset-font t 'symbol (font-spec :family "Apple Color Emoji")
+        ;;                   frame 'prepend)
         (set-fontset-font t 'symbol (font-spec :family "Noto Emoji")
-                          frame 'prepend)))
+                        frame 'prepend)
+      ;; GNU/Linux
+      (set-fontset-font t 'symbol (font-spec :family "Noto Emoji")
+                        frame 'prepend)))
 
-    ;; For when Emacs is started in GUI mode:
-    (eqyiel/set-emoji-font nil)
-    ;; Hook for when a frame is created with emacsclient
-    ;; see https://www.gnu.org/software/emacs/manual/html_node/elisp/Creating-Frames.html
-    (add-hook 'after-make-frame-functions 'eqyiel/set-emoji-font)
+  ;; For when Emacs is started in GUI mode:
+  (eqyiel/set-emoji-font nil)
+  ;; Hook for when a frame is created with emacsclient
+  ;; see https://www.gnu.org/software/emacs/manual/html_node/elisp/Creating-Frames.html
+  (add-hook 'after-make-frame-functions 'eqyiel/set-emoji-font)
 #+end_src
 
 * Bootstrap ~use-package~
@@ -273,331 +285,337 @@
 
 * Utility functions
 #+begin_src emacs-lisp
-  (defun eqyiel/kill-region-or-backward-kill-word (&optional arg region)
-    "`kill-region' if the region is active, otherwise `backward-kill-word'
+    (defun eqyiel/kill-region-or-backward-kill-word (&optional arg region)
+      "`kill-region' if the region is active, otherwise `backward-kill-word'
 
-      Taken from: http://david.rothlis.net/emacs/ergonomics.html"
-    (interactive
-     (list (prefix-numeric-value current-prefix-arg) (use-region-p)))
-    (if region (kill-region (region-beginning) (region-end))
-      (backward-kill-word arg)))
+        Taken from: http://david.rothlis.net/emacs/ergonomics.html"
+      (interactive
+       (list (prefix-numeric-value current-prefix-arg) (use-region-p)))
+      (if region (kill-region (region-beginning) (region-end))
+        (backward-kill-word arg)))
 
-  (bind-key "C-w" 'eqyiel/kill-region-or-backward-kill-word)
+    (bind-key "C-w" 'eqyiel/kill-region-or-backward-kill-word)
 
-  (defun eqyiel/local-comment-auto-fill ()
-    "Taken from: https://github.com/technomancy/emacs-starter-kit"
-    (set (make-local-variable 'comment-auto-fill-only-comments) t)
-    (auto-fill-mode t))
+    (defun eqyiel/local-comment-auto-fill ()
+      "Taken from: https://github.com/technomancy/emacs-starter-kit"
+      (set (make-local-variable 'comment-auto-fill-only-comments) t)
+      (auto-fill-mode t))
 
-  (add-hook 'prog-mode-hook 'eqyiel/local-comment-auto-fill)
+    (add-hook 'prog-mode-hook 'eqyiel/local-comment-auto-fill)
 
-  (defun eqyiel/sudo-edit (&optional arg)
-    "Edit currently visited file as root.  With a prefix ARG prompt for a file to
-      visit.  Will also prompt for a file to visit if current buffer is not visiting a
-      file.
+    (defun eqyiel/sudo-edit (&optional arg)
+      "Edit currently visited file as root.  With a prefix ARG prompt for a file to
+        visit.  Will also prompt for a file to visit if current buffer is not visiting a
+        file.
 
-      Taken from: http://emacsredux.com/blog/2013/04/21/edit-files-as-root/"
-    (interactive "P")
-    (if (or arg (not buffer-file-name))
-        (find-file (concat "/sudo:root@localhost:"
-                           (ido-read-file-name "Find file(as root): ")))
-      (find-alternate-file (concat "/sudo:root@localhost:" buffer-file-name))))
+        Taken from: http://emacsredux.com/blog/2013/04/21/edit-files-as-root/"
+      (interactive "P")
+      (if (or arg (not buffer-file-name))
+          (find-file (concat "/sudo:root@localhost:"
+                             (ido-read-file-name "Find file(as root): ")))
+        (find-alternate-file (concat "/sudo:root@localhost:" buffer-file-name))))
 
-  (defun eqyiel/eval-and-replace ()
-    "Replace the preceding sexp with its value.
+    (defun eqyiel/eval-and-replace ()
+      "Replace the preceding sexp with its value.
 
-      Taken from: http://emacsredux.com/blog/2013/06/21/eval-and-replace/"
-    (interactive)
-    (backward-kill-sexp)
-    (condition-case nil
-        (prin1 (eval (read (current-kill 0)))
-               (current-buffer))
-      (error (message "Invalid expression")
-             (insert (current-kill 0)))))
+        Taken from: http://emacsredux.com/blog/2013/06/21/eval-and-replace/"
+      (interactive)
+      (backward-kill-sexp)
+      (condition-case nil
+          (prin1 (eval (read (current-kill 0)))
+                 (current-buffer))
+        (error (message "Invalid expression")
+               (insert (current-kill 0)))))
 
-  (defun eqyiel/insert-date ()
-    "Insert today's date."
-    (interactive)
-    (let ((t0 (current-time)))
-      (insert (completing-read "Select format: "
-                               `(,(format-time-string "<%F %a %T>" t0)
-                                 ,(format-time-string "<%F %a>" t0)
-                                 ,(format-time-string "%s" t0)
-                                 ,(format-time-string "%R" t0)
-                                 ,(format-time-string "%T" t0))))))
+    (defun eqyiel/insert-date ()
+      "Insert today's date."
+      (interactive)
+      (let ((t0 (current-time)))
+        (insert (completing-read "Select format: "
+                                 `(,(format-time-string "<%F %a %T>" t0)
+                                   ,(format-time-string "<%F %a>" t0)
+                                   ,(format-time-string "%s" t0)
+                                   ,(format-time-string "%R" t0)
+                                   ,(format-time-string "%T" t0))))))
 
-  (bind-key "C-c d" 'eqyiel/insert-date)
+    (bind-key "C-c d" 'eqyiel/insert-date)
 
-  (defun eqyiel/open-line-below ()
-    "Taken from: http://whattheemacsd.com/editing-defuns.el-01.html"
-    (interactive)
-    (end-of-line)
-    (newline)
-    (indent-for-tab-command))
+    (defun eqyiel/open-line-below ()
+      "Taken from: http://whattheemacsd.com/editing-defuns.el-01.html"
+      (interactive)
+      (end-of-line)
+      (newline)
+      (indent-for-tab-command))
 
-  (bind-key "C-o" 'eqyiel/open-line-below)
+    (bind-key "C-o" 'eqyiel/open-line-below)
 
-  (defun eqyiel/open-line-above ()
-    "Taken from: http://whattheemacsd.com/editing-defuns.el-01.html"
-    (interactive)
-    (beginning-of-line)
-    (newline)
-    (forward-line -1)
-    (indent-for-tab-command))
-
-  (bind-key "H-O" 'eqyiel/open-line-above)
-
-  (defun eqyiel/comint-delchar-or-eof-or-kill-buffer (arg)
-    "C-d on an empty line in the shell terminates the process.
-
-      Taken from: http://whattheemacsd.com/setup-shell.el-01.html"
-    (interactive "p")
-    (if (null (get-buffer-process (current-buffer)))
-        (kill-buffer)
-      (comint-delchar-or-maybe-eof arg)))
-
-  (defun eqyiel/rotate-windows ()
-    "Rotate your windows.
-
-      Taken from: http://whattheemacsd.com/buffer-defuns.el-02.html"
-    (interactive)
-    (cond ((not (> (count-windows)1))
-           (message "You can't rotate a single window!"))
-          (t
-           (setq i 1)
-           (setq num-windows (count-windows))
-           (while  (< i num-windows)
-             (let* (
-                    (w1 (elt (window-list) i))
-                    (w2 (elt (window-list) (+ (% i num-windows) 1)))
-
-                    (b1 (window-buffer w1))
-                    (b2 (window-buffer w2))
-
-                    (s1 (window-start w1))
-                    (s2 (window-start w2))
-                    )
-               (set-window-buffer w1  b2)
-               (set-window-buffer w2 b1)
-               (set-window-start w1 s2)
-               (set-window-start w2 s1)
-               (setq i (1+ i)))))))
-
-  (bind-key "H-<return>" 'eqyiel/rotate-windows)
-  (bind-key "M-s-S-C-<return>" 'eqyiel/rotate-windows)
-
-  (defun eqyiel/toggle-window-split ()
-    "Taken from: http://whattheemacsd.com/buffer-defuns.el-03.html"
-    (interactive)
-    (if (= (count-windows) 2)
-        (let* ((this-win-buffer (window-buffer))
-               (next-win-buffer (window-buffer (next-window)))
-               (this-win-edges (window-edges (selected-window)))
-               (next-win-edges (window-edges (next-window)))
-               (this-win-2nd (not (and (<= (car this-win-edges)
-                                           (car next-win-edges))
-                                       (<= (cadr this-win-edges)
-                                           (cadr next-win-edges)))))
-               (splitter
-                (if (= (car this-win-edges)
-                       (car (window-edges (next-window))))
-                    'split-window-horizontally
-                  'split-window-vertically)))
-          (delete-other-windows)
-          (let ((first-win (selected-window)))
-            (funcall splitter)
-            (if this-win-2nd (other-window 1))
-            (set-window-buffer (selected-window) this-win-buffer)
-            (set-window-buffer (next-window) next-win-buffer)
-            (select-window first-win)
-            (if this-win-2nd (other-window 1))))))
-
-  (bind-key "H-SPC" 'eqyiel/toggle-window-split)
-  (bind-key "M-s-S-C-SPC" 'eqyiel/toggle-window-split)
-
-  (defun eqyiel/open-width ()
-    "Simple function that allows us to open the underlying
-      file of a buffer in an external program.
-
-      Taken from: https://github.com/bbatsov/prelude/blob/master/core/prelude-core.el"
-    (interactive)
-    (when buffer-file-name
-      (shell-command
-       (concat
-        (if (eq system-type 'darwin)
-            "open"
-          (read-shell-command "Open current file with: "))
-        " "
-        buffer-file-name))))
-
-  (defun eqyiel/duckduckgo ()
-    "DDG a query or region if any."
-    (interactive)
-    (browse-url
-     (concat "https://duckduckgo.com/?q="
-             (url-hexify-string
-              (if (use-region-p)
-                  (buffer-substring (region-beginning) (region-end))
-                (read-string "DuckDuckGo: "))))))
-
-  (defun eqyiel/copy-file-name-to-clipboard ()
-    "Copy the current `buffer-file-name' to the clipboard."
-    (interactive)
-    (let ((filename (if (equal major-mode 'dired-mode)
-                        default-directory
-                      (buffer-file-name))))
-      (when filename
-        (kill-new filename)
-        (message "Copied buffer file name '%s' to the clipboard." filename))))
-
-  (bind-key "C-c w" 'eqyiel/copy-file-name-to-clipboard)
-
-  (defun eqyiel/rename-file-and-buffer ()
-    "Renames current buffer and file it is visiting.
-
-      http://whattheemacsd.com/file-defuns.el-01.html"
-    (interactive)
-    (let ((name (buffer-name))
-          (filename (buffer-file-name)))
-      (if (not (and filename (file-exists-p filename)))
-          (error "Buffer '%s' is not visiting a file!" name)
-        (let ((new-name (read-file-name "New name: " filename)))
-          (if (get-buffer new-name)
-              (error "A buffer named '%s' already exists!" new-name)
-            (rename-file filename new-name 1)
-            (rename-buffer new-name)
-            (set-visited-file-name new-name)
-            (set-buffer-modified-p nil)
-            (message "File '%s' successfully renamed to '%s'"
-                     name (file-name-nondirectory new-name)))))))
-
-  (bind-key "C-x C-r" 'eqyiel/rename-file-and-buffer)
-
-  (defun eqyiel/delete-file-and-buffer ()
-    "Removes file connected to current buffer and kills buffer.
-
-      http://whattheemacsd.com/file-defuns.el-02.html"
-    (interactive)
-    (let ((filename (buffer-file-name))
-          (buffer (current-buffer))
-          (name (buffer-name)))
-      (if (not (and filename (file-exists-p filename)))
-          (ido-kill-buffer)
-        (when (yes-or-no-p "Are you sure you want to remove this file? ")
-          (delete-file filename)
-          (kill-buffer buffer)
-          (message "File '%s' successfully removed" filename)))))
-
-  (bind-key "C-x C-k" 'eqyiel/delete-file-and-buffer)
-
-  (defun eqyiel/sprunge-region ()
-    "Send the current region to sprunge.us and save the URL returned to the
-      kill-ring."
-    (interactive)
-    (if (use-region-p)
-        (let ((filename (substring (shell-command-to-string "mktemp") 0 -1)))
-          (write-region (region-beginning) (region-end) filename)
-          (let ((url (substring (shell-command-to-string
-                                 (concat "curl -s -F 'sprunge=<"
-                                         filename "' http://sprunge.us")) 0 -1)))
-            (shell-command (concat "rm " filename))
-            (kill-new url)
-            (message "Saved %s to kill ring." url)))
-      (message "Mark a region first.")))
-
-  (defun eqyiel/rotn-region (n)
-    "Decode a caesar cipher.  Adapted from `rot13' to shift by N."
-    (interactive "NHow many? ")
-    (if (use-region-p)
-        (let ((rotn-translate-table
-               (let ((str (make-string 127 0))
-                     (i 0))
-                 (while (< i 127)
-                   (aset str i i)
-                   (setq i (1+ i)))
-                 (setq i 0)
-                 (while (< i 26)
-                   (aset str (+ i ?a) (+ (% (+ i n) 26) ?a))
-                   (aset str (+ i ?A) (+ (% (+ i n) 26) ?A))
-                   (setq i (1+ i)))
-                 str)))
-          (translate-region (region-beginning) (region-end) rotn-translate-table))
-      (message "Mark a region first.")))
-
-  (defun eqyiel/print-to-pdf (dest)
-    "Pretty-print a buffer using PostScript and save it as a PDF."
-    (interactive "FSave to where? ")
-    (let ((tmp (substring (shell-command-to-string "mktemp") 0 -1)))
-      (ps-spool-buffer-with-faces)
-      (switch-to-buffer "*PostScript*")
-      (write-file tmp)
-      (kill-buffer (file-name-nondirectory tmp))
-      (shell-command (concat "ps2pdf14 " tmp " " dest))
-      (shell-command (concat "rm " tmp))
-      (message (concat "PDF written to " dest "."))))
-
-  ;; http://www.emacswiki.org/emacs/EmacsAsDaemon#toc9
-  (defun eqyiel/server-shutdown ()
-    "Save buffers, quit, and shutdown (kill) server."
-    (interactive)
-    (save-some-buffers)
-    (kill-emacs))
-
-  (defun eqyiel-count-commas ()
-    "CSV files are a pain to read, use this to see if there are as many commas as
-      there should be."
-    (interactive)
-    (let ((i 0))
+    (defun eqyiel/open-line-above ()
+      "Taken from: http://whattheemacsd.com/editing-defuns.el-01.html"
+      (interactive)
       (beginning-of-line)
-      (while (re-search-forward "," (line-end-position) t)
-        (setq i (+ i 1)))
-      (message "found %s" i)))
+      (newline)
+      (forward-line -1)
+      (indent-for-tab-command))
 
-  (defun eqyiel/copy-rectangle-to-kill-ring (start end)
-    "Saves a rectangle to the normal kill ring."
-    (interactive "r")
-    (let ((lines (extract-rectangle start end)))
-      (with-temp-buffer
-        (while lines
-          (insert-for-yank (car lines))
-          (insert "\n")
-          (setq lines (cdr lines)))
-        (kill-ring-save (point-min) (point-max)))))
+    (bind-key "H-O" 'eqyiel/open-line-above)
 
-  (defun eqyiel/parent-directory (dir)
-    (file-name-directory
-     (directory-file-name
-      dir)))
+    (defun eqyiel/comint-delchar-or-eof-or-kill-buffer (arg)
+      "C-d on an empty line in the shell terminates the process.
 
-  ;; https://www.emacswiki.org/emacs/SortWords
-  (defun eqyiel/sort-words (reverse beg end)
-    "Sort words in region alphabetically, in REVERSE if negative.
-      Prefixed with negative \\[universal-argument], sorts in reverse.
+        Taken from: http://whattheemacsd.com/setup-shell.el-01.html"
+      (interactive "p")
+      (if (null (get-buffer-process (current-buffer)))
+          (kill-buffer)
+        (comint-delchar-or-maybe-eof arg)))
 
-      The variable `sort-fold-case' determines whether alphabetic case affects the
-      sort order.
+    (defun eqyiel/rotate-windows ()
+      "Rotate your windows.
 
-      See `sort-regexp-fields'."
-    (interactive "P\nr")
-    (sort-regexp-fields reverse "\\w+" "\\&" beg end))
+        Taken from: http://whattheemacsd.com/buffer-defuns.el-02.html"
+      (interactive)
+      (cond ((not (> (count-windows)1))
+             (message "You can't rotate a single window!"))
+            (t
+             (setq i 1)
+             (setq num-windows (count-windows))
+             (while  (< i num-windows)
+               (let* (
+                      (w1 (elt (window-list) i))
+                      (w2 (elt (window-list) (+ (% i num-windows) 1)))
 
-  (defun eqyiel/sort-lines-or-words (reverse beg end)
-    "Sort lines if active region covers more than one line, otherwise sort words."
-    (interactive "P\nr")
-    (if (> (count-lines beg end) 1)
-        (sort-lines reverse beg end)
-      (eqyiel/sort-words reverse beg end)))
+                      (b1 (window-buffer w1))
+                      (b2 (window-buffer w2))
 
-  (global-set-key [f9] 'eqyiel/sort-lines-or-words)
+                      (s1 (window-start w1))
+                      (s2 (window-start w2))
+                      )
+                 (set-window-buffer w1  b2)
+                 (set-window-buffer w2 b1)
+                 (set-window-start w1 s2)
+                 (set-window-start w2 s1)
+                 (setq i (1+ i)))))))
 
-  ;; Make life better in SSH sessions
-  (defun eqyiel/copy-to-clipboard (beg end &optional region)
-    (when (executable-find "copy-to-clipboard")
-      (let ((inhibit-message t))
-        (shell-command-on-region beg end "copy-to-clipboard"))))
+    (bind-key "H-<return>" 'eqyiel/rotate-windows)
+    (bind-key "M-s-S-C-<return>" 'eqyiel/rotate-windows)
 
-  (advice-add 'kill-region :after 'eqyiel/copy-to-clipboard)
-  (advice-add 'copy-region-as-kill :after 'eqyiel/copy-to-clipboard)
+    (defun eqyiel/toggle-window-split ()
+      "Taken from: http://whattheemacsd.com/buffer-defuns.el-03.html"
+      (interactive)
+      (if (= (count-windows) 2)
+          (let* ((this-win-buffer (window-buffer))
+                 (next-win-buffer (window-buffer (next-window)))
+                 (this-win-edges (window-edges (selected-window)))
+                 (next-win-edges (window-edges (next-window)))
+                 (this-win-2nd (not (and (<= (car this-win-edges)
+                                             (car next-win-edges))
+                                         (<= (cadr this-win-edges)
+                                             (cadr next-win-edges)))))
+                 (splitter
+                  (if (= (car this-win-edges)
+                         (car (window-edges (next-window))))
+                      'split-window-horizontally
+                    'split-window-vertically)))
+            (delete-other-windows)
+            (let ((first-win (selected-window)))
+              (funcall splitter)
+              (if this-win-2nd (other-window 1))
+              (set-window-buffer (selected-window) this-win-buffer)
+              (set-window-buffer (next-window) next-win-buffer)
+              (select-window first-win)
+              (if this-win-2nd (other-window 1))))))
+
+    (bind-key "H-SPC" 'eqyiel/toggle-window-split)
+    (bind-key "M-s-S-C-SPC" 'eqyiel/toggle-window-split)
+
+    (defun eqyiel/open-width ()
+      "Simple function that allows us to open the underlying
+        file of a buffer in an external program.
+
+        Taken from: https://github.com/bbatsov/prelude/blob/master/core/prelude-core.el"
+      (interactive)
+      (when buffer-file-name
+        (shell-command
+         (concat
+          (if (eq system-type 'darwin)
+              "open"
+            (read-shell-command "Open current file with: "))
+          " "
+          buffer-file-name))))
+
+    (defun eqyiel/duckduckgo ()
+      "DDG a query or region if any."
+      (interactive)
+      (browse-url
+       (concat "https://duckduckgo.com/?q="
+               (url-hexify-string
+                (if (use-region-p)
+                    (buffer-substring (region-beginning) (region-end))
+                  (read-string "DuckDuckGo: "))))))
+
+    (defun eqyiel/copy-file-name-to-clipboard ()
+      "Copy the current `buffer-file-name' to the clipboard."
+      (interactive)
+      (let ((filename (if (equal major-mode 'dired-mode)
+                          default-directory
+                        (buffer-file-name))))
+        (when filename
+          (kill-new filename)
+          (message "Copied buffer file name '%s' to the clipboard." filename))))
+
+    (bind-key "C-c w" 'eqyiel/copy-file-name-to-clipboard)
+
+    (defun eqyiel/rename-file-and-buffer ()
+      "Renames current buffer and file it is visiting.
+
+        http://whattheemacsd.com/file-defuns.el-01.html"
+      (interactive)
+      (let ((name (buffer-name))
+            (filename (buffer-file-name)))
+        (if (not (and filename (file-exists-p filename)))
+            (error "Buffer '%s' is not visiting a file!" name)
+          (let ((new-name (read-file-name "New name: " filename)))
+            (if (get-buffer new-name)
+                (error "A buffer named '%s' already exists!" new-name)
+              (rename-file filename new-name 1)
+              (rename-buffer new-name)
+              (set-visited-file-name new-name)
+              (set-buffer-modified-p nil)
+              (message "File '%s' successfully renamed to '%s'"
+                       name (file-name-nondirectory new-name)))))))
+
+    (bind-key "C-x C-r" 'eqyiel/rename-file-and-buffer)
+
+    (defun eqyiel/delete-file-and-buffer ()
+      "Removes file connected to current buffer and kills buffer.
+
+        http://whattheemacsd.com/file-defuns.el-02.html"
+      (interactive)
+      (let ((filename (buffer-file-name))
+            (buffer (current-buffer))
+            (name (buffer-name)))
+        (if (not (and filename (file-exists-p filename)))
+            (ido-kill-buffer)
+          (when (yes-or-no-p "Are you sure you want to remove this file? ")
+            (delete-file filename)
+            (kill-buffer buffer)
+            (message "File '%s' successfully removed" filename)))))
+
+    (bind-key "C-x C-k" 'eqyiel/delete-file-and-buffer)
+
+    (defun eqyiel/sprunge-region ()
+      "Send the current region to sprunge.us and save the URL returned to the
+        kill-ring."
+      (interactive)
+      (if (use-region-p)
+          (let ((filename (substring (shell-command-to-string "mktemp") 0 -1)))
+            (write-region (region-beginning) (region-end) filename)
+            (let ((url (substring (shell-command-to-string
+                                   (concat "curl -s -F 'sprunge=<"
+                                           filename "' http://sprunge.us")) 0 -1)))
+              (shell-command (concat "rm " filename))
+              (kill-new url)
+              (message "Saved %s to kill ring." url)))
+        (message "Mark a region first.")))
+
+    (defun eqyiel/rotn-region (n)
+      "Decode a caesar cipher.  Adapted from `rot13' to shift by N."
+      (interactive "NHow many? ")
+      (if (use-region-p)
+          (let ((rotn-translate-table
+                 (let ((str (make-string 127 0))
+                       (i 0))
+                   (while (< i 127)
+                     (aset str i i)
+                     (setq i (1+ i)))
+                   (setq i 0)
+                   (while (< i 26)
+                     (aset str (+ i ?a) (+ (% (+ i n) 26) ?a))
+                     (aset str (+ i ?A) (+ (% (+ i n) 26) ?A))
+                     (setq i (1+ i)))
+                   str)))
+            (translate-region (region-beginning) (region-end) rotn-translate-table))
+        (message "Mark a region first.")))
+
+    (defun eqyiel/print-to-pdf (dest)
+      "Pretty-print a buffer using PostScript and save it as a PDF."
+      (interactive "FSave to where? ")
+      (let ((tmp (substring (shell-command-to-string "mktemp") 0 -1)))
+        (ps-spool-buffer-with-faces)
+        (switch-to-buffer "*PostScript*")
+        (write-file tmp)
+        (kill-buffer (file-name-nondirectory tmp))
+        (shell-command (concat "ps2pdf14 " tmp " " dest))
+        (shell-command (concat "rm " tmp))
+        (message (concat "PDF written to " dest "."))))
+
+    ;; http://www.emacswiki.org/emacs/EmacsAsDaemon#toc9
+    (defun eqyiel/server-shutdown ()
+      "Save buffers, quit, and shutdown (kill) server."
+      (interactive)
+      (save-some-buffers)
+      (kill-emacs))
+
+    (defun eqyiel-count-commas ()
+      "CSV files are a pain to read, use this to see if there are as many commas as
+        there should be."
+      (interactive)
+      (let ((i 0))
+        (beginning-of-line)
+        (while (re-search-forward "," (line-end-position) t)
+          (setq i (+ i 1)))
+        (message "found %s" i)))
+
+    (defun eqyiel/copy-rectangle-to-kill-ring (start end)
+      "Saves a rectangle to the normal kill ring."
+      (interactive "r")
+      (let ((lines (extract-rectangle start end)))
+        (with-temp-buffer
+          (while lines
+            (insert-for-yank (car lines))
+            (insert "\n")
+            (setq lines (cdr lines)))
+          (kill-ring-save (point-min) (point-max)))))
+
+    (defun eqyiel/parent-directory (dir)
+      (file-name-directory
+       (directory-file-name
+        dir)))
+
+    ;; https://www.emacswiki.org/emacs/SortWords
+    (defun eqyiel/sort-words (reverse beg end)
+      "Sort words in region alphabetically, in REVERSE if negative.
+        Prefixed with negative \\[universal-argument], sorts in reverse.
+
+        The variable `sort-fold-case' determines whether alphabetic case affects the
+        sort order.
+
+        See `sort-regexp-fields'."
+      (interactive "P\nr")
+      (sort-regexp-fields reverse "\\w+" "\\&" beg end))
+
+    (defun eqyiel/sort-lines-or-words (reverse beg end)
+      "Sort lines if active region covers more than one line, otherwise sort words."
+      (interactive "P\nr")
+      (if (> (count-lines beg end) 1)
+          (sort-lines reverse beg end)
+        (eqyiel/sort-words reverse beg end)))
+
+    (global-set-key [f9] 'eqyiel/sort-lines-or-words)
+
+    ;; Make life better in SSH sessions
+    (defun eqyiel/copy-to-clipboard (beg end &optional region)
+      (when (executable-find "copy-to-clipboard")
+        (let ((inhibit-message t))
+          (shell-command-on-region beg end "copy-to-clipboard"))))
+
+    (advice-add 'kill-region :after 'eqyiel/copy-to-clipboard)
+    (advice-add 'copy-region-as-kill :after 'eqyiel/copy-to-clipboard)
+
+  (defun eqyiel/slugify (string &optional delimiter)
+    (let ((actual-delimiter (or delimiter "-")))
+      (replace-regexp-in-string
+       (rx (any " _")) actual-delimiter
+       (downcase (replace-regexp-in-string "[^A-Za-z0-9 ]" "" string)))))
 #+end_src
 
 * Packages
@@ -1035,8 +1053,11 @@ So diminish ~auto-fill-function~, not ~auto-fill-mode~.
        (flycheck-add-mode 'javascript-eslint 'web-mode)
        ;; this is the only way I could get both eslint and flow checker results
        ;; simultaneously 💩
-       (flycheck-add-next-checker 'javascript-flow '(t . javascript-flow-coverage))
-       (flycheck-add-next-checker 'javascript-flow-coverage '(t . javascript-eslint))))
+       ;; (flycheck-add-next-checker 'javascript-flow '(t . javascript-flow-coverage))
+       ;; (flycheck-add-next-checker 'javascript-flow-coverage '(t . javascript-eslint))
+       ;; Disable coverage for now, because it runs even on files not annotated
+       ;; with ~@flow~
+       (flycheck-add-next-checker 'javascript-flow '(t . javascript-eslint))))
  #+end_src
 
 ** ~gnorb~                                                           :melpa:
@@ -1053,284 +1074,471 @@ on server `rkm.id.au` create `rkm.id.au/Test` and ignore the warnings.
 
 Don't forget to add the group to `mbsyncrc`.
 
+ATM I'm trying to figure out how to change ~nnir-notmuch-remove-prefix~ for
+different groups.
+
+#+begin_example
+(nnir-notmuch-remove-prefix
+               ,(concat eqyiel/mail-directory "/ruben@mangochutney.com.au"))
+#+end_example
+
+I think it might be possible with ~gnus-parameters-get-parameter~, see
+~(gnus-parameters-get-parameter "r@rkm.id.au/GitHub.*")~.  I could add a
+parameter to there overriding the prefix for specific topics and override
+~nnir-run-notmuch~ to respect it.
+
+Alternatively, can I just use nnmaildir and achieve the splitting I want with
+sieve scripts?
+
+The only thing that's stopping me from using nnmaildir is that I can't do
+splitting with it.
+
+The only thing that keeps me using nnmaildir is that I can use notmuch with it.
+
 #+begin_src emacs-lisp
-  (use-package gnus
-    :defer t
-    :config
-    (progn
-      (require 'epg-config)
-      (require 'shr)
-      (require 'ivy)
-      (require 'nnir)
-      (require 'org-gnus)
-      (setq-default
-       epg-debug t
-       epg-user-id user-full-name
-       gnus-activate-level 5
-       gnus-agent-directory eqyiel/news-directory
-       gnus-article-save-directory eqyiel/news-directory
-       gnus-auto-center-group t
-       gnus-auto-center-summary t
-       gnus-asynchronous t
-       gnus-blocked-images nil
-       gnus-buttonized-mime-types '("multipart/alternative" "multipart/encrypted" "multipart/signed")
-       gnus-cache-directory eqyiel/news-directory
-       gnus-directory eqyiel/news-directory
-       gnus-fetch-old-headers 'some
-       gnus-gcc-mark-as-read t
-       gnus-group-line-format "%M\%S\%p\%P\%5y: %(%-40,40g%) %6,6~(cut 2)d\n"
-       gnus-home-directory eqyiel/home-directory
-       gnus-inhibit-images nil
-       gnus-kill-files-directory eqyiel/news-directory
-       gnus-large-ephemeral-newsgroup nil
-       gnus-large-newsgroup nil
-       gnus-permanently-visible-groups ".*"
-       gnus-message-replyencrypt t
-       gnus-message-replysign t
-       gnus-message-replysignencrypted t
-       gnus-read-newsrc-file nil
-       gnus-save-newsrc-file nil
-       gnus-refer-thread-limit t
-       gnus-safe-html-newsgroups "\\`nnimap[+:]"
-       gnus-save-killed-list nil
-       gnus-startup-file (concat eqyiel/xdg-config-home "/gnus/newsrc")
-       gnus-subscribe-newsgroup-method 'gnus-subscribe-zombies
-       gnus-sum-thread-tree-false-root ""
-       gnus-sum-thread-tree-indent " "
-       gnus-sum-thread-tree-leaf-with-other "\u251c\u25ba "
-       gnus-sum-thread-tree-root ""
-       gnus-sum-thread-tree-single-leaf "\u2570\u25ba "
-       gnus-sum-thread-tree-vertical "\u2502"
-       gnus-summary-display-arrow t
-       gnus-summary-line-format "%U%R%z %(%&user-date;  %-15,15f  %B%s%)\n"
-       gnus-summary-save-parts-default-mime ".*/.*"
-       gnus-summary-stop-at-end-of-message t
-       gnus-summary-thread-gathering-function 'gnus-gather-threads-by-subject
-       gnus-thread-sort-functions '(gnus-thread-sort-by-date)
-       gnus-treat-x-pgp-sig t
-       gnus-user-date-format-alist '((t . "%Y-%m-%d %H:%M"))
-       gnus-uu-be-dangerous t
-       mail-specify-envelope-from t
-       mail-envelope-from 'header
-       mail-from-style nil
-       mail-source-directory eqyiel/mail-directory
-       mm-decrypt-option 'always
-       mm-encrypt-option 'guided
-       mm-inline-large-images-proportion 0.5
-       mm-inline-text-html-with-images t
-       mm-sign-option 'guided
-       mm-text-html-renderer 'shr
-       mm-verify-option 'always
-       mml2015-always-trust nil
-       mml2015-cache-passphrase t
-       mml2015-encrypt-to-self t
-       mml2015-passphrase-cache-expiry '3600
-       mml2015-sign-with-sender t
-       mml2015-use 'epg
-       mml2015-verbose t
-       send-mail-function 'message-send-mail-with-sendmail
-       sendmail-program "msmtpq"
-       shr-blocked-images nil
-       starttls-use-gnutls t)
+    ;; (require 'nnir)
+    ;; (require 'gnus-group)
+    ;; (require 'message)
+    ;; (require 'nnmaildir)
+    ;; ;; (require 'gnus-util)
 
-      (setq
-       gnus-parameters
-       '(("rkm.id.au.*"
-          (display . default)
-          (auto-expire . nil)
-          (expiry-wait . immediate)
-          (posting-style
-           (name user-full-name)
-           (address user-mail-address))
-          (gcc-self . ("rkm.id.au/Sent"))
-          (expiry-target . "rkm.id.au/Archive"))
-         ("rkm.id.au/github/*"
-          (auto-expire . t)
-          (expiry-wait . 28) ;; days
-          (expiry-target . "rkm.id.au/Trash"))
-         ("rkm.id.au/lists/*"
-          (auto-expire . t)
-          (expiry-wait . 28) ;; days
-          (expiry-target . "rkm.id.au/Trash"))
-         ("rkm.id.au/Marketing Spam"
-          (expiry-wait . immediate)
-          (expiry-target . "rkm.id.au/Trash"))
-         ("gmail.com.*"
-          (display . default)
-          (auto-expire . nil)
-          (expiry-wait . immediate)
-          (posting-style
-           (name user-full-name)
-           (address "eqyiel@gmail.com"))
-          (gcc-self . ("gmail.com/Sent"))
-          (expiry-target . "gmail.com/Bin"))
-         ("mangochutney.com.au.*"
-          (display . default)
-          (auto-expire . nil)
-          (expiry-wait . immediate)
-          (posting-style
-           (name user-full-name)
-           (organization "Mango Chutney")
-           (address "ruben@mangochutney.com.au"))
-          (gcc-self . ("mangochutney.com.au/Sent"))
-          (expiry-target . "mangochutney.com.au/Bin"))
-         ("internode.on.net.*"
-          (display . default)
-          (auto-expire . nil)
-          (expiry-wait . immediate)
-          (posting-style
-           (name user-full-name)
-           (address "eqyiel@internode.on.net"))
-          (gcc-self . ("internode.on.net/Sent"))
-          (expiry-target . "internode.on.net/Bin"))
-         ("flinders.edu.au.*"
-          (display . default)
-          (auto-expire . nil)
-          (expiry-wait . immediate)
-          (posting-style
-           (name user-full-name)
-           (address "mahe0054@flinders.edu.au"))
-          (gcc-self . ("flinders.edu.au/Sent"))
-          (expiry-target . "flinders.edu.au/Trash"))
-         ("huttriverprovince.com.au.*"
-          (display . default)
-          (auto-expire . nil)
-          (expiry-wait . immediate)
-          (posting-style
-           (name user-full-name)
-           (address "info@huttriverprovince.com.au"))
-          (gcc-self . ("huttriverprovince.com.au/Sent"))
-          (expiry-target . "huttriverprovince.com.au/Trash"))))
+    ;; (defmacro eqyiel/nnir-add-result (dirnam artno score prefix server artlist)
+    ;;   "Ask `nnir-compose-result' to construct a result vector,
+    ;; and if it is non-nil, add it to artlist."
+    ;;   `(let ((result (eqyiel/nnir-compose-result ,dirnam ,artno ,score ,prefix ,server)))
+    ;;      (when (not (null result))
+    ;;        (push result ,artlist))))
 
-      (if (eq system-type 'darwin)
-          (progn
-            (setq
-             gnus-select-method
-             `(nnmaildir ""
-                         (directory eqyiel/mail-directory)
-                         (get-new-mail nil)
-                         (nnir-search-engine notmuch))
-             nnir-notmuch-remove-prefix (expand-file-name eqyiel/mail-directory))
-            (add-hook
-             'gnus-after-getting-new-news-hook
-             (lambda () (start-process "update-notmuch" nil "notmuch" "new"))))
-        ;; otherwise
+    ;; (autoload 'nnmaildir-base-name-to-article-number "nnmaildir")
+
+    ;; (defun eqyiel/nnir-compose-result (dirnam article score prefix server)
+    ;;   "Extract the group from dirnam, and create a result vector
+    ;; ready to be added to the list of search results."
+
+    ;;   ;; remove nnir-*-remove-prefix from beginning of dirnam filename
+    ;;   (when (string-match (concat "^" prefix) dirnam)
+    ;;     (setq dirnam (replace-match "" t t dirnam)))
+
+    ;;   (when (file-readable-p (concat prefix dirnam article))
+    ;;     ;; remove trailing slash and, for nnmaildir, cur/new/tmp
+    ;;     (setq dirnam
+    ;; 	  (substring dirnam 0 -5
+    ;; 		     ;; (if (string-match "\\`nnmaildir:" (gnus-group-server server))
+    ;; 			 ;; -5 -1)
+    ;;          ))
+
+    ;;     ;; Set group to dirnam without any leading dots or slashes,
+    ;;     ;; and with all subsequent slashes replaced by dots
+    ;;     (let ((group
+    ;;            (gnus-replace-in-string dirnam "^[\./\\]?[./\\]?" "" t)
+    ;;            ;; (gnus-replace-in-string
+    ;;            ;; (gnus-replace-in-string dirnam "^[./\\]" "" t)
+    ;;            ;; "[/\\]" "." t)
+    ;;            ))
+
+    ;;     (vector (gnus-group-full-name group server)
+    ;; 	    (if (string-match "\\`nnmaildir:" (gnus-group-server server))
+    ;; 		(nnmaildir-base-name-to-article-number
+    ;; 		 (substring article 0 (string-match ":" article))
+    ;; 		 group nil)
+    ;; 	      (string-to-number article))
+    ;; 	    (string-to-number score)))))
+
+    ;; (defun eqyiel/nnir-run-notmuch (query server &optional group)
+    ;;   "Run QUERY against notmuch.
+    ;; Returns a vector of (group name, file name) pairs (also vectors,
+    ;; actually)."
+
+    ;;   ;; (when group
+    ;;   ;;   (error "The notmuch backend cannot search specific groups"))
+
+    ;;   (save-excursion
+    ;;     (let ((qstring (cdr (assq 'query query)))
+    ;;           (groupspec (cdr (assq 'notmuch-group query)))
+    ;;           (prefix (nnir-read-server-parm 'nnir-notmuch-remove-prefix server))
+    ;;           artlist
+    ;;           ;; (article-pattern (if (string-match "\\`nnmaildir:"
+    ;;           ;;  		      (gnus-group-server server))
+    ;;           ;;         ":[0-9]+"
+    ;;           ;;       "^[0-9]+$"))
+    ;;           (article-pattern ":[0-9]+")
+    ;;           artno
+    ;;           dirnam
+    ;;           filenam)
+
+    ;;       (when (equal "" qstring)
+    ;;         (error "notmuch: You didn't enter anything"))
+
+    ;;       (set-buffer (get-buffer-create nnir-tmp-buffer))
+    ;;       (erase-buffer)
+
+    ;;       (if groupspec
+    ;;           (message "Doing notmuch query %s on %s..." qstring groupspec)
+    ;;         (message "Doing notmuch query %s..." qstring))
+
+    ;;       (let* ((cp-list `( ,nnir-notmuch-program
+    ;;                          nil            ; input from /dev/null
+    ;;                          t              ; output
+    ;;                          nil            ; don't redisplay
+    ;;                          "search"
+    ;;                          "--format=text"
+    ;;                          "--output=files"
+    ;;                          ,@(nnir-read-server-parm 'nnir-notmuch-additional-switches server)
+    ;;                          ,qstring       ; the query, in notmuch format
+    ;;                          ))
+    ;;              (exitstatus
+    ;;               (progn
+    ;;                 (message "%s args: %s" nnir-notmuch-program
+    ;;                          (mapconcat 'identity (cddddr cp-list) " ")) ;; ???
+    ;;                 (apply 'call-process cp-list))))
+    ;;         (unless (or (null exitstatus)
+    ;;                     (zerop exitstatus))
+    ;;           (nnheader-report 'nnir "Couldn't run notmuch: %s" exitstatus)
+    ;;           ;; notmuch failure reason is in this buffer, show it if
+    ;;           ;; the user wants it.
+    ;;           (when (> gnus-verbose 6)
+    ;;             (display-buffer nnir-tmp-buffer))))
+
+    ;;       ;; The results are output in the format of:
+    ;;       ;; absolute-path-name
+    ;;       (goto-char (point-min))
+    ;;       (while (not (eobp))
+    ;;         (setq filenam (buffer-substring-no-properties (line-beginning-position)
+    ;;                                                       (line-end-position))
+    ;;               artno (file-name-nondirectory filenam)
+    ;;               dirnam (file-name-directory filenam))
+    ;;         (forward-line 1)
+
+    ;;         ;; don't match directories
+    ;;         (when (string-match article-pattern artno)
+    ;;           (when (not (null dirnam))
+
+    ;;             ;; maybe limit results to matching groups.
+    ;;             (when (or (not groupspec)
+    ;;                       (string-match groupspec dirnam))
+    ;;               (eqyiel/nnir-add-result dirnam artno "" prefix server artlist)))))
+
+    ;;       (message "Massaging notmuch output...done")
+
+    ;;       artlist)))
+
+    ;; (add-to-list 'nnir-engines '(eqyiel/notmuch eqyiel/nnir-run-notmuch ()))
+
+    (use-package gnus
+      :defer t
+      :config
+      (progn
+        (require 'epg-config)
+        (require 'shr)
+        (require 'ivy)
+        (require 'nnir)
+        (require 'org-gnus)
+        (setq-default
+         epg-debug t
+         epg-user-id user-full-name
+         gnus-activate-level 5
+         gnus-agent-directory eqyiel/news-directory
+         gnus-article-save-directory eqyiel/news-directory
+         gnus-auto-center-group t
+         gnus-auto-center-summary t
+         gnus-asynchronous t
+         gnus-blocked-images nil
+         gnus-buttonized-mime-types '("multipart/alternative" "multipart/encrypted" "multipart/signed")
+         gnus-cache-directory eqyiel/news-directory
+         gnus-directory eqyiel/news-directory
+         gnus-fetch-old-headers 'some
+         gnus-gcc-mark-as-read t
+         gnus-group-line-format "%M\%S\%p\%P\%5y: %(%-40,40g%) %6,6~(cut 2)d\n"
+         gnus-home-directory eqyiel/home-directory
+         gnus-inhibit-images nil
+         gnus-kill-files-directory eqyiel/news-directory
+         gnus-large-ephemeral-newsgroup nil
+         gnus-large-newsgroup nil
+         gnus-permanently-visible-groups ".*"
+         gnus-message-replyencrypt t
+         gnus-message-replysign t
+         gnus-message-replysignencrypted t
+         gnus-read-newsrc-file nil
+         gnus-save-newsrc-file nil
+         gnus-refer-thread-limit t
+         gnus-safe-html-newsgroups "\\`nnimap[+:]"
+         gnus-save-killed-list nil
+         gnus-startup-file (concat eqyiel/xdg-config-home "/gnus/newsrc")
+         gnus-subscribe-newsgroup-method 'gnus-subscribe-zombies
+         gnus-sum-thread-tree-false-root ""
+         gnus-sum-thread-tree-indent " "
+         gnus-sum-thread-tree-leaf-with-other "\u251c\u25ba "
+         gnus-sum-thread-tree-root ""
+         gnus-sum-thread-tree-single-leaf "\u2570\u25ba "
+         gnus-sum-thread-tree-vertical "\u2502"
+         gnus-summary-display-arrow t
+         gnus-summary-line-format "%U%R%z %(%&user-date;  %-15,15f  %B%s%)\n"
+         gnus-summary-save-parts-default-mime ".*/.*"
+         gnus-summary-stop-at-end-of-message t
+         gnus-summary-thread-gathering-function 'gnus-gather-threads-by-subject
+         gnus-thread-sort-functions '(gnus-thread-sort-by-date)
+         gnus-treat-x-pgp-sig t
+         gnus-user-date-format-alist '((t . "%Y-%m-%d %H:%M"))
+         gnus-uu-be-dangerous t
+         mail-specify-envelope-from t
+         mail-envelope-from 'header
+         mail-from-style nil
+         mail-source-directory eqyiel/mail-directory
+         mm-decrypt-option 'always
+         mm-encrypt-option 'guided
+         mm-inline-large-images-proportion 0.5
+         mm-inline-text-html-with-images t
+         mm-sign-option 'guided
+         mm-text-html-renderer 'shr
+         mm-verify-option 'always
+         mml2015-always-trust nil
+         mml2015-cache-passphrase t
+         mml2015-encrypt-to-self t
+         mml2015-passphrase-cache-expiry '3600
+         mml2015-sign-with-sender t
+         mml2015-use 'epg
+         mml2015-verbose t
+         send-mail-function 'message-send-mail-with-sendmail
+         sendmail-program "msmtpq"
+         shr-blocked-images nil
+         starttls-use-gnutls t)
+
         (setq
-         gnus-select-method
-         ;; First argument to nnimap should match name of some file in
-         ;; ~/.password-store/.
-         '(nnimap
-           "eqyiel@localhost"
-           (nnimap-address "localhost")
-           (nnimap-stream network)
-           (nnimap-inbox "rkm.id.au/Inbox")
-           (nnir-search-engine imap)
-           (nnimap-split-methods 'nnmail-split-fancy)
-           (nnimap-split-fancy
-            (|
-             ;; Mailing lists
-             ("List-Id" ".*nix-dev.lists.science.uu.nl.*" "rkm.id.au/lists/nix-dev")
-             (any ".*@github.com.*" "rkm.id.au/github")
+         gnus-parameters
+         '(("r@rkm.id.au.*"
+            (display . default)
+            (auto-expire . nil)
+            (expiry-wait . immediate)
+            (posting-style
+             (name user-full-name)
+             (address user-mail-address))
+            (gcc-self . ("r@rkm.id.au/Sent"))
+            (expiry-target . "r@rkm.id.au/Archive"))
+           ("r@rkm.id.au/GitHub.*"
+            (auto-expire . t)
+            (expiry-wait . 28) ;; days
+            (expiry-target . "r@rkm.id.au/Trash"))
+           ("r@rkm.id.au/Lists*"
+            (auto-expire . t)
+            (expiry-wait . 28) ;; days
+            (expiry-target . "r@rkm.id.au/Trash"))
+           ("eqyiel@gmail.com.*"
+            (display . default)
+            (auto-expire . nil)
+            (expiry-wait . immediate)
+            (posting-style
+             (name user-full-name)
+             (address "eqyiel@gmail.com"))
+            (gcc-self . ("eqyiel@gmail.com/Sent"))
+            (expiry-target . "eqyiel@gmail.com/Bin"))
+           ("ruben@mangochutney.com.au.*"
+            (display . default)
+            (auto-expire . nil)
+            (expiry-wait . immediate)
+            (posting-style
+             (name user-full-name)
+             (organization "Mango Chutney")
+             (address "ruben@mangochutney.com.au"))
+            (gcc-self . ("ruben@mangochutney.com.au/Sent Mail"))
+            (expiry-target . "ruben@mangochutney.com.au/Bin"))
+           ("eqyiel@internode.on.net.*"
+            (display . default)
+            (auto-expire . nil)
+            (expiry-wait . immediate)
+            (posting-style
+             (name user-full-name)
+             (address "eqyiel@internode.on.net"))
+            (gcc-self . ("eqyiel@internode.on.net/Sent"))
+            (expiry-target . "eqyiel@internode.on.net/Bin"))
+           ("mahe0054@flinders.edu.au.*"
+            (display . default)
+            (auto-expire . nil)
+            (expiry-wait . immediate)
+            (posting-style
+             (name user-full-name)
+             (address "mahe0054@flinders.edu.au"))
+            (gcc-self . ("mahe0054@flinders.edu.au/Sent"))
+            (expiry-target . "mahe0054@flinders.edu.au/Trash"))
+           ("info@huttriverprovince.com.au.*"
+            (display . default)
+            (auto-expire . nil)
+            (expiry-wait . immediate)
+            (posting-style
+             (name user-full-name)
+             (address "info@huttriverprovince.com.au"))
+            (gcc-self . ("info@huttriverprovince.com.au/Sent"))
+            (expiry-target . "info@huttriverprovince.com.au/Trash"))))
 
-             ;; IDK
-             (to ".*adele@rkm.id.au.*" "rkm.id.au/Spam")
-             (to ".*crazydaiz@rkm.id.au.*" "rkm.id.au/Spam")
-             (to ".*rolf@rkm.id.au.*" "rkm.id.au/Spam")
-             (to ".*tarot@rkm.id.au.*" "rkm.id.au/Spam")
-             "rkm.id.au/Inbox")))))
+        (if (eq system-type 'darwin)
+            (setq
+             gnus-select-method '(nnnil)
+             gnus-secondary-select-methods
+             `((nnmaildir
+                "ruben@mangochutney.com.au"
+                (directory
+                 ,(concat eqyiel/mail-directory "/ruben@mangochutney.com.au"))
+                (get-new-mail nil)
+                (nnir-search-engine notmuch)
+                (nnir-notmuch-remove-prefix
+                 ,(concat eqyiel/mail-directory "/ruben@mangochutney.com.au")))))
+          ;; (setq
+          ;;  gnus-select-method
+          ;;  ;; First argument to nnimap should match name of some file in
+          ;;  ;; ~/.password-store/.
+          ;;  `(nnimap
+          ;;    "eqyiel@localhost"
+          ;;    (nnimap-address "localhost")
+          ;;    (nnimap-stream network)
+          ;;    (nnimap-inbox "r@rkm.id.au/Inbox")
+          ;;    ;; (nnir-search-engine eqyiel/notmuch)
+          ;;    (nnir-search-engine imap)
+          ;;    (nnir-notmuch-remove-prefix ,eqyiel/mail-directory)
+          ;;    (nnimap-split-methods 'nnmail-split-fancy)
+          ;;    (nnimap-split-fancy
+          ;;     (|
+          ;;      ;; Mailing lists
+          ;;      ("List-Id" ".*nix-dev.lists.science.uu.nl.*" "r@rkm.id.au/Lists")
+          ;;      (any ".*@github.com.*" "r@rkm.id.au/GitHub")
 
-      (setq nnir-notmuch-remove-prefix eqyiel/mail-directory)
+          ;;      ;; IDK
+          ;;      (to ".*adele@rkm.id.au.*" "r@rkm.id.au/Spam")
+          ;;      (to ".*crazydaiz@rkm.id.au.*" "r@rkm.id.au/Spam")
+          ;;      (to ".*rolf@rkm.id.au.*" "r@rkm.id.au/Spam")
+          ;;      (to ".*tarot@rkm.id.au.*" "r@rkm.id.au/Spam")
+          ;;      "r@rkm.id.au/Inbox")))
+          ;;  gnus-secondary-select-methods nil)
 
-      (setq gnus-topic-topology
-            '(("Gnus" visible nil nil)
-              (("rkm.id.au" visible nil nil))
-              (("internode.on.net" visible nil nil))
-              (("flinders.edu.au" visible nil nil))
-              (("gmail.com" visible nil nil))
-              (("huttriverprovince.com.au" visible nil nil))
-              (("mangochutney.com.au" visible nil nil))))
+          (setq
+           gnus-select-method '(nnnil)
+           gnus-secondary-select-methods
+           `((nnmaildir
+              "r@rkm.id.au"
+              (directory
+               ,(concat eqyiel/mail-directory "/r@rkm.id.au"))
+              (get-new-mail nil)
+              (nnir-search-engine notmuch)
+              (nnir-notmuch-remove-prefix
+               ,(concat eqyiel/mail-directory "/r@rkm.id.au")))
+             (nnmaildir
+              "eqyiel@internode.on.net"
+              (directory
+               ,(concat eqyiel/mail-directory "/eqyiel@internode.on.net"))
+              (get-new-mail nil)
+              (nnir-search-engine notmuch)
+              (nnir-notmuch-remove-prefix
+               ,(concat eqyiel/mail-directory "/eqyiel@internode.on.net")))
+             (nnmaildir
+              "mahe0054@flinders.edu.au"
+              (directory
+               ,(concat eqyiel/mail-directory "/mahe0054@flinders.edu.au"))
+              (get-new-mail nil)
+              (nnir-search-engine notmuch)
+              (nnir-notmuch-remove-prefix
+               ,(concat eqyiel/mail-directory "/mahe0054@flinders.edu.au")))
+             (nnmaildir
+              "eqyiel@gmail.com"
+              (directory
+               ,(concat eqyiel/mail-directory "/eqyiel@gmail.com"))
+              (get-new-mail nil)
+              (nnir-search-engine notmuch)
+              (nnir-notmuch-remove-prefix
+               ,(concat eqyiel/mail-directory "/eqyiel@gmail.com")))
+             (nnmaildir
+              "info@huttriverprovince.com.au"
+              (directory
+               ,(concat eqyiel/mail-directory "/info@huttriverprovince.com.au"))
+              (get-new-mail nil)
+              (nnir-search-engine notmuch)
+              (nnir-notmuch-remove-prefix
+               ,(concat eqyiel/mail-directory "/info@huttriverprovince.com.au")))
+             (nnmaildir
+              "ruben@mangochutney.com.au"
+              (directory
+               ,(concat eqyiel/mail-directory "/ruben@mangochutney.com.au"))
+              (get-new-mail nil)
+              (nnir-search-engine notmuch)
+              (nnir-notmuch-remove-prefix
+               ,(concat eqyiel/mail-directory "/ruben@mangochutney.com.au"))))))
 
-      (setq gnus-topic-alist
-            '(("Gnus" "archive" "nndraft:drafts")
-              (
-               "flinders.edu.au"
-               "flinders.edu.au/Archive"
-               "flinders.edu.au/Calendar"
-               "flinders.edu.au/Clutter"
-               "flinders.edu.au/Contacts"
-               "flinders.edu.au/Conversation History"
-               "flinders.edu.au/Deleted Items"
-               "flinders.edu.au/Drafts"
-               "flinders.edu.au/Inbox"
-               "flinders.edu.au/Journal"
-               "flinders.edu.au/Junk E-Mail"
-               "flinders.edu.au/Keep"
-               "flinders.edu.au/Notes"
-               "flinders.edu.au/Outbox"
-               "flinders.edu.au/Sent Items"
-               "flinders.edu.au/Tasks"
-               "flinders.edu.au/Trash"
-               )
-              (
-               "gmail.com"
-               "gmail.com/Bin"
-               "gmail.com/Inbox"
-               "gmail.com/Sent"
-               "gmail.com/Spam"
-               )
-              (
-               "huttriverprovince.com.au"
-               "huttriverprovince.com.au/Archive"
-               "huttriverprovince.com.au/Drafts"
-               "huttriverprovince.com.au/Inbox"
-               "huttriverprovince.com.au/Marketing Spam"
-               "huttriverprovince.com.au/Sent"
-               "huttriverprovince.com.au/Spam"
-               "huttriverprovince.com.au/Trash"
-               )
-              (
-               "internode.on.net"
-               "internode.on.net/Bin"
-               "internode.on.net/Trash"
-               "internode.on.net/Drafts"
-               "internode.on.net/Inbox"
-               "internode.on.net/Sent"
-               "internode.on.net/Spam"
-               )
-              (
-               "rkm.id.au"
-               "rkm.id.au/Archive"
-               "rkm.id.au/Call log"
-               "rkm.id.au/Drafts"
-               "rkm.id.au/Inbox"
-               "rkm.id.au/Marketing Spam"
-               "rkm.id.au/RSS"
-               "rkm.id.au/SMS"
-               "rkm.id.au/Sent"
-               "rkm.id.au/Spam"
-               "rkm.id.au/Trash"
-               "rkm.id.au/github"
-               "rkm.id.au/lists"
-               "rkm.id.au/lists/nix-dev"
-               "rkm.id.au/receipts"
-               "rkm.id.au/sa-learn"
-               "rkm.id.au/sa-unlearn"
-               )
-              (
-               "mangochutney.com.au"
-               "mangochutney.com.au/Bin"
-               "mangochutney.com.au/Inbox"
-               "mangochutney.com.au/Sent"
-               "mangochutney.com.au/Spam"
-               ))))
-    :init
-    (progn
-      (add-hook 'gnus-group-mode-hook 'gnus-topic-mode)
-      (add-hook 'gnus-select-group-hook 'gnus-group-set-timestamp)
-      ;; (add-hook 'message-mode-hook 'turn-off-auto-fill)
-      ;; (add-hook 'message-mode-hook 'turn-on-visual-line-mode)
-      (add-hook 'dired-mode-hook 'turn-on-gnus-dired-mode))
-    :ensure nil)
+
+        (add-hook
+               'gnus-after-getting-new-news-hook
+               (lambda () (start-process "update-notmuch" nil "notmuch" "new")))
+
+        (setq gnus-topic-topology
+              '(("Gnus" visible nil nil)
+                (("r@rkm.id.au" visible nil nil))
+                (("eqyiel@internode.on.net" visible nil nil))
+                (("mahe0054@flinders.edu.au" visible nil nil))
+                (("eqyiel@gmail.com" visible nil nil))
+                (("info@huttriverprovince.com.au" visible nil nil))
+                (("ruben@mangochutney.com.au" visible nil nil))))
+
+        (setq
+         gnus-topic-alist
+         '(("Gnus" "archive" "nndraft:drafts")
+           ("mahe0054@flinders.edu.au"
+            "mahe0054@flinders.edu.au/Archive"
+            "mahe0054@flinders.edu.au/Calendar"
+            "mahe0054@flinders.edu.au/Clutter"
+            "mahe0054@flinders.edu.au/Contacts"
+            "mahe0054@flinders.edu.au/Conversation History"
+            "mahe0054@flinders.edu.au/Deleted Items"
+            "mahe0054@flinders.edu.au/Drafts"
+            "mahe0054@flinders.edu.au/Inbox"
+            "mahe0054@flinders.edu.au/Journal"
+            "mahe0054@flinders.edu.au/Junk E-Mail"
+            "mahe0054@flinders.edu.au/Keep"
+            "mahe0054@flinders.edu.au/Notes"
+            "mahe0054@flinders.edu.au/Outbox"
+            "mahe0054@flinders.edu.au/Sent Items"
+            "mahe0054@flinders.edu.au/Tasks"
+            "mahe0054@flinders.edu.au/Trash")
+           ("eqyiel@gmail.com"
+            "eqyiel@gmail.com/All Mail"
+            "eqyiel@gmail.com/Bin"
+            "eqyiel@gmail.com/Sent Mail"
+            "eqyiel@gmail.com/Spam")
+           ("info@huttriverprovince.com.au"
+            "info@huttriverprovince.com.au/Archive"
+            "info@huttriverprovince.com.au/Drafts"
+            "info@huttriverprovince.com.au/Inbox"
+            "info@huttriverprovince.com.au/Sent"
+            "info@huttriverprovince.com.au/Spam"
+            "info@huttriverprovince.com.au/Trash")
+           ("eqyiel@internode.on.net"
+            "eqyiel@internode.on.net/Bin"
+            "eqyiel@internode.on.net/Drafts"
+            "eqyiel@internode.on.net/Inbox"
+            "eqyiel@internode.on.net/Sent"
+            "eqyiel@internode.on.net/Spam"
+            "eqyiel@internode.on.net/Trash")
+           ("r@rkm.id.au"
+            "r@rkm.id.au/Archive"
+            "r@rkm.id.au/Call log"
+            "r@rkm.id.au/Drafts"
+            "r@rkm.id.au/GitHub"
+            "r@rkm.id.au/Inbox"
+            "r@rkm.id.au/Lists"
+            "r@rkm.id.au/RSS"
+            "r@rkm.id.au/Receipts"
+            "r@rkm.id.au/SMS"
+            "r@rkm.id.au/Sent"
+            "r@rkm.id.au/Spam"
+            "r@rkm.id.au/Trash")
+           ("ruben@mangochutney.com.au"
+            "ruben@mangochutney.com.au/All Mail"
+            "ruben@mangochutney.com.au/Bin"
+            "ruben@mangochutney.com.au/Sent Mail"
+            "ruben@mangochutney.com.au/Spam"))))
+      :init
+      (progn
+        (add-hook 'gnus-group-mode-hook 'gnus-topic-mode)
+        (add-hook 'gnus-select-group-hook 'gnus-group-set-timestamp)
+        ;; (add-hook 'message-mode-hook 'turn-off-auto-fill)
+        ;; (add-hook 'message-mode-hook 'turn-on-visual-line-mode)
+        (add-hook 'dired-mode-hook 'turn-on-gnus-dired-mode))
+      :ensure nil)
 #+end_src
 
 ** ~gnus-start~                                                    :builtin:
@@ -1638,6 +1846,130 @@ MIME viewer]].
     :ensure nil)
 #+end_src
 
+** ~mu4e~                                                           :system:
+
+#+begin_src emacs-lisp
+(add-to-list 'load-path "/run/current-system/sw/share/emacs/site-lisp/mu4e")
+#+end_src
+
+Check out this for tips: https://vxlabs.com/2017/02/07/mu4e-0-9-18-e-mailing-with-emacs-now-even-better/
+
+#+begin_src emacs-lisp
+  (use-package mu4e
+    :config
+    (progn
+      (setq
+       mu4e-get-mail-command
+       (if (eq system-type 'darwin)
+           "mbsync -V -D ruben@mangochutney.com.au"
+         "mbsync -V -D -a"))
+      ;;rename files when moving
+      ;;NEEDED FOR MBSYNC?
+      (setq mu4e-change-filenames-when-moving t)
+      (setq mu4e-maildir eqyiel/mail-directory)
+      (setq mu4e-sent-folder eqyiel/mail-directory)
+      (setq mu4e-compose-format-flowed t) ;; https://www.ietf.org/rfc/rfc3676.txt
+      (setq mu4e-use-fancy-chars nil)
+      (setq mu4e-attachment-dir eqyiel/downloads-directory)
+      (setq mu4e-completing-read-function 'completing-read)
+      (setq mu4e-index-cleanup t)
+      (setq mu4e-compose-keep-self-cc t)
+      (setq send-mail-function 'message-send-mail-with-sendmail
+            sendmail-program "msmtpq")  ; from gnus config
+      (setq mu4e-bookmarks
+            (list
+             (make-mu4e-bookmark
+              :name "Flagged Messages"
+              :query "flag:flagged"
+              :key ?f)
+             (make-mu4e-bookmark
+              :name "Inbox"
+              :query "maildir:/r@rkm.id.au/Inbox OR maildir:/r@rkm.id.au/Archive OR maildir:/r@rkm.id.au/Sent"
+              :key ?x)
+             (make-mu4e-bookmark
+              :name "Unread Messages (Private)"
+              :query "flag:unread AND maildir:/r@rkm.id.au/Inbox"
+              :key ?u)
+             (make-mu4e-bookmark
+              :name "Unread Messages (Work)"
+              :query "flag:unread AND maildir:/ruben@mangochutney.com.au/Inbox"
+              :key ?w)
+             (make-mu4e-bookmark
+              :name "Today's messages"
+              :query "date:today..now"
+              :key ?t)
+             (make-mu4e-bookmark
+              :name "Last 7 days"
+              :query "date:7d..now"
+              :key ?7)))
+      (setq mu4e-contexts
+            `(,(make-mu4e-context
+                :name "r@rkm.id.au"
+                :match-func
+                (lambda (msg)
+                  (when msg
+                    (string=
+                     (mu4e-message-field msg :maildir)
+                     "/r@rkm.id.au")))
+                :vars '((user-mail-address . "r@rkm.id.au")
+                        (mu4e-sent-folder . "/r@rkm.id.au/Sent")
+                        (mu4e-refile-folder . "/r@rkm.id.au/Archive")
+                        (mu4e-drafts-folder . "/r@rkm.id.au/Drafts")
+                        (mu4e-trash-folder . "/r@rkm.id.au/Trash")
+                        (mu4e-sent-messages-behavior . sent)
+                        (mu4e-compose-crypto-reply-policy . sign-and-encrypt)
+                        (mu4e-maildir-shortcuts
+                         . (("/r@rkm.id.au/Inbox"   . ?i)
+                            ("/r@rkm.id.au/Archive" . ?a)
+                            ("/r@rkm.id.au/Lists"   . ?l)
+                            ("/r@rkm.id.au/Sent"    . ?s)))))
+              ,(make-mu4e-context
+                :name "internode"
+                :match-func
+                (lambda (msg)
+                  (when msg
+                    (string=
+                     (mu4e-message-field msg :maildir)
+                     "/eqyiel@internode.on.net")))
+                :vars '((user-mail-address . "eqyiel@internode.on.net")
+                        (mu4e-sent-folder . "/r@rkm.id.au/Sent")
+                        (mu4e-refile-folder . "/eqyiel@internode.on.net/Archive")
+                        (mu4e-drafts-folder . "/eqyiel@internode.on.net/Drafts")
+                        (mu4e-trash-folder . "/eqyiel@internode.on.net/Trash")
+                        (mu4e-sent-messages-behavior . sent)
+                        (mu4e-compose-crypto-reply-policy . sign-and-encrypt)
+                        (mu4e-maildir-shortcuts
+                         . (("/eqyiel@internode.on.net/Inbox"   . ?i)
+                            ("/eqyiel@internode.on.net/Archive" . ?a)
+                            ("/eqyiel@internode.on.net/Lists"   . ?l)
+                            ("/eqyiel@internode.on.net/Sent"    . ?s)))))
+              ,(make-mu4e-context
+                :name "mangochutney"
+                :match-func
+                (lambda (msg)
+                  (when msg
+                    (string= (mu4e-message-field msg :maildir)
+                             "/ruben@mangochutney.com.au")))
+                :vars '((user-mail-address . "ruben@mangochutney.com.au")
+                        (mu4e-sent-folder . "/ruben@mangochutney.com.au/Sent Mail")
+                        (mu4e-refile-folder . "/ruben@mangochutney.com.au/All Mail")
+                        (mu4e-drafts-folder . "/ruben@mangochutney.com.au/Drafts")
+                        (mu4e-trash-folder . "/ruben@mangochutney.com.au/Bin")
+                        ;; GMail already takes care of keeping copies in the sent
+                        ;; folder
+                        (mu4e-sent-messages-behavior . delete)
+                        (mu4e-maildir-shortcuts
+                         . (("/ruben@mangochutney.com.au/All Mail"  . ?i)
+                            ("/ruben@mangochutney.com.au/Drafts"    . ?d)
+                            ("/ruben@mangochutney.com.au/Bin"       . ?b)
+                            ("/ruben@mangochutney.com.au/Sent Mail" . ?s))))))))
+    :bind (("<f4>" . mu4e)
+           ("C-x m" . mu4e-compose-new))
+    :demand
+    :ensure nil)
+#+end_src
+
+
 ** ~multiple-cursors~                                                :melpa:
 #+begin_src emacs-lisp
   (use-package multiple-cursors
@@ -1667,16 +1999,46 @@ MIME viewer]].
 #+end_src
 
 ** ~org-caldav~                                                      :melpa:
+
+The goal here is to sync everything that has the tag ~:shared:~.  I would prefer
+to do ~(setq org-caldav-select-tags '("shared"))~ but it ~ox-icalendar.el~ seems
+to ignore it.
+
+I also tried setting ~(setq org-caldav-skip-conditions '(notregexp ":shared:"))~
+but the trouble with that is that ~org-agenda-skip-if~ uses boolean ~OR~ to
+combine the results from different tests, and I also want to exclude items with
+todo keywords ~DONE~.  Negating a regular expression is [[https://stackoverflow.com/questions/2217928/][difficult in Emacs lisp]],
+so the only thing left to do is advise ~org-caldav-skip-function~ so that I can
+use ~AND~ instead of ~OR~.
+
 #+begin_src emacs-lisp
   (use-package org-caldav
+    :ensure t
     :config
-    (setq
-     org-caldav-save-directory (concat eqyiel/xdg-cache-home "/emacs")
-     org-caldav-url "http://cloud.rkm.id.au/remote.php/caldav/calendars/eqyiel"
-     org-caldav-calendar-id "test" ; name of calendar in owncloud
-     org-caldav-inbox (concat eqyiel/org-directory "/caldav-test.org")
-     org-caldav-files `(,(concat eqyiel/org-directory "/test-calendar-events.org"))
-     org-icalendar-timezone "Australia/Adelaide"))
+    (progn
+      (advice-add
+       'org-caldav-skip-function :override
+       (lambda (backend)
+         (when (eq backend 'icalendar)
+           (org-map-entries
+            (lambda ()
+              (let ((pt (and
+                         (org-agenda-skip-if 'notregexp '(":shared:"))
+                         (org-agenda-skip-if 'todo '("DONE")))))
+                (when pt
+                  (delete-region (point) pt))))))))
+
+      (setq
+       org-caldav-calendar-id "org"
+       org-caldav-delete-org-entries 'ask
+       org-caldav-files (directory-files eqyiel/org-directory t "\\.org$")
+       org-caldav-inbox (concat eqyiel/org-directory "/org-caldav-inbox.org")
+       org-caldav-save-directory (concat eqyiel/xdg-cache-home "/emacs")
+       org-caldav-url "https://cloud.rkm.id.au/remote.php/dav/calendars/eqyiel"
+       org-icalendar-include-todo t
+       org-caldav-skip-conditions t ; must be truthy to run `org-caldav-skip-function'
+       org-icalendar-timezone eqyiel/timezone
+       org-icalendar-use-scheduled '(event-if-todo))))
 #+end_src
 
 ** ~org-download~                                                    :melpa:
@@ -1707,87 +2069,135 @@ MIME viewer]].
 #+end_src
 
 ** ~org-mode~                                                      :builtin:
+
 #+begin_src emacs-lisp
   (defun eqyiel/org-prev-visible-heading (arg)
     "Move to the previous visible heading.
 
-  This function wraps `outline-prev-visible-heading' with
-  `org-with-limited-levels' in order to skip over inline tasks and
-  respect customization of `org-odd-levels-only'."
+    This function wraps `outline-prev-visible-heading' with
+    `org-with-limited-levels' in order to skip over inline tasks and
+    respect customization of `org-odd-levels-only'."
     (interactive "p")
     (org-with-limited-levels
      (outline-previous-visible-heading arg)))
 
-  (use-package org
-    :config
-    (setq
-     org-adapt-indentation t
-     org-image-actual-width '(400)
-     org-directory eqyiel/org-directory
-     org-log-done 'time
-     org-agenda-files
-     (file-expand-wildcards
-      (concat eqyiel/org-directory "/*.org*"))
-     org-descriptive-links nil
-     org-src-tab-acts-natively t
-     org-src-preserve-indentation nil
-     org-confirm-babel-evaluate nil
-     org-export-babel-evaluate nil
-     org-export-default-language "en"
-     org-capture-templates
-     '(("t" "Todo" entry (file (concat "~/org/todo-" (system-name) ".org"))
-        "* TODO %?\nSCHEDULED: %(org-insert-time-stamp (org-read-date nil t \"+0d\"))"
-        '(:empty-lines 1
-          :kill-buffer t))
-       ("s" "Shopping" entry (file (concat "~/org/shopping-" (system-name) ".org"))
-        "* TODO %?\nSCHEDULED: %(org-insert-time-stamp (org-read-date nil t \"+0d\"))"
-        '(:empty-lines 1
-          :kill-buffer t))))
-    :init
-    (progn
-      (defun eqyiel/org-clock-sum-today ()
-        "Visit each file in `org-agenda-files' and return the total time of
-  today's clocked tasks in minutes."
-        (let ((files (org-agenda-files))
-              (total 0))
-          (org-agenda-prepare-buffers files)
-          (dolist (file files)
-            (with-current-buffer (find-buffer-visiting file)
-              (setq total (+ total (org-clock-sum-today)))))
-          total))
+  (defun eqyiel/maybe-create-agenda-file-with-category (category)
+    (let ((target
+           (format "%s/%s-%s.org"
+                   eqyiel/org-directory
+                   (eqyiel/slugify category "_")
+                   (eqyiel/slugify (system-name) "_"))))
+      (unless (and (file-exists-p target)
+                   (file-readable-p target)
+                   (file-writable-p target))
+        (with-temp-buffer
+          (insert
+           (format "#+CATEGORY: %s\n#+STARTUP: showall"
+                   (eqyiel/slugify category "_")))
+          (write-region (point-min) (point-max) target t nil nil t)))
+      target))
 
-      (defun eqyiel/org-archive-done-tasks ()
-        (interactive)
-        (org-map-entries 'org-archive-subtree "/DONE" 'file))
-      (defun eqyiel/org-select-src-lang-mode ()
-        "Select a language's key from the alist of languages org-mode groks."
-        (interactive)
-        (insert
-         (completing-read
-          "Select language: "
-          (seq-reduce
-           (lambda (prev next)
-             (if (not (member next prev))
-                 (cons next prev)
-               prev))
-           (mapcar (lambda (arg) (cdr arg)) org-src-lang-modes) '()))))
-      (add-hook 'org-mode-hook (lambda () (org-indent-mode t)))
-      (org-babel-do-load-languages
-       'org-babel-load-languages
-       '((js . t)
-         (emacs-lisp . t)
-         (sh . t)))
+    (use-package org
+      :config
+      (setq
+       org-adapt-indentation t
+       org-image-actual-width '(400)
+       org-directory eqyiel/org-directory
+       org-log-done 'time
+       org-agenda-files
+       (file-expand-wildcards
+        (concat eqyiel/org-directory "/*.org*"))
+       org-descriptive-links nil
+       org-src-tab-acts-natively t
+       org-src-preserve-indentation nil
+       org-confirm-babel-evaluate nil
+       org-export-babel-evaluate nil
+       org-export-default-language "en"
+       org-capture-templates
+       '(("t" "Todo" entry (file (eqyiel/maybe-create-agenda-file-with-category "Todo"))
+          "* TODO %?%^G
+  SCHEDULED: %(org-insert-time-stamp (org-read-date nil t \"+0d\"))
+  :PROPERTIES:
+  :CREATED: %U
+  :END:
+  "
+          '(:empty-lines 1 :kill-buffer t))
+         ("s" "Shopping"
+          entry (file (eqyiel/maybe-create-agenda-file-with-category "Shopping"))
+          "* TODO %?%^G
+  SCHEDULED: %(org-insert-time-stamp (org-read-date nil t \"+0d\"))
+  :PROPERTIES:
+  :CREATED: %U
+  :END:
+  "
+          '(:empty-lines 1 :kill-buffer t))
+       ("m" "Media"
+        entry (file (eqyiel/maybe-create-agenda-file-with-category "Media"))
+          "* %?%^G
+  :PROPERTIES:
+  :CREATED: %U
+  :END:
+  "
+          '(:empty-lines 1 :kill-buffer t)))
+       ;; add slugified CATEGORY to tags
+       org-capture-before-finalize-hook
+       (lambda ()
+         (progn
+           (org-set-tags-to
+            (delq nil (cons (eqyiel/slugify (org-get-category) "_")
+                            (org-get-tags))))
+           (org-align-all-tags)))
+       ;; realign tags after capture
+       org-capture-after-finalize-hook 'org-align-all-tags
+       org-agenda-custom-commands
+       '(("n" "Agenda and all TODOs"
+          ((agenda "")
+           (alltodo "")))))
+      :init
+      (progn
+        (defun eqyiel/org-clock-sum-today ()
+          "Visit each file in `org-agenda-files' and return the total time of
+    today's clocked tasks in minutes."
+          (let ((files (org-agenda-files))
+                (total 0))
+            (org-agenda-prepare-buffers files)
+            (dolist (file files)
+              (with-current-buffer (find-buffer-visiting file)
+                (setq total (+ total (org-clock-sum-today)))))
+            total))
 
-      (add-hook 'org-mode-hook 'turn-on-auto-fill))
-    :bind
-    (("<f12>" . org-capture)
-     ("<f7>" . org-agenda)
-     :map org-mode-map
-     ("M-p" . eqyiel/org-prev-visible-heading)
-     ("M-n" . org-next-visible-heading))
-    :ensure nil
-    :load-path "site-lisp/org-mode"
-    :demand)
+        (defun eqyiel/org-archive-done-tasks ()
+          (interactive)
+          (org-map-entries 'org-archive-subtree "/DONE" 'file))
+        (defun eqyiel/org-select-src-lang-mode ()
+          "Select a language's key from the alist of languages org-mode groks."
+          (interactive)
+          (insert
+           (completing-read
+            "Select language: "
+            (seq-reduce
+             (lambda (prev next)
+               (if (not (member next prev))
+                   (cons next prev)
+                 prev))
+             (mapcar (lambda (arg) (cdr arg)) org-src-lang-modes) '()))))
+        (add-hook 'org-mode-hook (lambda () (org-indent-mode t)))
+        (org-babel-do-load-languages
+         'org-babel-load-languages
+         '((js . t)
+           (emacs-lisp . t)
+           (sh . t)))
+
+        (add-hook 'org-mode-hook 'turn-on-auto-fill))
+      :bind
+      (("<f12>" . org-capture)
+       ("<f7>" . org-agenda)
+       :map org-mode-map
+       ("M-p" . eqyiel/org-prev-visible-heading)
+       ("M-n" . org-next-visible-heading))
+      :ensure nil
+      :load-path "site-lisp/org-mode"
+      :demand)
 #+end_src
 
 ** ~ox-gfm~                                                          :melpa:

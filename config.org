@@ -1871,6 +1871,16 @@ Check out this for tips: https://vxlabs.com/2017/02/07/mu4e-0-9-18-e-mailing-wit
   (use-package mu4e
     :config
     (progn
+      (defun eqyiel/htmlize-and-send ()
+        "When in an org-mu4e-compose-org-mode message, htmlize and send it."
+        (interactive)
+        (when (member 'org~mu4e-mime-switch-headers-or-body post-command-hook)
+          (org-mime-htmlize)
+          (org-mu4e-compose-org-mode)
+          (mu4e-compose-mode)
+          (message-send-and-exit)))
+
+      (add-hook 'org-ctrl-c-ctrl-c-hook 'eqyiel/htmlize-and-send t)
       (setq
        mu4e-get-mail-command
        (if (eq system-type 'darwin)
@@ -1878,6 +1888,8 @@ Check out this for tips: https://vxlabs.com/2017/02/07/mu4e-0-9-18-e-mailing-wit
          "mbsync -V -D -a"))
       ;;rename files when moving
       ;;NEEDED FOR MBSYNC?
+      (use-package org-mu4e :defer t :ensure nil :config (setq org-mu4e-convert-to-html t))
+      (use-package simple :ensure nil :config (setq mail-user-agent 'mu4e-user-agent))
       (setq mu4e-change-filenames-when-moving t)
       (setq mu4e-maildir eqyiel/mail-directory)
       (setq mu4e-sent-folder eqyiel/mail-directory)

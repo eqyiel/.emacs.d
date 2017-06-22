@@ -1663,10 +1663,19 @@ The only thing that keeps me using nnmaildir is that I can use notmuch with it.
 #+end_src
 
 ** ~js-mode~                                                       :builtin:
+
+I don't really use this, but configure it in case I ever activate it by accident
+instead of ~js2-mode~ or ~web-mode~.
+
 #+begin_src emacs-lisp
-(use-package js-mode
-  :config (setq js-indent-level 2)
-  :ensure nil)
+  (use-package js-mode
+    :config
+    (progn
+      (setq js-indent-level 2)
+      ;; https://emacs.stackexchange.com/questions/22044/treat-shebang-as-a-comment
+      (modify-syntax-entry ?# ". 1" js-mode-syntax-table)
+      (modify-syntax-entry ?! ". 2b" js-mode-syntax-table))
+    :ensure nil)
 #+end_src
 
 ** ~js2-mode~                                                        :melpa:
@@ -1703,7 +1712,11 @@ The only thing that keeps me using nnmaildir is that I can use notmuch with it.
             js2-idle-timer-delay 3 ;; wait until I'm actually idle
             js2-include-node-externs t
             js2-concat-multiline-strings t
-            js2-strict-trailing-comma-warning nil))
+            js2-strict-trailing-comma-warning nil)
+
+      ;; https://emacs.stackexchange.com/questions/22044/treat-shebang-as-a-comment
+      (modify-syntax-entry ?# ". 1" js2-mode-syntax-table)
+      (modify-syntax-entry ?! ". 2b" js2-mode-syntax-table))
     :init
     (progn
       (add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
@@ -2581,6 +2594,10 @@ This is a pretty good replacement  for ~longlines-mode~.
      web-mode-sql-indent-offset 2
      web-mode-content-types-alist
      '(("jsx" . "\\.js[x]?\\'")))
+
+    ;; https://emacs.stackexchange.com/questions/22044/treat-shebang-as-a-comment
+    (modify-syntax-entry ?# ". 1" web-mode-syntax-table)
+    (modify-syntax-entry ?! ". 2b" web-mode-syntax-table)
     :bind
     (:map web-mode-map
           ("C-M-s-\"" . eqyiel/toggle-web-mode-to-js2-mode)

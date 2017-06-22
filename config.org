@@ -2164,11 +2164,13 @@ use ~AND~ instead of ~OR~.
   :END:
   "
           '(:empty-lines 1 :kill-buffer t)))
+       org-log-done 'time
        ;; remove scheduled date and deadline when changing state from TODO
        org-after-todo-state-change-hook
        (lambda ()
          (when (not org-state)
            (progn
+             ;; as if I were running C-u M-x org-schedule and C-u M-x org-deadline
              (execute-extended-command '(4) "org-schedule")
              (execute-extended-command '(4) "org-deadline"))))
        ;; add slugified CATEGORY to tags

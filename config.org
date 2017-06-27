@@ -1994,7 +1994,6 @@ Check out this for tips: https://vxlabs.com/2017/02/07/mu4e-0-9-18-e-mailing-wit
     :ensure nil)
 #+end_src
 
-
 ** ~multiple-cursors~                                                :melpa:
 #+begin_src emacs-lisp
   (use-package multiple-cursors
@@ -2257,6 +2256,22 @@ Export ~org~ files to Github-flavoured markdown.
   (use-package pkgbuild-mode
     :init (add-to-list 'auto-mode-alist '("/PKGBUILD$" . pkgbuild-mode)))
 #+end_src
+
+** ~prettier-emacs~                                                  :melpa:
+#+BEGIN_SRC emacs-lisp
+  (use-package prettier-js
+    :init (progn
+            (add-hook 'js-mode-hook 'prettier-js-mode)
+            (add-hook 'js2-mode-hook 'prettier-js-mode)
+            (add-hook 'web-mode-hook
+                      (lambda ()
+                        (when (or (string-equal web-mode-content-type "javascript")
+                                  (string-equal web-mode-content-type "jsx"))
+                          (prettier-js-mode)))))
+    :config (setq prettier-js-command "prettier-eslint")
+    :defer t
+    :ensure t)
+#+END_SRC
 
 ** ~projectile~                                                      :melpa:
 #+begin_src emacs-lisp

@@ -1884,8 +1884,8 @@ Check out this for tips: https://vxlabs.com/2017/02/07/mu4e-0-9-18-e-mailing-wit
       (setq
        mu4e-get-mail-command
        (if (eq system-type 'darwin)
-           "mbsync -V -D ruben@mangochutney.com.au"
-         "mbsync -V -D -a"))
+           "mbsync ruben@mangochutney.com.au"
+         "mbsync -a"))
       ;;rename files when moving
       ;;NEEDED FOR MBSYNC?
       (use-package org-mu4e :defer t :ensure nil :config (setq org-mu4e-convert-to-html t))
@@ -2325,7 +2325,7 @@ Export ~org~ files to Github-flavoured markdown.
     (setq
      savehist-file
      (concat eqyiel/xdg-cache-home "/emacs/history")
-     history-length 1000)
+     history-length 10000)
     :ensure nil
     :demand)
 #+end_src
@@ -2616,6 +2616,7 @@ This is a pretty good replacement  for ~longlines-mode~.
       (add-hook 'web-mode-hook 'eqyiel/web-mode-hook))
     :config
     (setq
+     web-mode-enable-auto-indentation nil
      web-mode-markup-indent-offset 2
      web-mode-code-indent-offset 2
      web-mode-css-indent-offset 2

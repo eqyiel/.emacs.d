@@ -2259,14 +2259,48 @@ Export ~org~ files to Github-flavoured markdown.
 
 ** ~prettier-emacs~                                                  :melpa:
 #+BEGIN_SRC emacs-lisp
+  ;; stolen from https://github.com/Galooshi/emacs-import-js/
+  (defun eqyiel/locate-js-project-root (path)
+    "Find the dir containing package.json by walking up the dir tree from path"
+    (let ((parent-dir (file-name-directory path))
+          (project-found nil))
+      (while (and parent-dir (not (setf project-found (file-exists-p (concat parent-dir "package.json")))))
+        (let* ((pd (file-name-directory (directory-file-name parent-dir)))
+               (pd-exists (not (equal pd parent-dir))))
+          (setf parent-dir (if pd-exists pd nil))))
+      (if project-found (directory-file-name (expand-file-name parent-dir))
+        (directory-file-name (expand-file-name default-directory)))))
+
+  (defun eqyiel/should-format-with-prettier-p ()
+    (let ((package-file (concat (eqyiel/locate-js-project-root default-directory) "/package.json")))
+      (if (and (file-readable-p package-file) (file-exists-p package-file))
+          (let ((package-file-as-string (json-read-file package-file)))
+            (caar
+             (delq
+              nil
+              (mapcar
+               (lambda (element)
+                 (assoc (cdr element)
+                        (assoc (car element) package-file-as-string)))
+               (-mapcat
+                (lambda (item)
+                  (-concat `(,(cons 'dependencies item)
+                             ,(cons 'devDependencies item))))
+                '(prettier prettier-eslint prettier-eslint-cli))))))
+        nil)))
+
+  (defun eqyiel/prettier-js-mode-hook ()
+    (when (eqyiel/should-format-with-prettier-p) (prettier-js-mode)))
+
   (use-package prettier-js
     :init (progn
-            (add-hook 'js-mode-hook 'prettier-js-mode)
-            (add-hook 'js2-mode-hook 'prettier-js-mode)
+            (add-hook 'js-mode-hook 'eqyiel/prettier-js-mode-hook)
+            (add-hook 'js2-mode-hook 'eqyiel/prettier-js-mode-hook)
             (add-hook 'web-mode-hook
                       (lambda ()
-                        (when (or (string-equal web-mode-content-type "javascript")
-                                  (string-equal web-mode-content-type "jsx"))
+                        (when (and (or (string-equal web-mode-content-type "javascript")
+                                       (string-equal web-mode-content-type "jsx"))
+                                   (eqyiel/should-format-with-prettier-p))
                           (prettier-js-mode)))))
     :config (setq prettier-js-command "prettier-eslint")
     :defer t

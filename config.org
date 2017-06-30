@@ -1947,6 +1947,7 @@ Check out this for tips: https://vxlabs.com/2017/02/07/mu4e-0-9-18-e-mailing-wit
                          . (("/r@rkm.id.au/Inbox"   . ?i)
                             ("/r@rkm.id.au/Archive" . ?a)
                             ("/r@rkm.id.au/Lists"   . ?l)
+                            ("/r@rkm.id.au/Trash"   . ?t)
                             ("/r@rkm.id.au/Sent"    . ?s)))))
               ,(make-mu4e-context
                 :name "internode"
@@ -1966,8 +1967,28 @@ Check out this for tips: https://vxlabs.com/2017/02/07/mu4e-0-9-18-e-mailing-wit
                         (mu4e-maildir-shortcuts
                          . (("/eqyiel@internode.on.net/Inbox"   . ?i)
                             ("/eqyiel@internode.on.net/Archive" . ?a)
-                            ("/eqyiel@internode.on.net/Lists"   . ?l)
+                            ("/eqyiel@internode.on.net/Trash"   . ?t)
                             ("/eqyiel@internode.on.net/Sent"    . ?s)))))
+              ,(make-mu4e-context
+                :name "flinders"
+                :match-func
+                (lambda (msg)
+                  (when msg
+                    (string=
+                     (mu4e-message-field msg :maildir)
+                     "/mahe0054@flinders.edu.au")))
+                :vars '((user-mail-address . "mahe0054@flinders.edu.au")
+                        (mu4e-sent-folder . "/mahe0054@flinders.edu.au/Sent Items")
+                        (mu4e-refile-folder . "/mahe0054@flinders.edu.au/Archive")
+                        (mu4e-drafts-folder . "/mahe0054@flinders.edu.au/Drafts")
+                        (mu4e-trash-folder . "/mahe0054@flinders.edu.au/Trash")
+                        (mu4e-sent-messages-behavior . sent)
+                        (mu4e-compose-crypto-reply-policy . sign-and-encrypt)
+                        (mu4e-maildir-shortcuts
+                         . (("/mahe0054@flinders.edu.au/Inbox"      . ?i)
+                            ("/mahe0054@flinders.edu.au/Archive"    . ?a)
+                            ("/mahe0054@flinders.edu.au/Trash"      . ?t)
+                            ("/mahe0054@flinders.edu.au/Sent Items" . ?s)))))
               ,(make-mu4e-context
                 :name "mangochutney"
                 :match-func
@@ -1986,7 +2007,7 @@ Check out this for tips: https://vxlabs.com/2017/02/07/mu4e-0-9-18-e-mailing-wit
                         (mu4e-maildir-shortcuts
                          . (("/ruben@mangochutney.com.au/All Mail"  . ?i)
                             ("/ruben@mangochutney.com.au/Drafts"    . ?d)
-                            ("/ruben@mangochutney.com.au/Bin"       . ?b)
+                            ("/ruben@mangochutney.com.au/Bin"       . ?t)
                             ("/ruben@mangochutney.com.au/Sent Mail" . ?s))))))))
     :bind (("<f4>" . mu4e)
            ("C-x m" . mu4e-compose-new))

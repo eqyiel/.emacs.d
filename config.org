@@ -1341,15 +1341,6 @@ The only thing that keeps me using nnmaildir is that I can use notmuch with it.
              (address "ruben@mangochutney.com.au"))
             (gcc-self . ("ruben@mangochutney.com.au/Sent Mail"))
             (expiry-target . "ruben@mangochutney.com.au/Bin"))
-           ("eqyiel@internode.on.net.*"
-            (display . default)
-            (auto-expire . nil)
-            (expiry-wait . immediate)
-            (posting-style
-             (name user-full-name)
-             (address "eqyiel@internode.on.net"))
-            (gcc-self . ("eqyiel@internode.on.net/Sent"))
-            (expiry-target . "eqyiel@internode.on.net/Bin"))
            ("mahe0054@flinders.edu.au.*"
             (display . default)
             (auto-expire . nil)
@@ -1420,14 +1411,6 @@ The only thing that keeps me using nnmaildir is that I can use notmuch with it.
               (nnir-notmuch-remove-prefix
                ,(concat eqyiel/mail-directory "/r@rkm.id.au")))
              (nnmaildir
-              "eqyiel@internode.on.net"
-              (directory
-               ,(concat eqyiel/mail-directory "/eqyiel@internode.on.net"))
-              (get-new-mail nil)
-              (nnir-search-engine notmuch)
-              (nnir-notmuch-remove-prefix
-               ,(concat eqyiel/mail-directory "/eqyiel@internode.on.net")))
-             (nnmaildir
               "mahe0054@flinders.edu.au"
               (directory
                ,(concat eqyiel/mail-directory "/mahe0054@flinders.edu.au"))
@@ -1468,7 +1451,6 @@ The only thing that keeps me using nnmaildir is that I can use notmuch with it.
         (setq gnus-topic-topology
               '(("Gnus" visible nil nil)
                 (("r@rkm.id.au" visible nil nil))
-                (("eqyiel@internode.on.net" visible nil nil))
                 (("mahe0054@flinders.edu.au" visible nil nil))
                 (("eqyiel@gmail.com" visible nil nil))
                 (("info@huttriverprovince.com.au" visible nil nil))
@@ -1506,13 +1488,6 @@ The only thing that keeps me using nnmaildir is that I can use notmuch with it.
             "info@huttriverprovince.com.au/Sent"
             "info@huttriverprovince.com.au/Spam"
             "info@huttriverprovince.com.au/Trash")
-           ("eqyiel@internode.on.net"
-            "eqyiel@internode.on.net/Bin"
-            "eqyiel@internode.on.net/Drafts"
-            "eqyiel@internode.on.net/Inbox"
-            "eqyiel@internode.on.net/Sent"
-            "eqyiel@internode.on.net/Spam"
-            "eqyiel@internode.on.net/Trash")
            ("r@rkm.id.au"
             "r@rkm.id.au/Archive"
             "r@rkm.id.au/Call log"
@@ -1619,28 +1594,6 @@ The only thing that keeps me using nnmaildir is that I can use notmuch with it.
     :ensure nil)
 #+end_src
 
-** ~internodeum~                                                 :submodule:
-#+begin_src emacs-lisp
-  (use-package internodeum
-    :load-path "site-lisp/internodeum"
-    :commands (internodeum/usage-summary)
-    :init
-    (use-package pass)
-    (defun eqyiel/internodeum-set-credentials (&rest args)
-      (setq
-       internodeum/credentials
-       (internodeum/make-creds
-        :username "eqyiel"
-        :password (password-store-get "auth-sources/eqyiel@mail.internode.on.net"))))
-    (defun eqyiel/internodeum-clear-credentials (&rest args)
-      (progn
-        (setf (internodeum/creds-username internodeum/credentials) nil)
-        (setf (internodeum/creds-password internodeum/credentials) nil)
-        (setq internodeum/credentials nil)))
-    (advice-add 'internodeum/usage-summary :before 'eqyiel/internodeum-set-credentials)
-    (advice-add 'internodeum/usage-summary :after 'eqyiel/internodeum-clear-credentials)
-    :ensure nil)
-#+end_src
 
 ** ~ispell~                                                        :builtin:
 #+begin_src emacs-lisp
@@ -1949,26 +1902,6 @@ Check out this for tips: https://vxlabs.com/2017/02/07/mu4e-0-9-18-e-mailing-wit
                             ("/r@rkm.id.au/Lists"   . ?l)
                             ("/r@rkm.id.au/Trash"   . ?t)
                             ("/r@rkm.id.au/Sent"    . ?s)))))
-              ,(make-mu4e-context
-                :name "internode"
-                :match-func
-                (lambda (msg)
-                  (when msg
-                    (string=
-                     (mu4e-message-field msg :maildir)
-                     "/eqyiel@internode.on.net")))
-                :vars '((user-mail-address . "eqyiel@internode.on.net")
-                        (mu4e-sent-folder . "/r@rkm.id.au/Sent")
-                        (mu4e-refile-folder . "/eqyiel@internode.on.net/Archive")
-                        (mu4e-drafts-folder . "/eqyiel@internode.on.net/Drafts")
-                        (mu4e-trash-folder . "/eqyiel@internode.on.net/Trash")
-                        (mu4e-sent-messages-behavior . sent)
-                        (mu4e-compose-crypto-reply-policy . sign-and-encrypt)
-                        (mu4e-maildir-shortcuts
-                         . (("/eqyiel@internode.on.net/Inbox"   . ?i)
-                            ("/eqyiel@internode.on.net/Archive" . ?a)
-                            ("/eqyiel@internode.on.net/Trash"   . ?t)
-                            ("/eqyiel@internode.on.net/Sent"    . ?s)))))
               ,(make-mu4e-context
                 :name "flinders"
                 :match-func

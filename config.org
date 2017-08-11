@@ -1704,24 +1704,28 @@ Export ~org~ files to Github-flavoured markdown.
 
   (defun eqyiel/find-prettier-in-package-file (package-file)
     "Return t if prettier exists in PACKAGE-FILE."
-    (when (and (file-readable-p package-file)
-               (file-exists-p package-file))
-      (let* ((package-file-as-string
-              (json-read-file package-file))
-             (prettier-package
-              (caar
-               (delq
-                nil
-                (mapcar
-                 (lambda (element)
-                   (assoc (cdr element)
-                          (assoc (car element) package-file-as-string)))
-                 (-mapcat
-                  (lambda (item)
-                    (-concat `(,(cons 'dependencies item)
-                               ,(cons 'devDependencies item))))
-                  '(prettier prettier-eslint prettier-eslint-cli)))))))
-        (when prettier-package (symbol-name prettier-package)))))
+    (condition-case nil
+        ;; silence errors from `json-read-file' if package.json is malformed
+        ;; (for example, while resolving merge conflicts)
+        (when (and (file-readable-p package-file)
+                   (file-exists-p package-file))
+          (let* ((package-file-as-string
+                  (json-read-file package-file))
+                 (prettier-package
+                  (caar
+                   (delq
+                    nil
+                    (mapcar
+                     (lambda (element)
+                       (assoc (cdr element)
+                              (assoc (car element) package-file-as-string)))
+                     (-mapcat
+                      (lambda (item)
+                        (-concat `(,(cons 'dependencies item)
+                                   ,(cons 'devDependencies item))))
+                      '(prettier prettier-eslint prettier-eslint-cli)))))))
+            (when prettier-package (symbol-name prettier-package))))
+      (error nil)))
 
   (defun eqyiel/should-format-with-prettier-p ()
     "Return t if prettier found in both package.json and node_modules."

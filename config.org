@@ -622,6 +622,13 @@
 #+end_src
 
 * Packages
+** ~aggressive-indent-mode~                                          :melpa:
+#+BEGIN_SRC emacs-lisp
+  (use-package aggressive-indent
+    :config (global-aggressive-indent-mode 1)
+    :ensure t)
+#+END_SRC
+
 ** ~auth-password-store~                                             :melpa:
 #+begin_src emacs-lisp
   (use-package auth-password-store
@@ -1356,6 +1363,10 @@ Check out this for tips: https://vxlabs.com/2017/02/07/mu4e-0-9-18-e-mailing-wit
               :name "Last 7 days"
               :query "date:7d..now"
               :key ?7)))
+      (setq mu4e-view-actions '(("capture message" . mu4e-action-capture-message)
+                                ("view as pdf" . mu4e-action-view-as-pdf)
+                                ("show this thread" . mu4e-action-show-thread)
+                                ("View in browser" . mu4e-action-view-in-browser)))
       (setq mu4e-contexts
             `(,(make-mu4e-context
                 :name "r@rkm.id.au"
@@ -1419,6 +1430,7 @@ Check out this for tips: https://vxlabs.com/2017/02/07/mu4e-0-9-18-e-mailing-wit
                             ("/ruben@mangochutney.com.au/Drafts"    . ?d)
                             ("/ruben@mangochutney.com.au/Bin"       . ?t)
                             ("/ruben@mangochutney.com.au/Sent Mail" . ?s))))))))
+    :init (use-package org-mu4e :ensure nil :demand)
     :bind (("<f4>" . mu4e)
            ("C-x m" . mu4e-compose-new))
     :demand
@@ -1439,7 +1451,7 @@ Check out this for tips: https://vxlabs.com/2017/02/07/mu4e-0-9-18-e-mailing-wit
 
 ** ~nix-mode~                                                        :melpa:
 #+begin_src emacs-lisp
-  (use-package nix-mode)
+  (use-package nix-mode :ensure t)
 #+end_src
 
 ** ~nodejs-repl~                                                     :melpa:

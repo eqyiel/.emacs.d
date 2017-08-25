@@ -1307,6 +1307,7 @@ Check out this for tips: https://vxlabs.com/2017/02/07/mu4e-0-9-18-e-mailing-wit
   (use-package mu4e
     :config
     (progn
+      (use-package org-mime :ensure t)
       (defun eqyiel/htmlize-and-send ()
         "When in an org-mu4e-compose-org-mode message, htmlize and send it."
         (interactive)

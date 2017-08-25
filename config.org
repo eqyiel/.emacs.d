@@ -1441,7 +1441,9 @@ Check out this for tips: https://vxlabs.com/2017/02/07/mu4e-0-9-18-e-mailing-wit
 #+begin_src emacs-lisp
   (use-package multiple-cursors
     :config
-    (setq mc/list-file (concat eqyiel/xdg-cache-home "/emacs/mc-lists.el"))
+    (setq
+      mc/always-run-for-all t
+      mc/list-file (concat eqyiel/xdg-cache-home "/emacs/mc-lists.el"))
     :bind (("C-M-*" . mc/edit-lines)
            ("C->" . mc/mark-next-like-this)
            ("C-<" . mc/mark-previous-like-this)

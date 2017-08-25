@@ -1462,12 +1462,6 @@ Check out this for tips: https://vxlabs.com/2017/02/07/mu4e-0-9-18-e-mailing-wit
 (use-package nodejs-repl :ensure t)
 #+end_src
 
-** ~notmuch~                                                         :melpa:
-#+begin_src emacs-lisp
-  (use-package notmuch
-    :config (setq notmuch-fcc-dirs nil))
-#+end_src
-
 ** ~org-caldav~                                                      :melpa:
 
 The goal here is to sync everything that has the tag ~:shared:~.  I would prefer

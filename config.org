@@ -1704,7 +1704,7 @@ Export ~org~ files to Github-flavoured markdown.
 
 ** ~prettier-emacs~                                                  :melpa:
 #+BEGIN_SRC emacs-lisp
-  (defun eqyiel/locate-js-project-root (path)
+  (defun eqyiel/prettier-locate-js-project-root (path)
     "Find the dir containing package.json by walking up the dir tree from PATH.
   Stolen from https://github.com/Galooshi/emacs-import-js/."
     (let ((parent-dir (file-name-directory path))
@@ -1716,7 +1716,7 @@ Export ~org~ files to Github-flavoured markdown.
       (if project-found (directory-file-name (expand-file-name parent-dir))
         (directory-file-name (expand-file-name default-directory)))))
 
-  (defun eqyiel/find-prettier-in-package-file (package-file)
+  (defun eqyiel/prettier-find-prettier-in-package-file (package-file)
     "Return t if prettier exists in PACKAGE-FILE."
     (condition-case nil
         ;; silence errors from `json-read-file' if package.json is malformed
@@ -1741,20 +1741,73 @@ Export ~org~ files to Github-flavoured markdown.
             (when prettier-package (symbol-name prettier-package))))
       (error nil)))
 
-  (defun eqyiel/should-format-with-prettier-p ()
+  (defun eqyiel/prettier-should-format-with-prettier-p ()
     "Return t if prettier found in both package.json and node_modules."
-    (let* ((js-project-root (eqyiel/locate-js-project-root default-directory))
-           (node-modules-dir (concat js-project-root "/node_modules"))
-           (prettier-package (eqyiel/find-prettier-in-package-file
-                              (concat js-project-root "/package.json")))
-           (prettier-package-path (concat node-modules-dir "/" prettier-package)))
-      (and prettier-package
-           (file-readable-p prettier-package-path)
+    (and (eqyiel/prettier-find-prettier-in-package-file (concat (eqyiel/prettier-locate-js-project-root default-directory) "/package.json"))
+         (eqyiel/prettier-package-path-exists-p)))
+
+  (defun eqyiel/prettier-find-prettier-package-path ()
+    "Construct the path to prettier in the project root."
+    (let ((js-project-root (eqyiel/prettier-locate-js-project-root default-directory)))
+      (concat
+       js-project-root
+       "/node_modules"
+       "/"
+       (eqyiel/prettier-find-prettier-in-package-file
+        (concat js-project-root "/package.json")))))
+
+  (defun eqyiel/prettier-package-path-exists-p ()
+    "Construct the path to prettier in the project root."
+    (let* ((prettier-package-path (eqyiel/prettier-find-prettier-package-path)))
+      (and (file-readable-p prettier-package-path)
            (file-exists-p prettier-package-path))))
+
+  (defun eqyiel/prettier-find-project-local-prettier-cmd ()
+    "Find the name of the local prettier command (something under
+  \"./node_modules/.bin\") if it exists."
+    (condition-case nil
+        (let* ((js-project-root (eqyiel/prettier-locate-js-project-root default-directory))
+               (prettier-package-name (eqyiel/prettier-find-prettier-in-package-file
+                                       (concat js-project-root "/package.json")))
+               (prettier-package-file (concat js-project-root "/node_modules/"
+                                              prettier-package-name "/package.json"))
+               (package-file-as-string (json-read-file prettier-package-file))
+               (local-prettier-cmd
+                (caar
+                 (delq nil
+                       (mapcar
+                        (lambda (element)
+                          (assoc
+                           element
+                           (cdr (assoc 'bin package-file-as-string))))
+                        '(prettier prettier-eslint prettier-eslint-cli))))))
+          (when local-prettier-cmd (symbol-name local-prettier-cmd)))
+      (error nil)))
+
+  (defun eqyiel/prettier-make-project-local-prettier-cmd-path ()
+    "Construct the path to the local prettier command (something under
+  \"./node_modules/.bin\") if it exists."
+    (let ((js-project-root (eqyiel/prettier-locate-js-project-root default-directory))
+          (local-prettier-cmd (eqyiel/prettier-find-project-local-prettier-cmd)))
+      (when local-prettier-cmd
+        (concat js-project-root "/node_modules/.bin/" local-prettier-cmd))))
+
+  (defun eqyiel/prettier-maybe-make-buffer-local-variables ()
+    "Set `prettier-js-command' to the prettier command in the project path if
+  found."
+    (let* ((local-prettier-cmd-path
+            (eqyiel/prettier-make-project-local-prettier-cmd-path)))
+      (when local-prettier-cmd-path
+        (set (make-local-variable 'prettier-js-command)
+             local-prettier-cmd-path))))
 
   (defun eqyiel/prettier-js-mode-hook ()
     "Maybe format buffer with prettier on save."
-    (when (eqyiel/should-format-with-prettier-p) (prettier-js-mode)))
+    (when (eqyiel/prettier-should-format-with-prettier-p)
+      (progn
+        (prettier-js-mode)
+        ;; use the local prettier package if available
+        (eqyiel/prettier-maybe-make-buffer-local-variables))))
 
   (use-package prettier-js
     :init (progn
@@ -1762,10 +1815,9 @@ Export ~org~ files to Github-flavoured markdown.
             (add-hook 'js2-mode-hook 'eqyiel/prettier-js-mode-hook)
             (add-hook 'web-mode-hook
                       (lambda ()
-                        (when (and (or (string-equal web-mode-content-type "javascript")
-                                       (string-equal web-mode-content-type "jsx"))
-                                   (eqyiel/should-format-with-prettier-p))
-                          (prettier-js-mode)))))
+                        (when (or (string-equal web-mode-content-type "javascript")
+                                  (string-equal web-mode-content-type "jsx"))
+                          (eqyiel/prettier-js-mode-hook)))))
     :config (setq prettier-js-command "prettier-eslint")
     :defer t
     :ensure t)

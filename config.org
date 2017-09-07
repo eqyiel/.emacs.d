@@ -1781,7 +1781,7 @@ Export ~org~ files to Github-flavoured markdown.
                       (lambda (item)
                         (-concat `(,(cons 'dependencies item)
                                    ,(cons 'devDependencies item))))
-                      '(prettier prettier-eslint prettier-eslint-cli)))))))
+                      '(prettier prettier-eslint-cli)))))))
             (when prettier-package (symbol-name prettier-package))))
       (error nil)))
 
@@ -1824,7 +1824,7 @@ Export ~org~ files to Github-flavoured markdown.
                           (assoc
                            element
                            (cdr (assoc 'bin package-file-as-string))))
-                        '(prettier prettier-eslint prettier-eslint-cli))))))
+                        '(prettier prettier-eslint))))))
           (when local-prettier-cmd (symbol-name local-prettier-cmd)))
       (error nil)))
 

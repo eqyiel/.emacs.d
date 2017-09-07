@@ -1268,14 +1268,18 @@ This package adds itself to ~auto-mode-alist~.
 #+end_src
 
 ** ~matrix-client~                                                   :melpa:
+This is no longer on MELPA unfortunately.  This is how I found out that MELPA
+will be contacted on each startup if the package you want to install has
+vanished.
+
 #+begin_src emacs-lisp
-  (use-package matrix-client
-    :init
-    (defun eqyiel/launch-matrix-client ()
-      (interactive)
-      (matrix-client "eqyiel"))
-    :config
-    (setq matrix-homeserver-base-url "https://matrix.rkm.id.au"))
+  ;; (use-package matrix-client
+  ;;   :init
+  ;;   (defun eqyiel/launch-matrix-client ()
+  ;;     (interactive)
+  ;;     (matrix-client "eqyiel"))
+  ;;   :config
+  ;;   (setq matrix-homeserver-base-url "https://matrix.rkm.id.au"))
 #+end_src
 
 ** ~message~                                                       :builtin:

@@ -1302,12 +1302,23 @@ vanished.
 ** ~mu4e~                                                           :system:
 
 #+begin_src emacs-lisp
-(add-to-list 'load-path "/run/current-system/sw/share/emacs/site-lisp/mu4e")
+  (add-to-list 'load-path "/run/current-system/sw/share/emacs/site-lisp/mu4e")
 #+end_src
 
 Check out this for tips: https://vxlabs.com/2017/02/07/mu4e-0-9-18-e-mailing-with-emacs-now-even-better/
 
 #+begin_src emacs-lisp
+  (defun eqyiel/mu4e-any-message-field-at-point (msg header)
+    "Quick & dirty way to get an arbitrary header HEADER from MSG. Requires the
+  'formail' tool from procmail."
+     (replace-regexp-in-string "\n$" ""
+       (shell-command-to-string
+         (concat "formail -x " header " -c < "
+           (shell-quote-argument (mu4e-message-field msg :path))))))
+
+  (defun eqyiel/mu4e-get-x-github-sender (msg)
+    (s-trim (eqyiel/mu4e-any-message-field-at-point msg "X-GitHub-Sender")))
+
   (use-package mu4e
     :config
     (progn
@@ -1368,10 +1379,39 @@ Check out this for tips: https://vxlabs.com/2017/02/07/mu4e-0-9-18-e-mailing-wit
               :name "Last 7 days"
               :query "date:7d..now"
               :key ?7)))
-      (setq mu4e-view-actions '(("capture message" . mu4e-action-capture-message)
-                                ("view as pdf" . mu4e-action-view-as-pdf)
-                                ("show this thread" . mu4e-action-show-thread)
-                                ("View in browser" . mu4e-action-view-in-browser)))
+      (setq mu4e-view-show-addresses t)
+      (setq
+       mu4e-header-info-custom
+       '((:x-github-sender .
+          (:name "X-Github-Sender"
+                 :shortname "GitHub Handle"
+                 :help "From field with GitHub handle if it exists"
+                 :function eqyiel/mu4e-get-x-github-sender))))
+      (setq mu4e-view-fields
+            '(:from
+              :x-github-sender
+              :to
+              :cc
+              :subject
+              :flags
+              :date
+              :maildir
+              :mailing-list
+              :tags
+              :attachments
+              :signature
+              :decryption))
+      (setq mu4e-view-actions
+            '(("capture message" . mu4e-action-capture-message)
+              ("view as pdf" . mu4e-action-view-as-pdf)
+              ("show this thread" . mu4e-action-show-thread)
+              ("View in browser" . mu4e-action-view-in-browser)
+              ("Eww view" .
+               (lambda (msg)
+                 (eww-browse-url
+                  (concat
+                   "file://"
+                   (mu4e~write-body-to-html msg)))))))
       (setq mu4e-contexts
             `(,(make-mu4e-context
                 :name "r@rkm.id.au"
@@ -1447,8 +1487,8 @@ Check out this for tips: https://vxlabs.com/2017/02/07/mu4e-0-9-18-e-mailing-wit
   (use-package multiple-cursors
     :config
     (setq
-      mc/always-run-for-all t
-      mc/list-file (concat eqyiel/xdg-cache-home "/emacs/mc-lists.el"))
+     mc/always-run-for-all t
+     mc/list-file (concat eqyiel/xdg-cache-home "/emacs/mc-lists.el"))
     :bind (("C-M-*" . mc/edit-lines)
            ("C->" . mc/mark-next-like-this)
            ("C-<" . mc/mark-previous-like-this)

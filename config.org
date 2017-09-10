@@ -1692,8 +1692,6 @@ use ~AND~ instead of ~OR~.
     :init
     (progn
       (defvar eqyiel/org-src-lang-modes
-        "This list is actually from `org-babel-load-languages', but it's not
-  exposed as a variable.  It might change from time to time so be sure to look back there."
         '(("Awk" . awk)
           ("C" . C)
           ("R" . R)
@@ -1737,7 +1735,10 @@ use ~AND~ instead of ~OR~.
           ("Sql" . sql)
           ("Sqlite" . sqlite)
           ("Stan" . stan)
-          ("ebnf2ps" . ebnf2ps)))
+          ("ebnf2ps" . ebnf2ps))
+        "This list is actually from `org-babel-load-languages', but it's not
+  exposed as a variable.  It might change from time to time so be sure to look
+  back there.")
 
       (defun eqyiel/org-clock-sum-today ()
         "Visit each file in `org-agenda-files' and return the total time of

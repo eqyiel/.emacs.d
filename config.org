@@ -2237,7 +2237,7 @@ This is a new one for me.  See [[http://oremacs.com/swiper/#key-bindings-for-sin
      ;; `tramp-terminal-prompt-regexp' doesn't recognise it:
      ;; http://stackoverflow.com/a/8363532
      tramp-shell-prompt-pattern "\\(?:^\\|\r\\)[^]#$%>\n]*#?[]#$%>].* *\\(^[\\[[0-9;]*[a-zA-Z] *\\)*")
-    :init
+    :config
     (progn
       ;; Uses sudo password for the user defined in ~/.ssh/config, not root password.
       ;; No need to allow ssh for root.

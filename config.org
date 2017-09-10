@@ -1568,6 +1568,13 @@ use ~AND~ instead of ~OR~.
        org-icalendar-use-scheduled '(event-if-todo))))
 #+end_src
 
+** ~org-cliplink~                                                    :melpa:
+A tool to insert a link in the clipboard as an ~org-mode~ link at point.
+
+#+BEGIN_SRC emacs-lisp
+(use-package org-cliplink :ensure t :bind (("H-i" . org-cliplink)))
+#+END_SRC
+
 ** ~org-download~                                                    :melpa:
 #+begin_src emacs-lisp
   (use-package org-download

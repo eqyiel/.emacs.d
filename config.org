@@ -750,12 +750,10 @@ So diminish ~auto-fill-function~, not ~auto-fill-mode~.
      circe-network-options
      `(("freenode"
         :nick "eqyiel"
-        :host "znc.rkm.id.au"
-        :service "7777"
+        :host "irc.freenode.net"
+        :service "6697"
         :tls t
-        :pass
-        ,(concat "eqyiel/freenode:"
-                 (password-store-get "www/znc.rkm.id.au"))))))
+        :pass (password-store-get "www/irc.freenode.net")))))
 
   (defun eqyiel/circe-clear-passwords ()
     (if (boundp 'circe-network-options)
@@ -805,8 +803,10 @@ So diminish ~auto-fill-function~, not ~auto-fill-mode~.
     (progn
       (use-package pass)
       (advice-add 'circe-reconnect-all :before 'eqyiel/circe-setup-networks)
+      ;; (add-hook 'circe-server-connected-hook
+      ;;           'eqyiel/circe-wait-for-authentication)
       (add-hook 'circe-server-connected-hook
-                'eqyiel/circe-wait-for-authentication)
+                'enable-circe-notifications)
       (add-hook 'lui-mode-hook 'eqyiel/circe-set-margin))
     :ensure t)
 #+end_src

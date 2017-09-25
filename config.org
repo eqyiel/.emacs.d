@@ -1631,116 +1631,176 @@ A tool to insert a link in the clipboard as an ~org-mode~ link at point.
           (write-region (point-min) (point-max) target t nil nil t)))
       target))
 
-    (use-package org
-      :config
-      (setq
-       org-adapt-indentation t
-       org-image-actual-width '(400)
-       org-directory eqyiel/org-directory
-       org-log-done 'time
-       org-agenda-files
-       (file-expand-wildcards
-        (concat eqyiel/org-directory "/*.org*"))
-       org-descriptive-links nil
-       org-src-tab-acts-natively t
-       org-src-preserve-indentation nil
-       org-confirm-babel-evaluate nil
-       org-export-babel-evaluate nil
-       org-export-default-language "en"
-       org-capture-templates
-       '(("t" "Todo" entry (file (eqyiel/maybe-create-agenda-file-with-category "Todo"))
-          "* TODO %?
+  (use-package org
+    :config
+    (setq
+     org-adapt-indentation t
+     org-image-actual-width '(400)
+     org-directory eqyiel/org-directory
+     org-log-done 'time
+     org-agenda-files
+     (file-expand-wildcards
+      (concat eqyiel/org-directory "/*.org*"))
+     org-descriptive-links nil
+     org-src-tab-acts-natively t
+     org-src-preserve-indentation nil
+     org-confirm-babel-evaluate nil
+     org-export-babel-evaluate nil
+     org-export-default-language "en"
+     org-capture-templates
+     '(("t" "Todo" entry (file (eqyiel/maybe-create-agenda-file-with-category "Todo"))
+        "* TODO %?
   SCHEDULED: %(org-insert-time-stamp (org-read-date nil t \"+0d\"))
   :PROPERTIES:
   :CREATED: %U
   :END:
   "
-          '(:empty-lines 1 :kill-buffer t))
-         ("s" "Shopping"
-          entry (file (eqyiel/maybe-create-agenda-file-with-category "Shopping"))
-          "* TODO %?
+        :empty-lines 1 :kill-buffer t)
+       ("s" "Shopping"
+        entry (file (eqyiel/maybe-create-agenda-file-with-category "Shopping"))
+        "* TODO %?
   SCHEDULED: %(org-insert-time-stamp (org-read-date nil t \"+0d\"))
   :PROPERTIES:
   :CREATED: %U
   :END:
   "
-          '(:empty-lines 1 :kill-buffer t))
+        :empty-lines 1 :kill-buffer t)
        ("m" "Media"
         entry (file (eqyiel/maybe-create-agenda-file-with-category "Media"))
-          "* %?
+        "* %?
   :PROPERTIES:
   :CREATED: %U
   :END:
   "
-          '(:empty-lines 1 :kill-buffer t)))
-       org-log-done 'time
-       ;; remove scheduled date and deadline when changing state from TODO
-       org-after-todo-state-change-hook
-       (lambda ()
-         (when (not org-state)
-           (progn
-             ;; as if I were running C-u M-x org-schedule and C-u M-x org-deadline
-             (execute-extended-command '(4) "org-schedule")
-             (execute-extended-command '(4) "org-deadline"))))
-       ;; add slugified CATEGORY to tags
-       org-capture-before-finalize-hook
-       (lambda ()
+        :empty-lines 1 :kill-buffer t))
+     org-log-done 'time
+     ;; remove scheduled date and deadline when changing state from TODO
+     org-after-todo-state-change-hook
+     (lambda ()
+       (when (not org-state)
          (progn
-           (org-set-tags-to
-            (delq nil (cons (eqyiel/slugify (org-get-category) "_")
-                            (org-get-tags))))
-           (org-align-all-tags)))
-       ;; realign tags after capture
-       org-capture-after-finalize-hook 'org-align-all-tags
-       org-agenda-custom-commands
-       '(("n" "Agenda and all TODOs"
-          ((agenda "")
-           (alltodo "")))))
-      :init
-      (progn
-        (defun eqyiel/org-clock-sum-today ()
-          "Visit each file in `org-agenda-files' and return the total time of
+           ;; as if I were running C-u M-x org-schedule and C-u M-x org-deadline
+           (execute-extended-command '(4) "org-schedule")
+           (execute-extended-command '(4) "org-deadline"))))
+     ;; add slugified CATEGORY to tags
+     org-capture-before-finalize-hook
+     (lambda ()
+       (progn
+         (org-set-tags-to
+          (delq nil (cons (eqyiel/slugify (org-get-category) "_")
+                          (org-get-tags))))
+         (org-align-all-tags)))
+     ;; realign tags after capture
+     org-capture-after-finalize-hook 'org-align-all-tags
+     org-agenda-custom-commands
+     '(("n" "Agenda and all TODOs"
+        ((agenda "")
+         (alltodo "")))))
+    :init
+    (progn
+      (defvar eqyiel/org-src-lang-modes
+        '(("Awk" . awk)
+          ("C" . C)
+          ("R" . R)
+          ("Asymptote" . asymptote)
+          ("Calc" . calc)
+          ("Clojure" . clojure)
+          ("CSS" . css)
+          ("Ditaa" . ditaa)
+          ("Dot" . dot)
+          ("Emacs Lisp" . emacs-lisp)
+          ("Forth" . forth)
+          ("Fortran" . fortran)
+          ("Gnuplot" . gnuplot)
+          ("Haskell" . haskell)
+          ("IO" . io)
+          ("J" . J)
+          ("Java" . java)
+          ("Javascript" . js)
+          ("LaTeX" . latex)
+          ("Ledger" . ledger)
+          ("Lilypond" . lilypond)
+          ("Lisp" . lisp)
+          ("Makefile" . makefile)
+          ("Maxima" . maxima)
+          ("Matlab" . matlab)
+          ("Mscgen" . mscgen)
+          ("Ocaml" . ocaml)
+          ("Octave" . octave)
+          ("Org" . org)
+          ("Perl" . perl)
+          ("Pico Lisp" . picolisp)
+          ("PlantUML" . plantuml)
+          ("Python" . python)
+          ("Ruby" . ruby)
+          ("Sass" . sass)
+          ("Scala" . scala)
+          ("Scheme" . scheme)
+          ("Screen" . screen)
+          ("Shell Script" . shell)
+          ("Shen" . shen)
+          ("Sql" . sql)
+          ("Sqlite" . sqlite)
+          ("Stan" . stan)
+          ("ebnf2ps" . ebnf2ps))
+        "This list is actually from `org-babel-load-languages', but it's not
+  exposed as a variable.  It might change from time to time so be sure to look
+  back there.")
+
+      (defun eqyiel/org-clock-sum-today ()
+        "Visit each file in `org-agenda-files' and return the total time of
     today's clocked tasks in minutes."
-          (let ((files (org-agenda-files))
-                (total 0))
-            (org-agenda-prepare-buffers files)
-            (dolist (file files)
-              (with-current-buffer (find-buffer-visiting file)
-                (setq total (+ total (org-clock-sum-today)))))
-            total))
+        (let ((files (org-agenda-files))
+              (total 0))
+          (org-agenda-prepare-buffers files)
+          (dolist (file files)
+            (with-current-buffer (find-buffer-visiting file)
+              (setq total (+ total (org-clock-sum-today)))))
+          total))
 
-        (defun eqyiel/org-archive-done-tasks ()
-          (interactive)
-          (org-map-entries 'org-archive-subtree "/DONE" 'file))
-        (defun eqyiel/org-select-src-lang-mode ()
-          "Select a language's key from the alist of languages org-mode groks."
-          (interactive)
+      (defun eqyiel/org-archive-done-tasks ()
+        (interactive)
+        (org-map-entries 'org-archive-subtree "/DONE" 'file))
+
+      (defun eqyiel/org-select-src-lang-mode ()
+        "Select a language mode from the alist of languages org-mode groks."
+        (interactive)
+        (let* ((selected-key
+                (completing-read
+                 "Select language: "
+                 (seq-reduce
+                  (lambda (prev next)
+                    (if (not (member next prev))
+                        (cons next prev)
+                      prev))
+                  (mapcar
+                   (lambda (arg) (car arg))
+                   eqyiel/org-src-lang-modes)
+                  '())))
+               (selected-value
+                (cdr
+                 (assoc selected-key eqyiel/org-src-lang-modes))))
           (insert
-           (completing-read
-            "Select language: "
-            (seq-reduce
-             (lambda (prev next)
-               (if (not (member next prev))
-                   (cons next prev)
-                 prev))
-             (mapcar (lambda (arg) (cdr arg)) org-src-lang-modes) '()))))
-        (add-hook 'org-mode-hook (lambda () (org-indent-mode t)))
-        (org-babel-do-load-languages
-         'org-babel-load-languages
-         '((js . t)
-           (emacs-lisp . t)
-           (sh . t)))
+           (if selected-value (symbol-name selected-value)
+             selected-key))))
 
-        (add-hook 'org-mode-hook 'turn-on-auto-fill))
-      :bind
-      (("<f12>" . org-capture)
-       ("<f7>" . org-agenda)
-       :map org-mode-map
-       ("M-p" . eqyiel/org-prev-visible-heading)
-       ("M-n" . org-next-visible-heading))
-      :ensure nil
-      :load-path "site-lisp/org-mode"
-      :demand)
+      (add-hook 'org-mode-hook (lambda () (org-indent-mode t)))
+      (org-babel-do-load-languages
+       'org-babel-load-languages
+       '((js . t)
+         (emacs-lisp . t)
+         (shell . t)))
+
+      (add-hook 'org-mode-hook 'turn-on-auto-fill))
+    :bind
+    (("<f12>" . org-capture)
+     ("<f7>" . org-agenda)
+     :map org-mode-map
+     ("M-p" . eqyiel/org-prev-visible-heading)
+     ("M-n" . org-next-visible-heading))
+    :ensure nil
+    :load-path "site-lisp/org-mode"
+    :demand)
 #+end_src
 
 ** ~ox-gfm~                                                          :melpa:

@@ -1514,6 +1514,13 @@ Check out this for tips: https://vxlabs.com/2017/02/07/mu4e-0-9-18-e-mailing-wit
 #+begin_src emacs-lisp
   (use-package nix-mode
     :ensure nil
+    :commands (nix-mode nix-repl-show nix-format-buffer)
+    :init (add-to-list 'auto-mode-alist '("\\.nix\\'" . nix-mode))
+    :load-path "site-lisp/nixos/nix-mode")
+
+  (use-package nix-shell
+    :ensure nil
+    :commands nix-shell
     :load-path "site-lisp/nixos/nix-mode")
 #+end_src
 

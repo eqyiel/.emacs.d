@@ -1510,9 +1510,11 @@ Check out this for tips: https://vxlabs.com/2017/02/07/mu4e-0-9-18-e-mailing-wit
            ("C-*" . mc/mark-all-like-this)))
 #+end_src
 
-** ~nix-mode~                                                        :melpa:
+** ~nix-mode~                                                      :subtree:
 #+begin_src emacs-lisp
-  (use-package nix-mode :ensure t)
+  (use-package nix-mode
+    :ensure nil
+    :load-path "site-lisp/nixos/nix-mode")
 #+end_src
 
 ** ~no-littering~                                                    :melpa:

@@ -931,11 +931,6 @@ So diminish ~auto-fill-function~, not ~auto-fill-mode~.
 ** ~company-flow~                                                    :melpa:
 #+begin_src emacs-lisp
 (use-package company-flow :after company :demand :ensure t)
-#+end_src  
-
-** ~company-nixos-options~                                           :melpa:
-#+begin_src emacs-lisp
-  (use-package company-nixos-options :after company :demand :ensure t)
 #+end_src
 
 ** ~company-tern~                                                    :melpa:
@@ -1315,10 +1310,6 @@ vanished.
 
 ** ~mu4e~                                                           :system:
 
-#+begin_src emacs-lisp
-  (add-to-list 'load-path "/run/current-system/sw/share/emacs/site-lisp/mu4e")
-#+end_src
-
 Check out this for tips: https://vxlabs.com/2017/02/07/mu4e-0-9-18-e-mailing-with-emacs-now-even-better/
 
 #+begin_src emacs-lisp
@@ -1493,7 +1484,8 @@ Check out this for tips: https://vxlabs.com/2017/02/07/mu4e-0-9-18-e-mailing-wit
     :bind (("<f4>" . mu4e)
            ("C-x m" . mu4e-compose-new))
     :demand
-    :ensure nil)
+    :ensure nil
+    :load-path "/run/current-system/sw/share/emacs/site-lisp/mu4e")
 #+end_src
 
 ** ~multiple-cursors~                                                :melpa:
@@ -1508,6 +1500,19 @@ Check out this for tips: https://vxlabs.com/2017/02/07/mu4e-0-9-18-e-mailing-wit
            ("C-<" . mc/mark-previous-like-this)
            ("C-8" . mc/mark-all-like-this)
            ("C-*" . mc/mark-all-like-this)))
+#+end_src
+** ~nix-emacs~                                                     :subtree:
+#+begin_src emacs-lisp
+  (use-package company-nixos-options
+    :after (company nix-mode)
+    :demand
+    :ensure nil
+    :load-path "site-lisp/travisbhartwell/nix-emacs")
+
+  (use-package nixos-options
+    :ensure nil
+    :after nix-mode
+    :load-path "site-lisp/travisbhartwell/nix-emacs")
 #+end_src
 
 ** ~nix-mode~                                                      :subtree:

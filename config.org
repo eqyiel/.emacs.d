@@ -943,7 +943,7 @@ So diminish ~auto-fill-function~, not ~auto-fill-mode~.
   (use-package counsel-projectile
     :after (projectile counsel)
     :demand
-    :bind ("C-c k" . counsel-projectile-ag)
+    :bind ("C-c k" . counsel-projectile-rg)
     :ensure t)
 #+END_SRC
 
@@ -2173,12 +2173,12 @@ This is a new one for me.  See [[http://oremacs.com/swiper/#key-bindings-for-sin
     :demand
     :ensure t)
 
-  (defun eqyiel/counsel-projectile-ag-around (orig-fun &rest args)
-    "If `projectile-counsel-ag' throws an error, fallback to regular `counsel-ag'."
+  (defun eqyiel/counsel-projectile-rg-around (orig-fun &rest args)
+    "If `projectile-counsel-rg' throws an error, fallback to regular `counsel-rg'."
     (when (not (condition-case nil (apply orig-fun args) (error nil)))
       (apply 'counsel-ag args)))
 
-  (advice-add 'counsel-projectile-ag :around 'eqyiel/counsel-projectile-ag-around)
+  (advice-add 'counsel-projectile-rg :around 'eqyiel/counsel-projectile-rg-around)
 
   (use-package avy :ensure t :demand)
 

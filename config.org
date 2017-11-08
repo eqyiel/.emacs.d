@@ -2369,6 +2369,11 @@ This package adds itself to ~auto-mode-alist~.
        `(,(concat (directory-file-name user-emacs-directory) "/eqyi-el/snippets")
          yas-installed-snippets-dir)
        yas-prompt-functions '(yas-ido-prompt))
+      ;; Warning (yasnippet): ‘Snippet’ modified buffer in a backquote expression.
+      ;; To hide this warning, add (yasnippet backquote-change) to
+      ;; ‘warning-suppress-types’.
+      (add-to-list 'warning-suppress-types 'yasnippet)
+      (add-to-list 'warning-suppress-types 'backquote-change)
       (yas-global-mode t))
     :bind (("C-c TAB" . yas-expand))
     :diminish yas-minor-mode

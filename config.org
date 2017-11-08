@@ -619,6 +619,19 @@
       (replace-regexp-in-string
        (rx (any " _")) actual-delimiter
        (downcase (replace-regexp-in-string "[^A-Za-z0-9 ]" "" string)))))
+
+  (defun eqyiel/psql ()
+    (interactive)
+    (require 'sql)
+    (if (member
+         nil
+         (mapcar
+          (lambda (element)
+            (getenv element))
+          '("PGHOST" "PGPORT" "PGUSER" "PGPASSWORD" "PGDATABASE")))
+        ;; if required environment not set, fall back to interactive login
+        (sql-postgres)
+      (switch-to-buffer (sql-comint-postgres 'postgres sql-postgres-options))))
 #+end_src
 
 * Packages
@@ -1002,6 +1015,15 @@ So diminish ~auto-fill-function~, not ~auto-fill-mode~.
      ("M->" . eqyiel/dired-jump-to-bottom))
     :ensure nil)
 #+end_src
+
+** ~direnv~                                                          :melpa:
+#+BEGIN_SRC emacs-lisp
+  (use-package direnv
+    :config (setq direnv-always-show-summary t
+                  direnv-show-paths-in-summary t)
+    :init (direnv-mode)
+    :demand)
+#+END_SRC
 
 ** ~dtrt-indent~                                                     :melpa:
 #+begin_src emacs-lisp

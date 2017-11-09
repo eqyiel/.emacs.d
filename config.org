@@ -2399,6 +2399,6 @@ This package adds itself to ~auto-mode-alist~.
       (yas-global-mode t))
     :bind (("C-c TAB" . yas-expand))
     :diminish yas-minor-mode
-    :demand
+    :demand t
     :ensure t)
 #+end_src

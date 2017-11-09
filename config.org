@@ -2110,6 +2110,18 @@ editing support.
     :ensure t)
 #+end_src
 
+** ~solarized-theme~                                                 :melpa:
+#+BEGIN_SRC emacs-lisp
+  (use-package solarized-theme
+    :init
+    (progn
+      (setq custom-safe-themes '("d677ef584c6dfc0697901a44b885cc18e206f05114c8a3b7fde674fce6180879" default))
+      (load-theme 'solarized-light))
+    :ensure t
+    :demand t)
+
+#+END_SRC
+
 ** ~shell-mode~                                                    :builtin:
 #+begin_src emacs-lisp
   (use-package shell

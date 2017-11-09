@@ -1234,10 +1234,10 @@ instead of ~js2-mode~ or ~web-mode~.
       ;; https://emacs.stackexchange.com/questions/22044/treat-shebang-as-a-comment
       (modify-syntax-entry ?# ". 1" js2-mode-syntax-table)
       (modify-syntax-entry ?! ". 2b" js2-mode-syntax-table))
-    :init
-    (progn
-      (add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
-      (add-to-list 'auto-mode-alist '("\\.jsx$" . js2-jsx-mode)))
+    ;; :init
+    ;; (progn
+    ;;   (add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
+    ;;   (add-to-list 'auto-mode-alist '("\\.jsx$" . js2-jsx-mode)))
     :bind
     (:map js2-mode-map
           ("C-M-s-\"" . eqyiel/toggle-js2-mode-to-web-mode)
@@ -2027,6 +2027,50 @@ Export ~org~ files to Github-flavoured markdown.
     :demand)
 #+end_src
 
+** ~rjsx-mode~                                                   :submodule:
+
+This is [[https://github.com/Fuco1/rjsx-mode][Fuco1's]] fork of
+[[https://github.com/antifuchs/rjsx-mode][antifuch's]] fork of
+[[https://github.com/felipeochoa/rjsx-mode][~rjsx-mode~]] with improved flow
+editing support.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package rjsx-mode
+    :commands rjsx-mode
+    :config
+    (progn
+        (use-package tern)
+        (use-package web-mode)
+        (use-package flycheck)
+        (use-package company)
+        (use-package company-tern)
+        (use-package company-flow)
+
+        (defun eqyiel/toggle-rjsx-mode-to-web-mode ()
+          (interactive)
+          (web-mode))
+
+        (defun eqyiel/company-rjsx-mode ()
+          (set (make-local-variable 'company-backends)
+               '((company-files
+                  company-flow
+                  company-yasnippet))))
+
+        (add-hook 'rjsx-mode-hook 'eqyiel/company-rjsx-mode)
+
+        ;; https://emacs.stackexchange.com/questions/22044/treat-shebang-as-a-comment
+        (modify-syntax-entry ?# ". 1" rjsx-mode-syntax-table)
+        (modify-syntax-entry ?! ". 2b" rjsx-mode-syntax-table))
+    :load-path "site-lisp/rjsx-mode"
+    :init (progn
+            (add-to-list 'auto-mode-alist '("\\.js$" . rjsx-mode))
+            (add-to-list 'auto-mode-alist '("\\.jsx$" . rjsx-mode)))
+    :bind (:map rjsx-mode-map
+                ("C-M-s-\"" . eqyiel/toggle-rjsx-mode-to-web-mode)
+                ("H-'" . eqyiel/toggle-rjsx-mode-to-web-mode))
+    :ensure nil)
+#+END_SRC
+
 ** ~savehist~                                                      :builtin:
 #+begin_src emacs-lisp
   (use-package savehist
@@ -2325,6 +2369,10 @@ This is a pretty good replacement  for ~longlines-mode~.
         (js2-jsx-mode)
       (js2-mode)))
 
+  (defun eqyiel/toggle-web-mode-to-rjsx-mode ()
+    (interactive)
+    (rjsx-mode))
+
   (defun eqyiel/web-mode-hook ()
     (when (or (string-equal web-mode-content-type "javascript")
               (string-equal web-mode-content-type "jsx"))
@@ -2351,8 +2399,8 @@ This is a pretty good replacement  for ~longlines-mode~.
     (modify-syntax-entry ?! ". 2b" web-mode-syntax-table)
     :bind
     (:map web-mode-map
-          ("C-M-s-\"" . eqyiel/toggle-web-mode-to-js2-mode)
-          ("H-'" . eqyiel/toggle-web-mode-to-js2-mode)
+          ("C-M-s-\"" . eqyiel/toggle-web-mode-to-rjsx-mode)
+          ("H-'" . eqyiel/toggle-web-mode-to-rjsx-mode)
           ("M-j" . newline-and-indent))
     :ensure t)
 #+end_src

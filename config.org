@@ -1049,6 +1049,18 @@ So diminish ~auto-fill-function~, not ~auto-fill-mode~.
     :bind (("C-=" . er/expand-region)))
 #+end_src
 
+** ~flow-minor-mode~                                                 :melpa:
+
+#+BEGIN_SRC emacs-lisp
+  (use-package
+    flow-minor-mode
+    :ensure t
+    :init
+    (progn
+      (add-hook 'js2-mode-hook 'flow-minor-enable-automatically)
+      (add-hook 'rjsx-mode-hook 'flow-minor-enable-automatically)))
+#+END_SRC
+
 ** ~flx~                                                             :melpa:
 #+begin_src emacs-lisp
 (use-package flx :ensure t)
@@ -1250,8 +1262,32 @@ This package adds itself to ~auto-mode-alist~.
 #+begin_src emacs-lisp
   (use-package json-mode
     :ensure t
+    :bind (:map json-mode-map
+                ("C-c C-c" . eqyiel/json-run-jq)
+                ("C-c C-m" . eqyiel/json-minify))
     :config
     (progn
+      (defun eqyiel/json-run-jq (query &optional arg)
+        "Run jq(1) on current buffer.
+  With prefix argument \\[universal-argument] replace the buffer
+  with the result of running jq(1)."
+        (interactive "sjq query: \nP")
+        (shell-command-on-region
+         (point-min) (point-max)
+         (concat "jq " (shell-quote-argument query))
+         (when arg (current-buffer))
+         (when arg t)))
+
+      (defun eqyiel/json-minify ()
+        "Minify the json at point."
+        (interactive)
+        (goto-char (point-min))
+        (let* ((p (point))
+               (json (json-read)))
+          (delete-region p (point))
+          (save-excursion
+            (insert (json-encode json)))))
+
       (add-to-list 'auto-mode-alist '("\\.eslintrc.*$" . json-mode))
       (add-to-list 'auto-mode-alist '("\\.babelrc$" . json-mode)))
     :init
@@ -1867,15 +1903,11 @@ Export ~org~ files to Github-flavoured markdown.
 #+BEGIN_SRC emacs-lisp
   (defun eqyiel/prettier-locate-js-project-root (path)
     "Find the dir containing package.json by walking up the dir tree from PATH.
-  Stolen from https://github.com/Galooshi/emacs-import-js/."
-    (let ((parent-dir (file-name-directory path))
-          (project-found nil))
-      (while (and parent-dir (not (setf project-found (file-exists-p (concat parent-dir "package.json")))))
-        (let* ((pd (file-name-directory (directory-file-name parent-dir)))
-               (pd-exists (not (equal pd parent-dir))))
-          (setf parent-dir (if pd-exists pd nil))))
-      (if project-found (directory-file-name (expand-file-name parent-dir))
-        (directory-file-name (expand-file-name default-directory)))))
+  Returns current working directory if no package.json was found found."
+    (directory-file-name
+     (expand-file-name
+      (or (locate-dominating-file path "package.json")
+          default-directory))))
 
   (defun eqyiel/prettier-find-prettier-in-package-file (package-file)
     "Return t if prettier exists in PACKAGE-FILE."
@@ -2034,9 +2066,12 @@ This is [[https://github.com/Fuco1/rjsx-mode][Fuco1's]] fork of
 [[https://github.com/felipeochoa/rjsx-mode][~rjsx-mode~]] with improved flow
 editing support.
 
+Sample usage:
+https://github.com/Fuco1/.emacs.d/blob/3deefbabb0c1765abd88743e61ee42846353525f/files/vendor.el#L1078-L1123
+
 #+BEGIN_SRC emacs-lisp
   (use-package rjsx-mode
-    :commands rjsx-mode
+    :commands (rjsx-mode)
     :config
     (progn
         (use-package tern)
@@ -2045,6 +2080,13 @@ editing support.
         (use-package company)
         (use-package company-tern)
         (use-package company-flow)
+
+        (condition-case nil
+            (use-package flow-js2-minor-mode
+              :load-path "site-lisp/rjsx-mode/flow-js2-minor-mode.el"
+              :demand t
+              :ensure nil)
+          (error nil))
 
         (defun eqyiel/toggle-rjsx-mode-to-web-mode ()
           (interactive)
@@ -2057,6 +2099,15 @@ editing support.
                   company-yasnippet))))
 
         (add-hook 'rjsx-mode-hook 'eqyiel/company-rjsx-mode)
+
+        ;; This should be smarter, like the prettier thing
+        (defun eqyiel/rjsx-flycheck-setup ()
+          (require 'flycheck)
+          (-when-let (root (locate-dominating-file default-directory "node_modules"))
+            (setq-local flycheck-javascript-eslint-executable (concat root "/node_modules/.bin/eslint"))
+            (setq-local flycheck-javascript-flow-executable (concat root "/node_modules/.bin/flow"))))
+
+        (add-hook 'rjsx-mode-hook 'eqyiel/rjsx-flycheck-setup)
 
         ;; https://emacs.stackexchange.com/questions/22044/treat-shebang-as-a-comment
         (modify-syntax-entry ?# ". 1" rjsx-mode-syntax-table)
@@ -2446,6 +2497,7 @@ This package adds itself to ~auto-mode-alist~.
   (use-package yasnippet
     :init
     (progn
+      (require 'warnings)
       (setq
        yas-snippet-dirs
        `(,(concat (directory-file-name user-emacs-directory) "/eqyi-el/snippets")

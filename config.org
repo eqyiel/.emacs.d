@@ -2092,22 +2092,36 @@ https://github.com/Fuco1/.emacs.d/blob/3deefbabb0c1765abd88743e61ee42846353525f/
           (interactive)
           (web-mode))
 
-        (defun eqyiel/company-rjsx-mode ()
+        (defun eqyiel/rjsx-mode-hook ()
+          (progn
+            (setq-local js2-highlight-level 3)
+            (setq-local js2-mode-show-strict-warnings nil)
+            (setq-local js2-strict-trailing-comma-warning nil)
+            (setq-local js2-strict-missing-semi-warning nil)
+            (setq-local js2-strict-inconsistent-return-warning nil)
+            (setq-local js2-strict-cond-assign-warning nil)
+            (setq-local js2-strict-var-redeclaration-warning nil)
+            (setq-local js2-strict-var-hides-function-arg-warning nil)
+            (setq-local js2-mode-show-parse-errors nil)))
+
+        (add-hook 'rjsx-mode-hook 'eqyiel/rjsx-mode-hook)
+
+        (defun eqyiel/company-rjsx-mode-hook ()
           (set (make-local-variable 'company-backends)
                '((company-files
                   company-flow
                   company-yasnippet))))
 
-        (add-hook 'rjsx-mode-hook 'eqyiel/company-rjsx-mode)
+        (add-hook 'rjsx-mode-hook 'eqyiel/company-rjsx-mode-hook)
 
         ;; This should be smarter, like the prettier thing
-        (defun eqyiel/rjsx-flycheck-setup ()
+        (defun eqyiel/flycheck-rjsx-mode-hook ()
           (require 'flycheck)
           (-when-let (root (locate-dominating-file default-directory "node_modules"))
             (setq-local flycheck-javascript-eslint-executable (concat root "/node_modules/.bin/eslint"))
             (setq-local flycheck-javascript-flow-executable (concat root "/node_modules/.bin/flow"))))
 
-        (add-hook 'rjsx-mode-hook 'eqyiel/rjsx-flycheck-setup)
+        (add-hook 'rjsx-mode-hook 'eqyiel/flycheck-rjsx-mode-hook)
 
         ;; https://emacs.stackexchange.com/questions/22044/treat-shebang-as-a-comment
         (modify-syntax-entry ?# ". 1" rjsx-mode-syntax-table)

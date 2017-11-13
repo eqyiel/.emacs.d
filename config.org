@@ -1477,6 +1477,28 @@ Check out this for tips: https://vxlabs.com/2017/02/07/mu4e-0-9-18-e-mailing-wit
                    (mu4e~write-body-to-html msg)))))))
       (setq mu4e-contexts
             `(,(make-mu4e-context
+                :name "m ruben@maher.fyi"
+                :match-func
+                (lambda (msg)
+                  (when msg
+                    (string=
+                     (mu4e-message-field msg :maildir)
+                     "/ruben@maher.fyi")))
+                :vars '((user-mail-address . "ruben@maher.fyi")
+                        (mu4e-sent-folder . "/ruben@maher.fyi/Sent")
+                        (mu4e-refile-folder . "/ruben@maher.fyi/Archive")
+                        (mu4e-drafts-folder . "/ruben@maher.fyi/Drafts")
+                        (mu4e-trash-folder . "/ruben@maher.fyi/Trash")
+                        (mu4e-sent-messages-behavior . sent)
+                        (mu4e-compose-crypto-reply-policy . sign-and-encrypt)
+                        (mu4e-maildir-shortcuts
+                         . (("/ruben@maher.fyi/Inbox"   . ?i)
+                            ("/ruben@maher.fyi/Archive" . ?a)
+                            ("/ruben@maher.fyi/GitHub"  . ?g)
+                            ("/ruben@maher.fyi/Lists"   . ?l)
+                            ("/ruben@maher.fyi/Trash"   . ?t)
+                            ("/ruben@maher.fyi/Sent"    . ?s)))))
+              ,(make-mu4e-context
                 :name "r@rkm.id.au"
                 :match-func
                 (lambda (msg)

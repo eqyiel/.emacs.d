@@ -2019,10 +2019,35 @@ Export ~org~ files to Github-flavoured markdown.
 ** ~projectile~                                                      :melpa:
 #+begin_src emacs-lisp
   (use-package projectile
+    :config
+    (progn
+      ;; monkeypatch `projectile-current-project-files' to use fd, it's much faster.
+      (defun eqyiel/projectile-current-project-files ()
+        "Return a list of files for the current project."
+        (let ((files (and projectile-enable-caching
+                          (gethash (projectile-project-root) projectile-projects-cache))))
+          ;; nothing is cached
+          (unless files
+            (when projectile-enable-caching
+              (message "Empty cache. Projectile is initializing cache..."))
+            (setq files
+                  (split-string
+                   (shell-command-to-string
+                    (concat
+                     "fd '' --hidden "
+                     (directory-file-name (projectile-project-root))))))
+            ;; cache the resulting list of files
+            (when projectile-enable-caching
+              (projectile-cache-project (projectile-project-root) files)))
+          (projectile-sort-files files))))
     :init
     (progn
       (use-package ivy :ensure t)
       (projectile-global-mode)
+      (advice-add
+       'projectile-current-project-files
+       :override
+       'eqyiel/projectile-current-project-files)
       (setq projectile-completion-system 'ivy
             projectile-globally-ignored-directories
             (append '("dist" "node_modules")

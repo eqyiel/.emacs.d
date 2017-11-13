@@ -2383,7 +2383,16 @@ This is a new one for me.  See [[http://oremacs.com/swiper/#key-bindings-for-sin
 
   (advice-add 'counsel-projectile-rg :around 'eqyiel/counsel-projectile-rg-around)
 
-  (use-package avy :ensure t :demand)
+  (use-package avy
+    :bind (("C-:" . avy-goto-char)
+           ("C-'" . avy-goto-char-2)
+           ("M-g f" . avy-goto-line)
+           ("M-g w" . avy-goto-word-1)
+           ("M-g e" . avy-goto-word-0)
+           ("M-g o" . avy-org-refile-as-child)
+           ("M-g j" . avy-org-goto-heading-timer))
+    :ensure t
+    :demand)
 
   (use-package ivy
     :config

@@ -1171,6 +1171,19 @@ So diminish ~auto-fill-function~, not ~auto-fill-mode~.
     :ensure nil)
 #+end_src
 
+** ~isearch~                                                       :builtin:
+
+I prefer ~swiper~ on ~C-s~ but since it's line based, there are some things it
+can't do well (like searching for a substring in a long command in
+`comint-mode`) so rebind ~isearch~ to a convenient key.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package isearch
+    :bind (("C-c C-s" . isearch-forward)
+           ("C-c C-r" . isearch-backward))
+    :ensure nil)
+#+END_SRC
+
 ** ~ispell~                                                        :builtin:
 #+begin_src emacs-lisp
   (use-package ispell

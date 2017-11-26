@@ -71,8 +71,8 @@
 * General defaults
 #+begin_src emacs-lisp
   (setq user-full-name "Ruben Maher"
-        user-mail-address "r@rkm.id.au"
-        mail-host-address "rkm.id.au")
+        user-mail-address "ruben@maher.fyi"
+        mail-host-address "maher.fyi")
 
   (menu-bar-mode -1)
   (scroll-bar-mode -1)
@@ -1430,35 +1430,10 @@ Check out this for tips: https://vxlabs.com/2017/02/07/mu4e-0-9-18-e-mailing-wit
       (setq mu4e-attachment-dir eqyiel/downloads-directory)
       (setq mu4e-completing-read-function 'completing-read)
       (setq mu4e-index-cleanup t)
+      (setq mu4e-headers-include-related t) ;; needed for proper threading
       (setq mu4e-compose-keep-self-cc t)
       (setq send-mail-function 'message-send-mail-with-sendmail
             sendmail-program "msmtpq")  ; from gnus config
-      (setq mu4e-bookmarks
-            (list
-             (make-mu4e-bookmark
-              :name "Flagged Messages"
-              :query "flag:flagged"
-              :key ?f)
-             (make-mu4e-bookmark
-              :name "Inbox"
-              :query "maildir:/r@rkm.id.au/Inbox OR maildir:/r@rkm.id.au/Archive OR maildir:/r@rkm.id.au/Sent"
-              :key ?x)
-             (make-mu4e-bookmark
-              :name "Unread Messages (Private)"
-              :query "flag:unread AND maildir:/r@rkm.id.au/Inbox"
-              :key ?u)
-             (make-mu4e-bookmark
-              :name "Unread Messages (Work)"
-              :query "flag:unread AND maildir:/ruben@mangochutney.com.au/Inbox"
-              :key ?w)
-             (make-mu4e-bookmark
-              :name "Today's messages"
-              :query "date:today..now"
-              :key ?t)
-             (make-mu4e-bookmark
-              :name "Last 7 days"
-              :query "date:7d..now"
-              :key ?7)))
       (setq mu4e-view-show-addresses t)
       (setq
        mu4e-header-info-custom
@@ -1517,26 +1492,20 @@ Check out this for tips: https://vxlabs.com/2017/02/07/mu4e-0-9-18-e-mailing-wit
                             ("/ruben@maher.fyi/Sent"    . ?s)))))
               ,(make-mu4e-context
                 :name "r@rkm.id.au"
-                :match-func
-                (lambda (msg)
-                  (when msg
-                    (string=
-                     (mu4e-message-field msg :maildir)
-                     "/r@rkm.id.au")))
                 :vars '((user-mail-address . "r@rkm.id.au")
-                        (mu4e-sent-folder . "/r@rkm.id.au/Sent")
-                        (mu4e-refile-folder . "/r@rkm.id.au/Archive")
-                        (mu4e-drafts-folder . "/r@rkm.id.au/Drafts")
-                        (mu4e-trash-folder . "/r@rkm.id.au/Trash")
+                        (mu4e-sent-folder . "/ruben@maher.fyi/Sent")
+                        (mu4e-refile-folder . "/ruben@maher.fyi/Archive")
+                        (mu4e-drafts-folder . "/ruben@maher.fyi/Drafts")
+                        (mu4e-trash-folder . "/ruben@maher.fyi/Trash")
                         (mu4e-sent-messages-behavior . sent)
                         (mu4e-compose-crypto-reply-policy . sign-and-encrypt)
                         (mu4e-maildir-shortcuts
-                         . (("/r@rkm.id.au/Inbox"   . ?i)
-                            ("/r@rkm.id.au/Archive" . ?a)
-                            ("/r@rkm.id.au/GitHub"  . ?g)
-                            ("/r@rkm.id.au/Lists"   . ?l)
-                            ("/r@rkm.id.au/Trash"   . ?t)
-                            ("/r@rkm.id.au/Sent"    . ?s)))))
+                         . (("/ruben@maher.fyi/Inbox"   . ?i)
+                            ("/ruben@maher.fyi/Archive" . ?a)
+                            ("/ruben@maher.fyi/GitHub"  . ?g)
+                            ("/ruben@maher.fyi/Lists"   . ?l)
+                            ("/ruben@maher.fyi/Trash"   . ?t)
+                            ("/ruben@maher.fyi/Sent"    . ?s)))))
               ,(make-mu4e-context
                 :name "flinders"
                 :match-func
@@ -1546,10 +1515,10 @@ Check out this for tips: https://vxlabs.com/2017/02/07/mu4e-0-9-18-e-mailing-wit
                      (mu4e-message-field msg :maildir)
                      "/mahe0054@flinders.edu.au")))
                 :vars '((user-mail-address . "mahe0054@flinders.edu.au")
-                        (mu4e-sent-folder . "/r@rkm.id.au/Sent")
-                        (mu4e-refile-folder . "/r@rkm.id.au/Archive")
-                        (mu4e-drafts-folder . "/r@rkm.id.au/Drafts")
-                        (mu4e-trash-folder . "/r@rkm.id.au/Trash")
+                        (mu4e-sent-folder . "/ruben@maher.fyi/Sent")
+                        (mu4e-refile-folder . "/ruben@maher.fyi/Archive")
+                        (mu4e-drafts-folder . "/ruben@maher.fyi/Drafts")
+                        (mu4e-trash-folder . "/ruben@maher.fyi/Trash")
                         (mu4e-sent-messages-behavior . sent)
                         (mu4e-compose-crypto-reply-policy . sign-and-encrypt)
                         (mu4e-maildir-shortcuts
@@ -1672,7 +1641,7 @@ use ~AND~ instead of ~OR~.
        org-caldav-files (directory-files eqyiel/org-directory t "\\.org$")
        org-caldav-inbox (concat eqyiel/org-directory "/org-caldav-inbox.org")
        org-caldav-save-directory (concat eqyiel/xdg-cache-home "/emacs")
-       org-caldav-url "https://cloud.rkm.id.au/remote.php/dav/calendars/eqyiel"
+       org-caldav-url "https://cloud.maher.fyi/remote.php/dav/calendars/eqyiel"
        org-icalendar-include-todo t
        org-caldav-skip-conditions t ; must be truthy to run `org-caldav-skip-function'
        org-icalendar-timezone eqyiel/timezone

@@ -1428,6 +1428,7 @@ Check out this for tips: https://vxlabs.com/2017/02/07/mu4e-0-9-18-e-mailing-wit
       (setq mu4e-completing-read-function 'completing-read)
       (setq mu4e-index-cleanup t)
       (setq mu4e-headers-include-related t) ;; needed for proper threading
+      (setq mu4e-headers-results-limit 1500)
       (setq mu4e-compose-keep-self-cc t)
       (setq send-mail-function 'message-send-mail-with-sendmail
             sendmail-program "msmtpq")  ; from gnus config

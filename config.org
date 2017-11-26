@@ -645,7 +645,7 @@
     :ensure t)
 #+END_SRC
 
-** ~auth-password-store~                                             :melpa:
+** ~auth-source-pass~                                              :builtin:
 #+begin_src emacs-lisp
   (use-package auth-password-store
     :after auth-source
@@ -658,7 +658,7 @@
       ;; Don't open in DCL mode
       (add-to-list 'auto-mode-alist
                    '("\\.com.gpg$" . fundamental-mode)))
-    :ensure t
+    :ensure nil
     :demand)
 #+end_src
 ** ~auto-fill-mode~                                                :builtin:

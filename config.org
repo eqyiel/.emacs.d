@@ -2243,7 +2243,9 @@ https://github.com/Fuco1/.emacs.d/blob/3deefbabb0c1765abd88743e61ee42846353525f/
   (use-package solarized-theme
     :init
     (progn
-      (setq custom-safe-themes '("d677ef584c6dfc0697901a44b885cc18e206f05114c8a3b7fde674fce6180879" default))
+      (setq custom-safe-themes '("d677ef584c6dfc0697901a44b885cc18e206f05114c8a3b7fde674fce6180879" default)
+            solarized-use-variable-pitch nil
+            solarized-scale-org-headlines nil)
       (load-theme 'solarized-light))
     :ensure t
     :demand t)

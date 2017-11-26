@@ -1257,7 +1257,8 @@ instead of ~js2-mode~ or ~web-mode~.
             js2-idle-timer-delay 3 ;; wait until I'm actually idle
             js2-include-node-externs t
             js2-concat-multiline-strings t
-            js2-strict-trailing-comma-warning nil)
+            js2-strict-trailing-comma-warning nil
+            js2-concat-multiline-strings nil)
 
       ;; https://emacs.stackexchange.com/questions/22044/treat-shebang-as-a-comment
       (modify-syntax-entry ?# ". 1" js2-mode-syntax-table)
@@ -2165,7 +2166,8 @@ https://github.com/Fuco1/.emacs.d/blob/3deefbabb0c1765abd88743e61ee42846353525f/
             (setq-local js2-strict-cond-assign-warning nil)
             (setq-local js2-strict-var-redeclaration-warning nil)
             (setq-local js2-strict-var-hides-function-arg-warning nil)
-            (setq-local js2-mode-show-parse-errors nil)))
+            (setq-local js2-mode-show-parse-errors nil)
+            (setq-local js2-concat-multiline-strings nil)))
 
         (add-hook 'rjsx-mode-hook 'eqyiel/rjsx-mode-hook)
 

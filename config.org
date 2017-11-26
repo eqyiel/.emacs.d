@@ -631,10 +631,7 @@
           '("PGHOST" "PGPORT" "PGUSER" "PGPASSWORD" "PGDATABASE")))
         ;; if required environment not set, fall back to interactive login
         (sql-postgres)
-      (progn
-        (setq sql-buffer (sql-comint-postgres 'postgres sql-postgres-options))
-        (switch-to-buffer sql-buffer)
-        (sql-interactive-mode))))
+      (switch-to-buffer (sql-comint-postgres 'postgres sql-postgres-options))))
 #+end_src
 
 * Packages

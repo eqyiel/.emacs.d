@@ -641,6 +641,20 @@
     :config (global-aggressive-indent-mode 1)
     :ensure t)
 #+END_SRC
+** ~atomic-chrome~                                                   :melpa:
+
+This along with the ~GhostText~ Firefox addon a replacement for /It's all
+text!/.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package atomic-chrome
+    :init (atomic-chrome-start-server)
+    :ensure t
+    :demand)
+#+END_SRC
+
+(require 'atomic-chrome)
+(atomic-chrome-start-server)
 
 ** ~auth-source-pass~                                              :builtin:
 #+begin_src emacs-lisp

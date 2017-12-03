@@ -4,6 +4,6 @@
 [submodule "site-lisp/org-mode"]
 	path = site-lisp/org-mode
 	url = git://orgmode.org/org-mode.git
-[submodule "site-lisp/rjsx-mode"]
-	path = site-lisp/rjsx-mode
-	url = git@github.com:Fuco1/rjsx-mode.git
+[submodule "site-lisp/flow-js2-mode"]
+	path = site-lisp/flow-js2-mode
+	url = git@github.com:Fuco1/flow-js2-mode.git

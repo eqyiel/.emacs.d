@@ -1063,18 +1063,6 @@ So diminish ~auto-fill-function~, not ~auto-fill-mode~.
     :bind (("C-=" . er/expand-region)))
 #+end_src
 
-** ~flow-minor-mode~                                                 :melpa:
-
-#+BEGIN_SRC emacs-lisp
-  (use-package
-    flow-minor-mode
-    :ensure t
-    :init
-    (progn
-      (add-hook 'js2-mode-hook 'flow-minor-enable-automatically)
-      (add-hook 'rjsx-mode-hook 'flow-minor-enable-automatically)))
-#+END_SRC
-
 ** ~flx~                                                             :melpa:
 #+begin_src emacs-lisp
 (use-package flx :ensure t)
@@ -1246,6 +1234,11 @@ instead of ~js2-mode~ or ~web-mode~.
       (use-package company-tern)
       (use-package company-flow)
 
+      (use-package flow-js2-mode
+        :load-path "site-lisp/flow-js2-mode"
+        :ensure nil
+        :demand t)
+
       (add-hook 'js2-mode-hook (lambda () (tern-mode t)))
 
       (defun eqyiel/toggle-js2-mode-to-web-mode ()
@@ -1262,22 +1255,35 @@ instead of ~js2-mode~ or ~web-mode~.
 
       (add-hook 'js2-mode-hook 'eqyiel/company-javascript)
 
-      (setq js-switch-indent-offset 2
-            js2-basic-offset 2
-            js2-highlight-level 3
-            js2-idle-timer-delay 3 ;; wait until I'm actually idle
-            js2-include-node-externs t
-            js2-concat-multiline-strings t
-            js2-strict-trailing-comma-warning nil
-            js2-concat-multiline-strings nil)
+      (defun eqyiel/js2-mode-hook ()
+        (progn
+          (setq-local js-switch-indent-offset 2)
+          (setq-local js2-basic-offset 2)
+          (setq-local js2-concat-multiline-strings nil)
+          (setq-local js2-concat-multiline-strings t)
+          (setq-local js2-highlight-level 3)
+          (setq-local js2-idle-timer-delay 3)  ;; wait until I'm actually idle
+          (setq-local js2-include-node-externs t)
+          (setq-local js2-mode-show-parse-errors nil)
+          (setq-local js2-mode-show-strict-warnings nil)
+          (setq-local js2-strict-cond-assign-warning nil)
+          (setq-local js2-strict-inconsistent-return-warning nil)
+          (setq-local js2-strict-missing-semi-warning nil)
+          (setq-local js2-strict-trailing-comma-warning nil)
+          (setq-local js2-strict-var-hides-function-arg-warning nil)
+          (setq-local js2-strict-var-redeclaration-warning nil)))
+
+      (add-hook 'js2-mode-hook 'eqyiel/js2-mode-hook)
+
+      (add-hook 'js2-mode-hook 'eqyiel/company-js2-mode-hook)
 
       ;; https://emacs.stackexchange.com/questions/22044/treat-shebang-as-a-comment
       (modify-syntax-entry ?# ". 1" js2-mode-syntax-table)
       (modify-syntax-entry ?! ". 2b" js2-mode-syntax-table))
-    ;; :init
-    ;; (progn
-    ;;   (add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
-    ;;   (add-to-list 'auto-mode-alist '("\\.jsx$" . js2-jsx-mode)))
+    :init
+    (progn
+      (add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
+      (add-to-list 'auto-mode-alist '("\\.jsx$" . js2-jsx-mode)))
     :bind
     (:map js2-mode-map
           ("C-M-s-\"" . eqyiel/toggle-js2-mode-to-web-mode)
@@ -2104,84 +2110,6 @@ Export ~org~ files to Github-flavoured markdown.
     :demand)
 #+end_src
 
-** ~rjsx-mode~                                                   :submodule:
-
-This is [[https://github.com/Fuco1/rjsx-mode][Fuco1's]] fork of
-[[https://github.com/antifuchs/rjsx-mode][antifuch's]] fork of
-[[https://github.com/felipeochoa/rjsx-mode][~rjsx-mode~]] with improved flow
-editing support.
-
-Sample usage:
-https://github.com/Fuco1/.emacs.d/blob/3deefbabb0c1765abd88743e61ee42846353525f/files/vendor.el#L1078-L1123
-
-#+BEGIN_SRC emacs-lisp
-  (use-package rjsx-mode
-    :commands (rjsx-mode)
-    :config
-    (progn
-        (use-package tern)
-        (use-package web-mode)
-        (use-package flycheck)
-        (use-package company)
-        (use-package company-tern)
-        (use-package company-flow)
-
-        (condition-case nil
-            (use-package flow-js2-minor-mode
-              :load-path "site-lisp/rjsx-mode/flow-js2-minor-mode.el"
-              :demand t
-              :ensure nil)
-          (error nil))
-
-        (defun eqyiel/toggle-rjsx-mode-to-web-mode ()
-          (interactive)
-          (web-mode))
-
-        (defun eqyiel/rjsx-mode-hook ()
-          (progn
-            (setq-local js2-highlight-level 3)
-            (setq-local js2-mode-show-strict-warnings nil)
-            (setq-local js2-strict-trailing-comma-warning nil)
-            (setq-local js2-strict-missing-semi-warning nil)
-            (setq-local js2-strict-inconsistent-return-warning nil)
-            (setq-local js2-strict-cond-assign-warning nil)
-            (setq-local js2-strict-var-redeclaration-warning nil)
-            (setq-local js2-strict-var-hides-function-arg-warning nil)
-            (setq-local js2-mode-show-parse-errors nil)
-            (setq-local js2-concat-multiline-strings nil)))
-
-        (add-hook 'rjsx-mode-hook 'eqyiel/rjsx-mode-hook)
-
-        (defun eqyiel/company-rjsx-mode-hook ()
-          (set (make-local-variable 'company-backends)
-               '((company-files
-                  company-flow
-                  company-yasnippet))))
-
-        (add-hook 'rjsx-mode-hook 'eqyiel/company-rjsx-mode-hook)
-
-        ;; This should be smarter, like the prettier thing
-        (defun eqyiel/flycheck-rjsx-mode-hook ()
-          (require 'flycheck)
-          (-when-let (root (locate-dominating-file default-directory "node_modules"))
-            (setq-local flycheck-javascript-eslint-executable (concat root "/node_modules/.bin/eslint"))
-            (setq-local flycheck-javascript-flow-executable (concat root "/node_modules/.bin/flow"))))
-
-        (add-hook 'rjsx-mode-hook 'eqyiel/flycheck-rjsx-mode-hook)
-
-        ;; https://emacs.stackexchange.com/questions/22044/treat-shebang-as-a-comment
-        (modify-syntax-entry ?# ". 1" rjsx-mode-syntax-table)
-        (modify-syntax-entry ?! ". 2b" rjsx-mode-syntax-table))
-    :load-path "site-lisp/rjsx-mode"
-    :init (progn
-            (add-to-list 'auto-mode-alist '("\\.js$" . rjsx-mode))
-            (add-to-list 'auto-mode-alist '("\\.jsx$" . rjsx-mode)))
-    :bind (:map rjsx-mode-map
-                ("C-M-s-\"" . eqyiel/toggle-rjsx-mode-to-web-mode)
-                ("H-'" . eqyiel/toggle-rjsx-mode-to-web-mode))
-    :ensure nil)
-#+END_SRC
-
 ** ~savehist~                                                      :builtin:
 #+begin_src emacs-lisp
   (use-package savehist
@@ -2533,8 +2461,8 @@ This is a pretty good replacement  for ~longlines-mode~.
     (modify-syntax-entry ?! ". 2b" web-mode-syntax-table)
     :bind
     (:map web-mode-map
-          ("C-M-s-\"" . eqyiel/toggle-web-mode-to-rjsx-mode)
-          ("H-'" . eqyiel/toggle-web-mode-to-rjsx-mode)
+          ("C-M-s-\"" . eqyiel/toggle-web-mode-to-js2-mode)
+          ("H-'" . eqyiel/toggle-web-mode-to-js2-mode)
           ("M-j" . newline-and-indent))
     :ensure t)
 #+end_src

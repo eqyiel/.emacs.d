@@ -1236,6 +1236,7 @@ instead of ~js2-mode~ or ~web-mode~.
 
       (use-package flow-js2-mode
         :load-path "site-lisp/flow-js2-mode"
+        :config (use-package flow-minor-mode :ensure t)
         :ensure nil
         :demand t)
 
@@ -1245,7 +1246,7 @@ instead of ~js2-mode~ or ~web-mode~.
         (interactive)
         (web-mode))
 
-      (defun eqyiel/company-javascript ()
+      (defun eqyiel/company-js2-mode-hook ()
         (require 'company-tern)
         (set (make-local-variable 'company-backends)
              '((company-files
@@ -1253,7 +1254,7 @@ instead of ~js2-mode~ or ~web-mode~.
                 company-tern
                 company-yasnippet))))
 
-      (add-hook 'js2-mode-hook 'eqyiel/company-javascript)
+      (add-hook 'js2-mode-hook 'eqyiel/company-js2-mode-hook)
 
       (defun eqyiel/js2-mode-hook ()
         (progn
@@ -1271,11 +1272,10 @@ instead of ~js2-mode~ or ~web-mode~.
           (setq-local js2-strict-missing-semi-warning nil)
           (setq-local js2-strict-trailing-comma-warning nil)
           (setq-local js2-strict-var-hides-function-arg-warning nil)
-          (setq-local js2-strict-var-redeclaration-warning nil)))
+          (setq-local js2-strict-var-redeclaration-warning nil)
+          (activate-flow-js2-mode)))
 
       (add-hook 'js2-mode-hook 'eqyiel/js2-mode-hook)
-
-      (add-hook 'js2-mode-hook 'eqyiel/company-js2-mode-hook)
 
       ;; https://emacs.stackexchange.com/questions/22044/treat-shebang-as-a-comment
       (modify-syntax-entry ?# ". 1" js2-mode-syntax-table)

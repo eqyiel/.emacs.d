@@ -1405,20 +1405,38 @@ Check out this for tips: https://vxlabs.com/2017/02/07/mu4e-0-9-18-e-mailing-wit
 
 #+begin_src emacs-lisp
   (defun eqyiel/mu4e-any-message-field-at-point (msg header)
-    "Quick & dirty way to get an arbitrary header HEADER from MSG. Requires the
-  'formail' tool from procmail."
+    "Quick & dirty way to get an arbitrary header HEADER from MSG.
+
+  Requires the 'formail' tool from procmail.
+
+  This is a thing because `mu4e-message-field' doesn't support getting arbitrary
+  fields, such as X-GitHub-Sender."
      (replace-regexp-in-string "\n$" ""
        (shell-command-to-string
          (concat "formail -x " header " -c < "
            (shell-quote-argument (mu4e-message-field msg :path))))))
 
   (defun eqyiel/mu4e-get-x-github-sender (msg)
+    "Get the X-Github-Sender field from a MSG"
     (s-trim (eqyiel/mu4e-any-message-field-at-point msg "X-GitHub-Sender")))
+
+  (defun eqyiel/mu4e-refile-sent-items-to-sent-folder (sent-folder refile-folder)
+    "When I'm refiling a thread I usually just mash the r key.
+
+  Because I have `mu4e-headers-include-related' that means that mesages from me
+  will also be refiled.  I'd prefer if they didn't get moved from
+  `mu4e-sent-folder' to `mu4e-refile-folder', so this function returns a function
+  that a suitable setting for `mu4e-refile-folder' and avoids refiling from
+  SENT-FOLDER into REFILE-FOLDER."
+    `(lambda (message)
+      (if (s-ends-with-p "Sent" (mu4e-message-field msg :maildir) t)
+          ,sent-folder
+        ,refile-folder)))
 
   (use-package mu4e
     :config
     (progn
-      (use-package org-mime :ensure t)
+      (use-package org-mime :ensure t :demand t)
       (defun eqyiel/htmlize-and-send ()
         "When in an org-mu4e-compose-org-mode message, htmlize and send it."
         (interactive)
@@ -1434,11 +1452,9 @@ Check out this for tips: https://vxlabs.com/2017/02/07/mu4e-0-9-18-e-mailing-wit
        (if (eq system-type 'darwin)
            "mbsync ruben@mangochutney.com.au"
          "mbsync -a"))
-      ;;rename files when moving
-      ;;NEEDED FOR MBSYNC?
       (use-package org-mu4e :defer t :ensure nil :config (setq org-mu4e-convert-to-html t))
       (use-package simple :ensure nil :config (setq mail-user-agent 'mu4e-user-agent))
-      (setq mu4e-change-filenames-when-moving t)
+      (setq mu4e-change-filenames-when-moving t) ;; needed for mbsync?
       (setq mu4e-maildir eqyiel/mail-directory)
       (setq mu4e-sent-folder eqyiel/mail-directory)
       (setq mu4e-compose-format-flowed t) ;; https://www.ietf.org/rfc/rfc3676.txt
@@ -1493,9 +1509,12 @@ Check out this for tips: https://vxlabs.com/2017/02/07/mu4e-0-9-18-e-mailing-wit
                     (string=
                      (mu4e-message-field msg :maildir)
                      "/ruben@maher.fyi")))
-                :vars '((user-mail-address . "ruben@maher.fyi")
+                :vars `((user-mail-address . "ruben@maher.fyi")
                         (mu4e-sent-folder . "/ruben@maher.fyi/Sent")
-                        (mu4e-refile-folder . "/ruben@maher.fyi/Archive")
+                        (mu4e-refile-folder
+                         . ,(eqyiel/mu4e-refile-sent-items-to-sent-folder
+                            "/ruben@maher.fyi/Sent"
+                            "/ruben@maher.fyi/Archive"))
                         (mu4e-drafts-folder . "/ruben@maher.fyi/Drafts")
                         (mu4e-trash-folder . "/ruben@maher.fyi/Trash")
                         (mu4e-sent-messages-behavior . sent)
@@ -1509,9 +1528,12 @@ Check out this for tips: https://vxlabs.com/2017/02/07/mu4e-0-9-18-e-mailing-wit
                             ("/ruben@maher.fyi/Sent"    . ?s)))))
               ,(make-mu4e-context
                 :name "r@rkm.id.au"
-                :vars '((user-mail-address . "r@rkm.id.au")
+                :vars `((user-mail-address . "r@rkm.id.au")
                         (mu4e-sent-folder . "/ruben@maher.fyi/Sent")
-                        (mu4e-refile-folder . "/ruben@maher.fyi/Archive")
+                        (mu4e-refile-folder
+                         . ,(eqyiel/mu4e-refile-sent-items-to-sent-folder
+                            "/ruben@maher.fyi/Sent"
+                            "/ruben@maher.fyi/Archive"))
                         (mu4e-drafts-folder . "/ruben@maher.fyi/Drafts")
                         (mu4e-trash-folder . "/ruben@maher.fyi/Trash")
                         (mu4e-sent-messages-behavior . sent)
@@ -1531,18 +1553,23 @@ Check out this for tips: https://vxlabs.com/2017/02/07/mu4e-0-9-18-e-mailing-wit
                     (string=
                      (mu4e-message-field msg :maildir)
                      "/mahe0054@flinders.edu.au")))
-                :vars '((user-mail-address . "mahe0054@flinders.edu.au")
+                :vars `((user-mail-address . "mahe0054@flinders.edu.au")
                         (mu4e-sent-folder . "/ruben@maher.fyi/Sent")
-                        (mu4e-refile-folder . "/ruben@maher.fyi/Archive")
+                        (mu4e-refile-folder
+                         . ,(eqyiel/mu4e-refile-sent-items-to-sent-folder
+                            "/ruben@maher.fyi/Sent"
+                            "/ruben@maher.fyi/Archive"))
                         (mu4e-drafts-folder . "/ruben@maher.fyi/Drafts")
                         (mu4e-trash-folder . "/ruben@maher.fyi/Trash")
                         (mu4e-sent-messages-behavior . sent)
                         (mu4e-compose-crypto-reply-policy . sign-and-encrypt)
                         (mu4e-maildir-shortcuts
-                         . (("/mahe0054@flinders.edu.au/Inbox"      . ?i)
-                            ("/mahe0054@flinders.edu.au/Archive"    . ?a)
-                            ("/mahe0054@flinders.edu.au/Trash"      . ?t)
-                            ("/mahe0054@flinders.edu.au/Sent Items" . ?s)))))
+                         . (("/ruben@maher.fyi/Inbox"   . ?i)
+                            ("/ruben@maher.fyi/Archive" . ?a)
+                            ("/ruben@maher.fyi/GitHub"  . ?g)
+                            ("/ruben@maher.fyi/Lists"   . ?l)
+                            ("/ruben@maher.fyi/Trash"   . ?t)
+                            ("/ruben@maher.fyi/Sent"    . ?s)))))
               ,(make-mu4e-context
                 :name "mangochutney"
                 :match-func
@@ -1550,9 +1577,12 @@ Check out this for tips: https://vxlabs.com/2017/02/07/mu4e-0-9-18-e-mailing-wit
                   (when msg
                     (string= (mu4e-message-field msg :maildir)
                              "/ruben@mangochutney.com.au")))
-                :vars '((user-mail-address . "ruben@mangochutney.com.au")
+                :vars `((user-mail-address . "ruben@mangochutney.com.au")
                         (mu4e-sent-folder . "/ruben@mangochutney.com.au/Sent Mail")
-                        (mu4e-refile-folder . "/ruben@mangochutney.com.au/All Mail")
+                        (mu4e-refile-folder
+                         . ,(eqyiel/mu4e-refile-sent-items-to-sent-folder
+                            "/ruben@mangochutney.com.au/Sent Mail"
+                            "/ruben@mangochutney.com.au/All Mail"))
                         (mu4e-drafts-folder . "/ruben@mangochutney.com.au/Drafts")
                         (mu4e-trash-folder . "/ruben@mangochutney.com.au/Bin")
                         ;; GMail already takes care of keeping copies in the sent

@@ -2125,10 +2125,7 @@ Export ~org~ files to Github-flavoured markdown.
         (interactive)
         (web-mode))
 
-      (defun eqyiel/rjsx-mode-hook ()
-        (activate-flow-js2-mode))
-
-      (add-hook 'rjsx-mode-hook 'eqyiel/rjsx-mode-hook)
+      (add-hook 'rjsx-mode-hook 'eqyiel/js2-mode-hook)
 
       (defun eqyiel/company-rjsx-mode-hook ()
         (set (make-local-variable 'company-backends)

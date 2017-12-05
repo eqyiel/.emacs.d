@@ -766,134 +766,132 @@ So diminish ~auto-fill-function~, not ~auto-fill-mode~.
 ** ~circe~                                                           :melpa:
 
 #+begin_src emacs-lisp
-  (defun eqyiel/irc ()
-    "Connect to IRC."
-    (interactive)
-    (eqyiel/circe-setup-networks)
-    (circe "freenode"))
+    (defun eqyiel/irc ()
+      "Connect to IRC."
+      (interactive)
+      (eqyiel/circe-setup-networks)
+      (circe "freenode"))
 
-  (defun eqyiel/circe-setup-networks ()
-    (setq
-     circe-network-options
-     `(("freenode"
-        :nick "eqyiel"
-        :host "irc.freenode.net"
-        :service "6697"
-        :tls t
-        :pass (password-store-get "www/irc.freenode.net")))))
+    (defun eqyiel/circe-setup-networks ()
+      (setq
+       circe-network-options
+       `(("freenode"
+          :nick "eqyiel"
+          :host "irc.freenode.net"
+          :service "6697"
+          :tls t
+          :pass ,(password-store-get "www/irc.freenode.net")))))
 
-  (defun eqyiel/circe-clear-passwords ()
-    (if (boundp 'circe-network-options)
-        (dolist (network circe-network-options)
-          (plist-put (cdr network) :pass nil))))
+    (defun eqyiel/circe-clear-passwords ()
+      (if (boundp 'circe-network-options)
+          (dolist (network circe-network-options)
+            (plist-put (cdr network) :pass nil))))
 
-  (defun eqyiel/circe-wait-for-authentication ()
-    (setq eqyiel/circe-authentications-count
-          (+ 1 eqyiel/circe-authentications-count))
-    (unless (> (length circe-network-options)
-               eqyiel/circe-authentications-count)
+    (defun eqyiel/circe-wait-for-authentication ()
+      (setq eqyiel/circe-authentications-count
+            (+ 1 eqyiel/circe-authentications-count))
+      (unless (> (length circe-network-options)
+                 eqyiel/circe-authentications-count)
+        (progn
+          (eqyiel/circe-clear-passwords)
+          (setq eqyiel/circe-authentications-count 0))))
+
+    (defun eqyiel/circe-set-margin ()
+      (setq right-margin-width 5))
+
+    (defvar eqyiel/circe-authentications-count 0
+      "Clear passwords after this many authentications have been seen.")
+
+    ;; Warning: this is very dumb
+    ;;
+    ;; ZNC's MOTD is 25 lines.
+    ;; I have two networks defined in `circe-network-options'.
+    ;; So wait to see 50 notices from ZNC before enabling notifications.
+    (defvar eqyiel/circe-znc-notices 0
+      "How many notices have we received from ZNC?")
+
+    (defvar eqyiel/circe-znc-motd-length 25
+      "How many lines are in ZNC's MOTD?")
+
+    (defun eqyiel/circe-znc-count-networks ()
+      "Return the number of networks in `circe-network-options' multiplied by
+      `eqyiel/circe-znc-motd-length', so we can know how many notices to expect before
+      enabling notifications."
+      (* eqyiel/circe-znc-motd-length (length circe-network-options)))
+
+    (defun eqyiel/circe-wait-for-znc (nick userhost _command target text)
+      "If this TEXT from NICK and USERHOST looks like a line of ZNC's MOTD,
+      increment `eqyiel/circe-znc-notices', and enable notifications if there have
+      been at least `eqyiel/circe-znc-count-networks' `eqyiel/circe-znc-notices'."
+      (when (and (string-equal nick "*status")
+                 (string-equal userhost "znc@znc.in"))
+        (setq eqyiel/circe-znc-notices (+ 1 eqyiel/circe-znc-notices))
+        (message "That's %d ..." eqyiel/circe-znc-notices)
+        (when (<= (eqyiel/circe-znc-count-networks) eqyiel/circe-znc-notices)
+          (message "OK.")
+          (advice-remove 'circe-display-NOTICE 'eqyiel/circe-wait-for-znc)
+          (enable-circe-notifications))))
+
+    (defun eqyiel/enable-circe-notifications ()
+      (interactive)
+      (advice-add 'circe-display-NOTICE :after 'eqyiel/circe-wait-for-znc)
+      (advice-add 'circe-reconnect-all :before
+                  'eqyiel/disable-circe-notifications))
+
+    (defun eqyiel/disable-circe-notifications ()
+      (interactive)
+      (disable-circe-notifications)
+      (setq eqyiel/circe-znc-notices 0)
+      (advice-add 'circe-display-NOTICE :after 'eqyiel/circe-wait-for-znc))
+
+    (use-package circe
+      :config
       (progn
-        (eqyiel/circe-clear-passwords)
-        (setq eqyiel/circe-authentications-count 0))))
+        (require 'circe-chanop)
+        (require 'circe-color-nicks)
 
-  (defun eqyiel/circe-set-margin ()
-    (setq right-margin-width 5))
+        (use-package alert :ensure t :defer t)
 
-  (defvar eqyiel/circe-authentications-count 0
-    "Clear passwords after this many authentications have been seen.")
+        (use-package circe-notifications
+          :load-path "site-lisp/circe-notifications"
+          :config
+          (progn (setq circe-notifications-watch-strings
+                       '("eqyiel" "versapunk" "nyarlu" "eqyiel1" "fthagn" "forcer")
+                       circe-notifications-alert-style 'osx-notifier
+                       circe-notifications-wait-for 30))
+          :ensure nil
+          :demand t)
 
-  (use-package circe
-    :config
-    (progn
-      (require 'circe-chanop)
-      (require 'circe-color-nicks)
-      (setq circe-default-quit-message
-            "( ' ヮ')ノ.・ﾟ*｡・.・ﾟ*｡・.・ﾟ*｡・ヽ(ﾟДﾟ,,)ノ"
-            circe-default-part-message
-            "( ' ヮ')ノ.・ﾟ*｡・.・ﾟ*｡・.・ﾟ*｡・ヽ(ﾟДﾟ,,)ノ"
-            circe-highlight-nick-type 'all
-            circe-reduce-lurker-spam nil ;; sometimes, I want to see this
-            circe-format-say "<{nick}> {body}"
-            circe-format-self-say "<{nick}> {body}"
-            circe-color-nicks-everywhere t
-            lui-highlight-keywords '("eqyiel")
-            lui-time-stamp-position 'right-margin
-            lui-time-stamp-format "%H:%M"
-            lui-flyspell-p t
-            lui-max-buffer-size 10000
-            lui-fill-column 70
-            lui-fill-type 'variable
-            lui-flyspell-alist '(("." "en_GB")))
-      (add-hook 'circe-channel-mode-hook 'turn-on-flyspell)
-      (enable-circe-color-nicks))
-    :init
-    (progn
-      (use-package pass)
-      (advice-add 'circe-reconnect-all :before 'eqyiel/circe-setup-networks)
-      ;; (add-hook 'circe-server-connected-hook
-      ;;           'eqyiel/circe-wait-for-authentication)
-      (add-hook 'circe-server-connected-hook
-                'enable-circe-notifications)
-      (add-hook 'lui-mode-hook 'eqyiel/circe-set-margin))
-    :ensure t)
-#+end_src
+        (use-package pass :demand t)
 
-** ~circe-notifications~                                         :submodule:
-
-#+begin_src emacs-lisp
-  ;; Warning: this is very dumb
-  ;;
-  ;; ZNC's MOTD is 25 lines.
-  ;; I have two networks defined in `circe-network-options'.
-  ;; So wait to see 50 notices from ZNC before enabling notifications.
-  (defvar eqyiel/circe-znc-notices 0
-    "How many notices have we received from ZNC?")
-
-  (defvar eqyiel/circe-znc-motd-length 25
-    "How many lines are in ZNC's MOTD?")
-
-  (defun eqyiel/circe-znc-count-networks ()
-    "Return the number of networks in `circe-network-options' multiplied by
-    `eqyiel/circe-znc-motd-length', so we can know how many notices to expect before
-    enabling notifications."
-    (* eqyiel/circe-znc-motd-length (length circe-network-options)))
-
-  (defun eqyiel/circe-wait-for-znc (nick userhost _command target text)
-    "If this TEXT from NICK and USERHOST looks like a line of ZNC's MOTD,
-    increment `eqyiel/circe-znc-notices', and enable notifications if there have
-    been at least `eqyiel/circe-znc-count-networks' `eqyiel/circe-znc-notices'."
-    (when (and (string-equal nick "*status")
-               (string-equal userhost "znc@znc.in"))
-      (setq eqyiel/circe-znc-notices (+ 1 eqyiel/circe-znc-notices))
-      (message "That's %d ..." eqyiel/circe-znc-notices)
-      (when (<= (eqyiel/circe-znc-count-networks) eqyiel/circe-znc-notices)
-        (message "OK.")
-        (advice-remove 'circe-display-NOTICE 'eqyiel/circe-wait-for-znc)
-        (enable-circe-notifications))))
-
-  (defun eqyiel/enable-circe-notifications ()
-    (interactive)
-    (advice-add 'circe-display-NOTICE :after 'eqyiel/circe-wait-for-znc)
-    (advice-add 'circe-reconnect-all :before
-                'eqyiel/disable-circe-notifications))
-
-  (defun eqyiel/disable-circe-notifications ()
-    (interactive)
-    (disable-circe-notifications)
-    (setq eqyiel/circe-znc-notices 0)
-    (advice-add 'circe-display-NOTICE :after 'eqyiel/circe-wait-for-znc))
-
-  (use-package circe-notifications
-    :load-path "site-lisp/circe-notifications"
-    :after circe alert
-    :init (use-package alert :ensure t :defer t)
-    :config
-    (setq circe-notifications-watch-strings
-          '("eqyiel" "versapunk" "nyarlu" "eqyiel1" "fthagn" "forcer")
-          circe-notifications-alert-style 'osx-notifier
-          circe-notifications-wait-for 30)
-    :init (eqyiel/enable-circe-notifications)
-    :ensure nil)
+        (setq circe-default-quit-message
+              "( ' ヮ')ノ.・ﾟ*｡・.・ﾟ*｡・.・ﾟ*｡・ヽ(ﾟДﾟ,,)ノ"
+              circe-default-part-message
+              "( ' ヮ')ノ.・ﾟ*｡・.・ﾟ*｡・.・ﾟ*｡・ヽ(ﾟДﾟ,,)ノ"
+              circe-highlight-nick-type 'all
+              circe-reduce-lurker-spam nil ;; sometimes, I want to see this
+              circe-format-say "<{nick}> {body}"
+              circe-format-self-say "<{nick}> {body}"
+              circe-color-nicks-everywhere t
+              lui-highlight-keywords '("eqyiel")
+              lui-time-stamp-position 'right-margin
+              lui-time-stamp-format "%H:%M"
+              lui-flyspell-p t
+              lui-max-buffer-size 10000
+              lui-fill-column 70
+              lui-fill-type 'variable
+              lui-flyspell-alist '(("." "en_GB")))
+        (add-hook 'circe-channel-mode-hook 'turn-on-flyspell)
+        (enable-circe-color-nicks))
+      :init
+      (progn
+        (advice-add 'circe-reconnect-all :before 'eqyiel/circe-setup-networks)
+        ;; (add-hook 'circe-server-connected-hook
+        ;;           'eqyiel/circe-wait-for-authentication)
+        (add-hook 'circe-server-connected-hook
+                  'enable-circe-notifications)
+        (add-hook 'lui-mode-hook 'eqyiel/circe-set-margin))
+      :ensure t)
 #+end_src
 
 ** ~column-enforce-mode~                                             :melpa:

@@ -656,9 +656,11 @@ text!/.
 (require 'atomic-chrome)
 (atomic-chrome-start-server)
 
-** ~auth-source-pass~                                              :builtin:
+** ~auth-password-store~                                             :melpa:
+Note that is this is included as ~auth-source-pass~ in Emacs 26 and up.
+
 #+begin_src emacs-lisp
-  (use-package auth-source-pass
+  (use-package auth-password-store
     :after auth-source
     :init
     (progn
@@ -686,12 +688,6 @@ So diminish ~auto-fill-function~, not ~auto-fill-mode~.
 
 #+begin_src emacs-lisp
   (use-package simple :ensure nil :diminish auto-fill-function)
-#+end_src
-
-** ~bbdb~                                                            :melpa:
-#+begin_src emacs-lisp
-  (use-package bbdb :ensure t)
-  (use-package bbdb-vcard :ensure t)
 #+end_src
 
 ** ~beacon~                                                          :melpa:
@@ -1059,11 +1055,6 @@ So diminish ~auto-fill-function~, not ~auto-fill-mode~.
 #+begin_src emacs-lisp
   (use-package expand-region
     :bind (("C-=" . er/expand-region)))
-#+end_src
-
-** ~flx~                                                             :melpa:
-#+begin_src emacs-lisp
-(use-package flx :ensure t)
 #+end_src
 
 ** ~flycheck~                                                        :melpa:

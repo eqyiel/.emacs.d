@@ -54,7 +54,7 @@
     (concat
      (directory-file-name
       (expand-file-name eqyiel/home-directory))
-     "/org"))
+     "/sync/org"))
 
   (defvar eqyiel/timezone "Australia/Adelaide")
 #+end_src

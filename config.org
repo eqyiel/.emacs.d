@@ -2001,33 +2001,12 @@ Export ~org~ files to Github-flavoured markdown.
       (and (file-readable-p prettier-package-path)
            (file-exists-p prettier-package-path))))
 
-  (defun eqyiel/prettier-find-project-local-prettier-cmd ()
-    "Find the name of the local prettier command (something under
-  \"./node_modules/.bin\") if it exists."
-    (condition-case nil
-        (let* ((js-project-root (eqyiel/prettier-locate-js-project-root default-directory))
-               (prettier-package-name (eqyiel/prettier-find-prettier-in-package-file
-                                       (concat js-project-root "/package.json")))
-               (prettier-package-file (concat js-project-root "/node_modules/"
-                                              prettier-package-name "/package.json"))
-               (package-file-as-string (json-read-file prettier-package-file))
-               (local-prettier-cmd
-                (caar
-                 (delq nil
-                       (mapcar
-                        (lambda (element)
-                          (assoc
-                           element
-                           (cdr (assoc 'bin package-file-as-string))))
-                        '(prettier prettier-eslint))))))
-          (when local-prettier-cmd (symbol-name local-prettier-cmd)))
-      (error nil)))
-
-  (defun eqyiel/prettier-make-project-local-prettier-cmd-path ()
+  ;; TODO: make this more generic so that it can be used for other project-local
+  ;; js things
+  (defun eqyiel/prettier-make-project-local-prettier-cmd-path (local-prettier-cmd)
     "Construct the path to the local prettier command (something under
   \"./node_modules/.bin\") if it exists."
-    (let ((js-project-root (eqyiel/prettier-locate-js-project-root default-directory))
-          (local-prettier-cmd (eqyiel/prettier-find-project-local-prettier-cmd)))
+    (let ((js-project-root (eqyiel/prettier-locate-js-project-root default-directory)))
       (when local-prettier-cmd
         (concat js-project-root "/node_modules/.bin/" local-prettier-cmd))))
 
@@ -2035,7 +2014,7 @@ Export ~org~ files to Github-flavoured markdown.
     "Set `prettier-js-command' to the prettier command in the project path if
   found."
     (let* ((local-prettier-cmd-path
-            (eqyiel/prettier-make-project-local-prettier-cmd-path)))
+            (eqyiel/prettier-make-project-local-prettier-cmd-path "prettier")))
       (when local-prettier-cmd-path
         (set (make-local-variable 'prettier-js-command)
              local-prettier-cmd-path))))
@@ -2057,7 +2036,7 @@ Export ~org~ files to Github-flavoured markdown.
                         (when (or (string-equal web-mode-content-type "javascript")
                                   (string-equal web-mode-content-type "jsx"))
                           (eqyiel/prettier-js-mode-hook)))))
-    :config (setq prettier-js-command "prettier-eslint")
+    :config (setq prettier-js-command "prettier")
     :defer t
     :ensure t)
 #+END_SRC

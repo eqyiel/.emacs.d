@@ -634,6 +634,133 @@
       (switch-to-buffer (sql-comint-postgres 'postgres sql-postgres-options))))
 #+end_src
 
+** Functions for working with node projects
+
+#+BEGIN_EXAMPLE
+ (eqyiel/node-find-dependency-in-package-file
+  (f-join (eqyiel/node-locate-js-project-root) "package.json")
+  '(prettier prettier-eslint-cli))
+ ;; => "prettier"
+
+(eqyiel/node-find-dependency-in-package-file
+  (f-join (eqyiel/node-locate-js-project-root) "package.json")
+  "lodash")
+ ;; => "lodash"
+
+(eqyiel/node-find-dependency-in-package-file
+  (f-join (eqyiel/node-locate-js-project-root) "package.json")
+  "react")
+ ;; => nil
+#+END_EXAMPLE
+
+#+BEGIN_SRC emacs-lisp
+  (use-package f :ensure t :demand)
+  (use-package json :ensure t :demand)
+
+  (defun eqyiel/node-locate-js-project-root ()
+    "Find the dir containing package.json by walking up the dir tree from PATH.
+  Returns current working directory if no package.json was found found."
+    (locate-dominating-file
+     (or (buffer-file-name) default-directory)
+     "package.json"))
+
+  (defun eqyiel/node-find-dependency-in-package-file (package-file dependency)
+    "Return t if prettier exists in PACKAGE-FILE.
+
+  PACKAGE-FILE should be is the absolute path to \"package.json\".  DEPENDENCY
+  should be a list of symbols in which case the first one that is found will
+  return or a string."
+    (condition-case nil
+        ;; silence errors from `json-read-file' if package.json is malformed
+        ;; (for example, while resolving merge conflicts)
+        (when (and (f-readable-p package-file)
+                   (f-exists-p package-file))
+          (let* ((package-file-as-string
+                  (json-read-file package-file))
+                 (node-dependency
+                  (caar
+                   (delq
+                    nil
+                    (mapcar
+                     (lambda (element)
+                       (assoc (cdr element)
+                              (assoc (car element) package-file-as-string)))
+                     (-mapcat
+                      (lambda (item)
+                        (-concat `(,(cons 'dependency item)
+                                   ,(cons 'devDependencies item))))
+
+                      (if (listp dependency)
+                          dependency (list (intern dependency)))))))))
+            (when node-dependency (symbol-name node-dependency))))
+      (error nil)))
+
+  (defun eqyiel/node-package-path-exists-p (js-project-root resolved-dependency)
+    "Construct the path in JS-PROJECT-ROOT to RESOLVED-DEPENDENCY."
+    (let* ((dependency-package-path
+            (eqyiel/node-find-dependency-package-path
+             js-project-root resolved-dependency)))
+      (and (f-readable-p dependency-package-path)
+           (f-exists-p dependency-package-path))))
+
+  (defun eqyiel/node-should-use-package-p (js-project-root dependency)
+    "Check JS-PROJECT-ROOT has DEPENDENCY in both package.json and node_modules.
+  DEPENDENCY should be a list of symbols (in which case the first one that is
+  found will return) or a string."
+    (let ((resolved-dependency
+           (eqyiel/node-find-dependency-in-package-file
+            (f-join js-project-root "package.json") dependency)))
+      (and resolved-dependency
+           (eqyiel/node-package-path-exists-p
+            js-project-root resolved-dependency))))
+
+  (defun eqyiel/node-find-dependency-package-path (js-project-root dependency)
+    "Using JS-PROJECT-ROOT, get the path to the first resolved DEPENDENCY."
+    (f-join
+     js-project-root
+     "node_modules/"
+     (eqyiel/node-find-dependency-in-package-file
+      (f-join js-project-root "package.json") dependency)))
+
+  (defun eqyiel/node-find-project-local-executable (js-project-root dependency)
+    "Construct the path in JS-PROJECT-ROOT to executable DEPENDENCY."
+    (condition-case nil
+        (let* ((dependency-package-name
+                (eqyiel/node-find-dependency-in-package-file
+                 (f-join js-project-root "package.json") dependency))
+               (dependency-package-file
+                (f-join js-project-root "node_modules/"
+                        dependency-package-name "package.json"))
+               (package-file-as-string (json-read-file dependency-package-file))
+               (local-project-executable
+                (if (listp (cdr (assoc 'bin package-file-as-string)))
+                    (caar
+                     (delq nil
+                           (mapcar
+                            (lambda (element)
+                              (assoc
+                               element
+                               (cdr (assoc 'bin package-file-as-string))))
+                            (if (listp dependency)
+                                dependency (list (intern dependency))))))
+                  (cdr (assoc 'bin package-file-as-string)))))
+          (if (symbolp local-project-executable)
+              (symbol-name local-project-executable)
+            local-project-executable))
+      (error nil)))
+
+  (defun eqyiel/node-find-project-local-executable-path (js-project-root dependency)
+    "Make path in JS-PROJECT-ROOT for executable DEPENDENCY."
+    (let* ((local-project-executable
+            (eqyiel/node-find-project-local-executable
+             js-project-root dependency)))
+      (when local-project-executable
+        (f-join
+         (eqyiel/node-find-dependency-package-path js-project-root dependency)
+         local-project-executable))))
+#+END_SRC
+
+
 * Packages
 ** ~aggressive-indent-mode~                                          :melpa:
 #+BEGIN_SRC emacs-lisp
@@ -1939,93 +2066,22 @@ Export ~org~ files to Github-flavoured markdown.
   (use-package php-mode)
 #+end_src
 
-** ~pkgbuild-mode~                                                   :melpa:
-#+begin_src emacs-lisp
-  (use-package pkgbuild-mode
-    :init (add-to-list 'auto-mode-alist '("/PKGBUILD$" . pkgbuild-mode)))
-#+end_src
-
 ** ~prettier-emacs~                                                  :melpa:
 #+BEGIN_SRC emacs-lisp
-  (defun eqyiel/prettier-locate-js-project-root (path)
-    "Find the dir containing package.json by walking up the dir tree from PATH.
-  Returns current working directory if no package.json was found found."
-    (directory-file-name
-     (expand-file-name
-      (or (locate-dominating-file path "package.json")
-          default-directory))))
-
-  (defun eqyiel/prettier-find-prettier-in-package-file (package-file)
-    "Return t if prettier exists in PACKAGE-FILE."
-    (condition-case nil
-        ;; silence errors from `json-read-file' if package.json is malformed
-        ;; (for example, while resolving merge conflicts)
-        (when (and (file-readable-p package-file)
-                   (file-exists-p package-file))
-          (let* ((package-file-as-string
-                  (json-read-file package-file))
-                 (prettier-package
-                  (caar
-                   (delq
-                    nil
-                    (mapcar
-                     (lambda (element)
-                       (assoc (cdr element)
-                              (assoc (car element) package-file-as-string)))
-                     (-mapcat
-                      (lambda (item)
-                        (-concat `(,(cons 'dependencies item)
-                                   ,(cons 'devDependencies item))))
-                      '(prettier prettier-eslint-cli)))))))
-            (when prettier-package (symbol-name prettier-package))))
-      (error nil)))
-
-  (defun eqyiel/prettier-should-format-with-prettier-p ()
-    "Return t if prettier found in both package.json and node_modules."
-    (and (eqyiel/prettier-find-prettier-in-package-file (concat (eqyiel/prettier-locate-js-project-root default-directory) "/package.json"))
-         (eqyiel/prettier-package-path-exists-p)))
-
-  (defun eqyiel/prettier-find-prettier-package-path ()
-    "Construct the path to prettier in the project root."
-    (let ((js-project-root (eqyiel/prettier-locate-js-project-root default-directory)))
-      (concat
-       js-project-root
-       "/node_modules"
-       "/"
-       (eqyiel/prettier-find-prettier-in-package-file
-        (concat js-project-root "/package.json")))))
-
-  (defun eqyiel/prettier-package-path-exists-p ()
-    "Construct the path to prettier in the project root."
-    (let* ((prettier-package-path (eqyiel/prettier-find-prettier-package-path)))
-      (and (file-readable-p prettier-package-path)
-           (file-exists-p prettier-package-path))))
-
-  ;; TODO: make this more generic so that it can be used for other project-local
-  ;; js things
-  (defun eqyiel/prettier-make-project-local-prettier-cmd-path (local-prettier-cmd)
-    "Construct the path to the local prettier command (something under
-  \"./node_modules/.bin\") if it exists."
-    (let ((js-project-root (eqyiel/prettier-locate-js-project-root default-directory)))
-      (when local-prettier-cmd
-        (concat js-project-root "/node_modules/.bin/" local-prettier-cmd))))
-
-  (defun eqyiel/prettier-maybe-make-buffer-local-variables ()
-    "Set `prettier-js-command' to the prettier command in the project path if
-  found."
-    (let* ((local-prettier-cmd-path
-            (eqyiel/prettier-make-project-local-prettier-cmd-path "prettier")))
-      (when local-prettier-cmd-path
-        (set (make-local-variable 'prettier-js-command)
-             local-prettier-cmd-path))))
-
   (defun eqyiel/prettier-js-mode-hook ()
     "Maybe format buffer with prettier on save."
-    (when (eqyiel/prettier-should-format-with-prettier-p)
-      (progn
-        (prettier-js-mode)
-        ;; use the local prettier package if available
-        (eqyiel/prettier-maybe-make-buffer-local-variables))))
+    (require 'prettier-js)
+    (let ((js-project-root (eqyiel/node-locate-js-project-root)))
+      (when (eqyiel/node-should-use-package-p js-project-root '(prettier))
+        (progn
+          (prettier-js-mode)
+          ;; prefer the project's local prettier package before any global one
+          (let ((local-project-prettier-executable
+                 (eqyiel/node-find-project-local-executable-path
+                  js-project-root '(prettier))))
+            (when local-project-prettier-executable
+              (set (make-local-variable 'prettier-js-command)
+                   local-project-prettier-executable)))))))
 
   (use-package prettier-js
     :init (progn
@@ -2154,826 +2210,6 @@ Export ~org~ files to Github-flavoured markdown.
                 ("C-M-s-\"" . eqyiel/toggle-rjsx-mode-to-web-mode)
                 ("H-'" . eqyiel/toggle-rjsx-mode-to-web-mode))
     :ensure t)
-#+end_src
-
-** ~json-mode~                                                       :melpa:
-This package adds itself to ~auto-mode-alist~.
-
-#+begin_src emacs-lisp
-  (use-package json-mode
-    :ensure t
-    :bind (:map json-mode-map
-                ("C-c C-c" . eqyiel/json-run-jq)
-                ("C-c C-m" . eqyiel/json-minify))
-    :config
-    (progn
-      (defun eqyiel/json-run-jq (query &optional arg)
-        "Run jq(1) on current buffer.
-  With prefix argument \\[universal-argument] replace the buffer
-  with the result of running jq(1)."
-        (interactive "sjq query: \nP")
-        (shell-command-on-region
-         (point-min) (point-max)
-         (concat "jq " (shell-quote-argument query))
-         (when arg (current-buffer))
-         (when arg t)))
-
-      (defun eqyiel/json-minify ()
-        "Minify the json at point."
-        (interactive)
-        (goto-char (point-min))
-        (let* ((p (point))
-               (json (json-read)))
-          (delete-region p (point))
-          (save-excursion
-            (insert (json-encode json)))))
-
-      (add-to-list 'auto-mode-alist '("\\.eslintrc.*$" . json-mode))
-      (add-to-list 'auto-mode-alist '("\\.babelrc$" . json-mode)))
-    :init
-    (defun eqyiel/json-mode-hook ()
-      (setq js-indent-level 2
-            json-reformat:indent-width 2))
-    (add-hook 'json-mode-hook 'eqyiel/json-mode-hook))
-#+end_src
-
-** ~key-chord~                                                       :melpa:
-#+begin_src emacs-lisp
-  (use-package key-chord
-    :init
-    (progn
-      (use-package expand-region)
-      (key-chord-mode t)
-      (key-chord-define-global "jk" 'er/expand-region)
-      (key-chord-define-global "kj" 'er/expand-region))
-    :demand)
-#+end_src
-
-** ~legalese~                                                        :melpa:
-#+begin_src emacs-lisp
-  (use-package legalese)
-#+end_src
-
-** ~magit~                                                           :melpa:
-#+begin_src emacs-lisp
-  (use-package magit
-    :init (use-package ivy :ensure t)
-    :config
-    (progn
-      (setq magit-completing-read-function 'ivy-completing-read))
-    :bind
-    (("<f8>" . magit-status)))
-#+end_src
-
-** ~markdown-mode~                                                   :melpa:
-#+begin_src emacs-lisp
-  (use-package markdown-mode
-    :init
-    (progn
-      (add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
-      (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))))
-#+end_src
-
-** ~matrix-client~                                                   :melpa:
-This is no longer on MELPA unfortunately.  This is how I found out that MELPA
-will be contacted on each startup if the package you want to install has
-vanished.
-
-#+begin_src emacs-lisp
-  ;; (use-package matrix-client
-  ;;   :init
-  ;;   (defun eqyiel/launch-matrix-client ()
-  ;;     (interactive)
-  ;;     (matrix-client "eqyiel"))
-  ;;   :config
-  ;;   (setq matrix-homeserver-base-url "https://matrix.rkm.id.au"))
-#+end_src
-
-** ~message~                                                       :builtin:
-#+begin_src emacs-lisp
-  (use-package message
-    :init
-    (setq
-     message-directory eqyiel/mail-directory
-     message-send-mail-function 'message-send-mail-with-sendmail
-     message-cite-function 'message-cite-original-without-signature
-     message-default-charset 'utf-8
-     message-default-mail-headers "Cc: \nBcc: \n"
-     message-from-style 'angles
-     message-generate-headers-first t
-     message-kill-buffer-on-exit t)
-    :defer t
-    :ensure nil)
-#+end_src
-
-** ~mu4e~                                                           :system:
-
-Check out this for tips: https://vxlabs.com/2017/02/07/mu4e-0-9-18-e-mailing-with-emacs-now-even-better/
-
-#+begin_src emacs-lisp
-  (defun eqyiel/mu4e-any-message-field-at-point (msg header)
-    "Quick & dirty way to get an arbitrary header HEADER from MSG. Requires the
-  'formail' tool from procmail."
-     (replace-regexp-in-string "\n$" ""
-       (shell-command-to-string
-         (concat "formail -x " header " -c < "
-           (shell-quote-argument (mu4e-message-field msg :path))))))
-
-  (defun eqyiel/mu4e-get-x-github-sender (msg)
-    (s-trim (eqyiel/mu4e-any-message-field-at-point msg "X-GitHub-Sender")))
-
-  (use-package mu4e
-    :config
-    (progn
-      (use-package org-mime :ensure t)
-      (defun eqyiel/htmlize-and-send ()
-        "When in an org-mu4e-compose-org-mode message, htmlize and send it."
-        (interactive)
-        (when (member 'org~mu4e-mime-switch-headers-or-body post-command-hook)
-          (org-mime-htmlize)
-          (org-mu4e-compose-org-mode)
-          (mu4e-compose-mode)
-          (message-send-and-exit)))
-
-      (add-hook 'org-ctrl-c-ctrl-c-hook 'eqyiel/htmlize-and-send t)
-      (setq
-       mu4e-get-mail-command
-       (if (eq system-type 'darwin)
-           "mbsync ruben@mangochutney.com.au"
-         "mbsync -a"))
-      ;;rename files when moving
-      ;;NEEDED FOR MBSYNC?
-      (use-package org-mu4e :defer t :ensure nil :config (setq org-mu4e-convert-to-html t))
-      (use-package simple :ensure nil :config (setq mail-user-agent 'mu4e-user-agent))
-      (setq mu4e-change-filenames-when-moving t)
-      (setq mu4e-maildir eqyiel/mail-directory)
-      (setq mu4e-sent-folder eqyiel/mail-directory)
-      (setq mu4e-compose-format-flowed t) ;; https://www.ietf.org/rfc/rfc3676.txt
-      (setq mu4e-use-fancy-chars nil)
-      (setq mu4e-attachment-dir eqyiel/downloads-directory)
-      (setq mu4e-completing-read-function 'completing-read)
-      (setq mu4e-index-cleanup t)
-      (setq mu4e-headers-include-related t) ;; needed for proper threading
-      (setq mu4e-headers-results-limit 1500)
-      (setq mu4e-compose-keep-self-cc t)
-      (setq send-mail-function 'message-send-mail-with-sendmail
-            sendmail-program "msmtpq")  ; from gnus config
-      (setq mu4e-view-show-addresses t)
-      (setq
-       mu4e-header-info-custom
-       '((:x-github-sender .
-          (:name "X-Github-Sender"
-                 :shortname "GitHub Handle"
-                 :help "From field with GitHub handle if it exists"
-                 :function eqyiel/mu4e-get-x-github-sender))))
-      (setq mu4e-view-fields
-            '(:from
-              :x-github-sender
-              :to
-              :cc
-              :subject
-              :flags
-              :date
-              :maildir
-              :mailing-list
-              :tags
-              :attachments
-              :signature
-              :decryption))
-      (setq mu4e-view-actions
-            '(("capture message" . mu4e-action-capture-message)
-              ("view as pdf" . mu4e-action-view-as-pdf)
-              ("show this thread" . mu4e-action-show-thread)
-              ("View in browser" . mu4e-action-view-in-browser)
-              ("Eww view" .
-               (lambda (msg)
-                 (eww-browse-url
-                  (concat
-                   "file://"
-                   (mu4e~write-body-to-html msg)))))))
-      (setq mu4e-contexts
-            `(,(make-mu4e-context
-                :name "m ruben@maher.fyi"
-                :match-func
-                (lambda (msg)
-                  (when msg
-                    (string=
-                     (mu4e-message-field msg :maildir)
-                     "/ruben@maher.fyi")))
-                :vars '((user-mail-address . "ruben@maher.fyi")
-                        (mu4e-sent-folder . "/ruben@maher.fyi/Sent")
-                        (mu4e-refile-folder . "/ruben@maher.fyi/Archive")
-                        (mu4e-drafts-folder . "/ruben@maher.fyi/Drafts")
-                        (mu4e-trash-folder . "/ruben@maher.fyi/Trash")
-                        (mu4e-sent-messages-behavior . sent)
-                        (mu4e-compose-crypto-reply-policy . sign-and-encrypt)
-                        (mu4e-maildir-shortcuts
-                         . (("/ruben@maher.fyi/Inbox"   . ?i)
-                            ("/ruben@maher.fyi/Archive" . ?a)
-                            ("/ruben@maher.fyi/GitHub"  . ?g)
-                            ("/ruben@maher.fyi/Lists"   . ?l)
-                            ("/ruben@maher.fyi/Trash"   . ?t)
-                            ("/ruben@maher.fyi/Sent"    . ?s)))))
-              ,(make-mu4e-context
-                :name "r@rkm.id.au"
-                :vars '((user-mail-address . "r@rkm.id.au")
-                        (mu4e-sent-folder . "/ruben@maher.fyi/Sent")
-                        (mu4e-refile-folder . "/ruben@maher.fyi/Archive")
-                        (mu4e-drafts-folder . "/ruben@maher.fyi/Drafts")
-                        (mu4e-trash-folder . "/ruben@maher.fyi/Trash")
-                        (mu4e-sent-messages-behavior . sent)
-                        (mu4e-compose-crypto-reply-policy . sign-and-encrypt)
-                        (mu4e-maildir-shortcuts
-                         . (("/ruben@maher.fyi/Inbox"   . ?i)
-                            ("/ruben@maher.fyi/Archive" . ?a)
-                            ("/ruben@maher.fyi/GitHub"  . ?g)
-                            ("/ruben@maher.fyi/Lists"   . ?l)
-                            ("/ruben@maher.fyi/Trash"   . ?t)
-                            ("/ruben@maher.fyi/Sent"    . ?s)))))
-              ,(make-mu4e-context
-                :name "flinders"
-                :match-func
-                (lambda (msg)
-                  (when msg
-                    (string=
-                     (mu4e-message-field msg :maildir)
-                     "/mahe0054@flinders.edu.au")))
-                :vars '((user-mail-address . "mahe0054@flinders.edu.au")
-                        (mu4e-sent-folder . "/ruben@maher.fyi/Sent")
-                        (mu4e-refile-folder . "/ruben@maher.fyi/Archive")
-                        (mu4e-drafts-folder . "/ruben@maher.fyi/Drafts")
-                        (mu4e-trash-folder . "/ruben@maher.fyi/Trash")
-                        (mu4e-sent-messages-behavior . sent)
-                        (mu4e-compose-crypto-reply-policy . sign-and-encrypt)
-                        (mu4e-maildir-shortcuts
-                         . (("/mahe0054@flinders.edu.au/Inbox"      . ?i)
-                            ("/mahe0054@flinders.edu.au/Archive"    . ?a)
-                            ("/mahe0054@flinders.edu.au/Trash"      . ?t)
-                            ("/mahe0054@flinders.edu.au/Sent Items" . ?s)))))
-              ,(make-mu4e-context
-                :name "mangochutney"
-                :match-func
-                (lambda (msg)
-                  (when msg
-                    (string= (mu4e-message-field msg :maildir)
-                             "/ruben@mangochutney.com.au")))
-                :vars '((user-mail-address . "ruben@mangochutney.com.au")
-                        (mu4e-sent-folder . "/ruben@mangochutney.com.au/Sent Mail")
-                        (mu4e-refile-folder . "/ruben@mangochutney.com.au/All Mail")
-                        (mu4e-drafts-folder . "/ruben@mangochutney.com.au/Drafts")
-                        (mu4e-trash-folder . "/ruben@mangochutney.com.au/Bin")
-                        ;; GMail already takes care of keeping copies in the sent
-                        ;; folder
-                        (mu4e-sent-messages-behavior . delete)
-                        (mu4e-maildir-shortcuts
-                         . (("/ruben@mangochutney.com.au/All Mail"  . ?i)
-                            ("/ruben@mangochutney.com.au/Drafts"    . ?d)
-                            ("/ruben@mangochutney.com.au/Bin"       . ?t)
-                            ("/ruben@mangochutney.com.au/Sent Mail" . ?s))))))))
-    :init (use-package org-mu4e :ensure nil :demand)
-    :bind (("<f4>" . mu4e)
-           ("C-x m" . mu4e-compose-new))
-    :demand
-    :ensure nil
-    :load-path "/run/current-system/sw/share/emacs/site-lisp/mu4e")
-#+end_src
-
-** ~multiple-cursors~                                                :melpa:
-#+begin_src emacs-lisp
-  (use-package multiple-cursors
-    :config
-    (setq
-     mc/always-run-for-all t
-     mc/list-file (concat eqyiel/xdg-cache-home "/emacs/mc-lists.el"))
-    :bind (("C-M-*" . mc/edit-lines)
-           ("C->" . mc/mark-next-like-this)
-           ("C-<" . mc/mark-previous-like-this)
-           ("C-8" . mc/mark-all-like-this)
-           ("C-*" . mc/mark-all-like-this)))
-#+end_src
-** ~nix-emacs~                                                     :subtree:
-#+begin_src emacs-lisp
-  (use-package company-nixos-options
-    :after (company nix-mode)
-    :demand
-    :ensure nil
-    :load-path "site-lisp/travisbhartwell/nix-emacs")
-
-  (use-package nixos-options
-    :ensure nil
-    :after nix-mode
-    :load-path "site-lisp/travisbhartwell/nix-emacs")
-#+end_src
-
-** ~nix-mode~                                                      :subtree:
-#+begin_src emacs-lisp
-  (use-package nix-mode
-    :ensure nil
-    :commands (nix-mode nix-repl-show nix-format-buffer)
-    :init (add-to-list 'auto-mode-alist '("\\.nix\\'" . nix-mode))
-    :load-path "site-lisp/nixos/nix-mode")
-
-  (use-package nix-shell
-    :ensure nil
-    :commands nix-shell
-    :load-path "site-lisp/nixos/nix-mode")
-#+end_src
-
-** ~no-littering~                                                    :melpa:
-#+BEGIN_SRC emacs-lisp
-  (use-package no-littering :ensure t)
-#+END_SRC
-
-** ~nodejs-repl~                                                     :melpa:
-#+begin_src emacs-lisp
-  (use-package nodejs-repl :ensure t)
-#+end_src
-
-** ~org-caldav~                                                      :melpa:
-
-The goal here is to sync everything that has the tag ~:shared:~.  I would prefer
-to do ~(setq org-caldav-select-tags '("shared"))~ but it ~ox-icalendar.el~ seems
-to ignore it.
-
-I also tried setting ~(setq org-caldav-skip-conditions '(notregexp ":shared:"))~
-but the trouble with that is that ~org-agenda-skip-if~ uses boolean ~OR~ to
-combine the results from different tests, and I also want to exclude items with
-todo keywords ~DONE~.  Negating a regular expression is [[https://stackoverflow.com/questions/2217928/][difficult in Emacs lisp]],
-so the only thing left to do is advise ~org-caldav-skip-function~ so that I can
-use ~AND~ instead of ~OR~.
-
-#+begin_src emacs-lisp
-  (use-package org-caldav
-    :ensure t
-    :config
-    (progn
-      (advice-add
-       'org-caldav-skip-function :override
-       (lambda (backend)
-         (when (eq backend 'icalendar)
-           (org-map-entries
-            (lambda ()
-              (let ((pt (and
-                         (org-agenda-skip-if 'notregexp '(":shared:"))
-                         (org-agenda-skip-if 'todo '("DONE")))))
-                (when pt
-                  (delete-region (point) pt))))))))
-
-      (setq
-       org-caldav-calendar-id "org"
-       org-caldav-delete-org-entries 'ask
-       org-caldav-files (directory-files eqyiel/org-directory t "\\.org$")
-       org-caldav-inbox (concat eqyiel/org-directory "/org-caldav-inbox.org")
-       org-caldav-save-directory (concat eqyiel/xdg-cache-home "/emacs")
-       org-caldav-url "https://cloud.maher.fyi/remote.php/dav/calendars/eqyiel"
-       org-icalendar-include-todo t
-       org-caldav-skip-conditions t ; must be truthy to run `org-caldav-skip-function'
-       org-icalendar-timezone eqyiel/timezone
-       org-icalendar-use-scheduled '(event-if-todo))))
-#+end_src
-
-** ~org-cliplink~                                                    :melpa:
-A tool to insert a link in the clipboard as an ~org-mode~ link at point.
-
-#+BEGIN_SRC emacs-lisp
-(use-package org-cliplink :ensure t :bind (("H-i" . org-cliplink)))
-#+END_SRC
-
-** ~org-download~                                                    :melpa:
-#+begin_src emacs-lisp
-  (use-package org-download
-    :config (setq org-download-method 'attach)
-    :ensure t)
-#+end_src
-
-** ~org-mobile~                                                  :submodule:
-#+begin_src emacs-lisp
-  (use-package org-mobile
-    :config
-    (setq org-mobile-directory "~/owncloud/org"
-          org-mobile-inbox-for-pull
-          (concat eqyiel/org-directory "/from-mobile.org"))
-    :load-path "site-lisp/org-mode"
-    :ensure nil)
-#+end_src
-
-** ~org-indent-mode~                                               :builtin:
-#+begin_src emacs-lisp
-  (use-package org-indent
-    :load-path "site-lisp/org-mode"
-    :diminish org-indent-mode
-    :ensure nil
-    :demand)
-#+end_src
-
-** ~org-mode~                                                      :builtin:
-
-#+begin_src emacs-lisp
-  (defun eqyiel/org-prev-visible-heading (arg)
-    "Move to the previous visible heading.
-
-    This function wraps `outline-prev-visible-heading' with
-    `org-with-limited-levels' in order to skip over inline tasks and
-    respect customization of `org-odd-levels-only'."
-    (interactive "p")
-    (org-with-limited-levels
-     (outline-previous-visible-heading arg)))
-
-  (defun eqyiel/maybe-create-agenda-file-with-category (category)
-    (let ((target
-           (format "%s/%s-%s.org"
-                   eqyiel/org-directory
-                   (eqyiel/slugify category "_")
-                   (eqyiel/slugify (system-name) "_"))))
-      (unless (and (file-exists-p target)
-                   (file-readable-p target)
-                   (file-writable-p target))
-        (with-temp-buffer
-          (insert
-           (format "#+CATEGORY: %s\n#+STARTUP: showall"
-                   (eqyiel/slugify category "_")))
-          (write-region (point-min) (point-max) target t nil nil t)))
-      target))
-
-  (use-package org
-    :config
-    (setq
-     org-adapt-indentation t
-     org-image-actual-width '(400)
-     org-directory eqyiel/org-directory
-     org-log-done 'time
-     org-agenda-files
-     (file-expand-wildcards
-      (concat eqyiel/org-directory "/*.org*"))
-     org-descriptive-links nil
-     org-src-tab-acts-natively t
-     org-src-preserve-indentation nil
-     org-confirm-babel-evaluate nil
-     org-export-babel-evaluate nil
-     org-export-default-language "en"
-     org-capture-templates
-     `(("t" "Todo" entry (file ,(eqyiel/maybe-create-agenda-file-with-category "Todo"))
-        "* TODO %?
-  SCHEDULED: %(org-insert-time-stamp (org-read-date nil t \"+0d\"))
-  :PROPERTIES:
-  :CREATED: %U
-  :END:
-  "
-        :empty-lines 1 :kill-buffer t)
-       ("s" "Shopping"
-        entry (file ,(eqyiel/maybe-create-agenda-file-with-category "Shopping"))
-        "* TODO %?
-  SCHEDULED: %(org-insert-time-stamp (org-read-date nil t \"+0d\"))
-  :PROPERTIES:
-  :CREATED: %U
-  :END:
-  "
-        :empty-lines 1 :kill-buffer t)
-       ("m" "Media"
-        entry (file ,(eqyiel/maybe-create-agenda-file-with-category "Media"))
-        "* %?
-  :PROPERTIES:
-  :CREATED: %U
-  :END:
-  "
-        :empty-lines 1 :kill-buffer t))
-     org-log-done 'time
-     ;; remove scheduled date and deadline when changing state from TODO
-     org-after-todo-state-change-hook
-     (lambda ()
-       (when (not org-state)
-         (progn
-           ;; as if I were running C-u M-x org-schedule and C-u M-x org-deadline
-           (execute-extended-command '(4) "org-schedule")
-           (execute-extended-command '(4) "org-deadline"))))
-     ;; add slugified CATEGORY to tags
-     org-capture-before-finalize-hook
-     (lambda ()
-       (progn
-         (org-set-tags-to
-          (delq nil (cons (eqyiel/slugify (org-get-category) "_")
-                          (org-get-tags))))
-         (org-align-all-tags)))
-     ;; realign tags after capture
-     org-capture-after-finalize-hook 'org-align-all-tags
-     org-agenda-custom-commands
-     '(("n" "Agenda and all TODOs"
-        ((agenda "")
-         (alltodo "")))))
-    :init
-    (progn
-      (defvar eqyiel/org-src-lang-modes
-        '(("Awk" . awk)
-          ("C" . C)
-          ("R" . R)
-          ("Asymptote" . asymptote)
-          ("Calc" . calc)
-          ("Clojure" . clojure)
-          ("CSS" . css)
-          ("Ditaa" . ditaa)
-          ("Dot" . dot)
-          ("Emacs Lisp" . emacs-lisp)
-          ("Forth" . forth)
-          ("Fortran" . fortran)
-          ("Gnuplot" . gnuplot)
-          ("Haskell" . haskell)
-          ("IO" . io)
-          ("J" . J)
-          ("Java" . java)
-          ("Javascript" . js)
-          ("LaTeX" . latex)
-          ("Ledger" . ledger)
-          ("Lilypond" . lilypond)
-          ("Lisp" . lisp)
-          ("Makefile" . makefile)
-          ("Maxima" . maxima)
-          ("Matlab" . matlab)
-          ("Mscgen" . mscgen)
-          ("Ocaml" . ocaml)
-          ("Octave" . octave)
-          ("Org" . org)
-          ("Perl" . perl)
-          ("Pico Lisp" . picolisp)
-          ("PlantUML" . plantuml)
-          ("Python" . python)
-          ("Ruby" . ruby)
-          ("Sass" . sass)
-          ("Scala" . scala)
-          ("Scheme" . scheme)
-          ("Screen" . screen)
-          ("Shell Script" . shell)
-          ("Shen" . shen)
-          ("Sql" . sql)
-          ("Sqlite" . sqlite)
-          ("Stan" . stan)
-          ("ebnf2ps" . ebnf2ps))
-        "This list is actually from `org-babel-load-languages', but it's not
-  exposed as a variable.  It might change from time to time so be sure to look
-  back there.")
-
-      (defun eqyiel/org-clock-sum-today ()
-        "Visit each file in `org-agenda-files' and return the total time of
-    today's clocked tasks in minutes."
-        (let ((files (org-agenda-files))
-              (total 0))
-          (org-agenda-prepare-buffers files)
-          (dolist (file files)
-            (with-current-buffer (find-buffer-visiting file)
-              (setq total (+ total (org-clock-sum-today)))))
-          total))
-
-      (defun eqyiel/org-archive-done-tasks ()
-        (interactive)
-        (org-map-entries 'org-archive-subtree "/DONE" 'file))
-
-      (defun eqyiel/org-select-src-lang-mode ()
-        "Select a language mode from the alist of languages org-mode groks."
-        (interactive)
-        (let* ((selected-key
-                (completing-read
-                 "Select language: "
-                 (seq-reduce
-                  (lambda (prev next)
-                    (if (not (member next prev))
-                        (cons next prev)
-                      prev))
-                  (mapcar
-                   (lambda (arg) (car arg))
-                   eqyiel/org-src-lang-modes)
-                  '())))
-               (selected-value
-                (cdr
-                 (assoc selected-key eqyiel/org-src-lang-modes))))
-          (insert
-           (if selected-value (symbol-name selected-value)
-             selected-key))))
-
-      (add-hook 'org-mode-hook (lambda () (org-indent-mode t)))
-      (org-babel-do-load-languages
-       'org-babel-load-languages
-       '((js . t)
-         (emacs-lisp . t)
-         (shell . t)))
-
-      (add-hook 'org-mode-hook 'turn-on-auto-fill))
-    :bind
-    (("<f12>" . org-capture)
-     ("<f7>" . org-agenda)
-     :map org-mode-map
-     ("M-p" . eqyiel/org-prev-visible-heading)
-     ("M-n" . org-next-visible-heading))
-    :ensure nil
-    :load-path "site-lisp/org-mode"
-    :demand)
-#+end_src
-
-** ~ox-gfm~                                                          :melpa:
-Export ~org~ files to Github-flavoured markdown.
-
-#+begin_src emacs-lisp
-  (use-package ox-gfm
-    :ensure t)
-#+end_src
-
-** ~pass~                                                            :melpa:
-#+begin_src emacs-lisp
-  (use-package pass :ensure t :demand)
-#+end_src
-
-** ~php-mode~                                                        :melpa:
-#+begin_src emacs-lisp
-  (use-package php-mode)
-#+end_src
-
-** ~pkgbuild-mode~                                                   :melpa:
-#+begin_src emacs-lisp
-  (use-package pkgbuild-mode
-    :init (add-to-list 'auto-mode-alist '("/PKGBUILD$" . pkgbuild-mode)))
-#+end_src
-
-** ~prettier-emacs~                                                  :melpa:
-#+BEGIN_SRC emacs-lisp
-  (defun eqyiel/prettier-locate-js-project-root (path)
-    "Find the dir containing package.json by walking up the dir tree from PATH.
-  Returns current working directory if no package.json was found found."
-    (directory-file-name
-     (expand-file-name
-      (or (locate-dominating-file path "package.json")
-          default-directory))))
-
-  (defun eqyiel/prettier-find-prettier-in-package-file (package-file)
-    "Return t if prettier exists in PACKAGE-FILE."
-    (condition-case nil
-        ;; silence errors from `json-read-file' if package.json is malformed
-        ;; (for example, while resolving merge conflicts)
-        (when (and (file-readable-p package-file)
-                   (file-exists-p package-file))
-          (let* ((package-file-as-string
-                  (json-read-file package-file))
-                 (prettier-package
-                  (caar
-                   (delq
-                    nil
-                    (mapcar
-                     (lambda (element)
-                       (assoc (cdr element)
-                              (assoc (car element) package-file-as-string)))
-                     (-mapcat
-                      (lambda (item)
-                        (-concat `(,(cons 'dependencies item)
-                                   ,(cons 'devDependencies item))))
-                      '(prettier prettier-eslint-cli)))))))
-            (when prettier-package (symbol-name prettier-package))))
-      (error nil)))
-
-  (defun eqyiel/prettier-should-format-with-prettier-p ()
-    "Return t if prettier found in both package.json and node_modules."
-    (and (eqyiel/prettier-find-prettier-in-package-file (concat (eqyiel/prettier-locate-js-project-root default-directory) "/package.json"))
-         (eqyiel/prettier-package-path-exists-p)))
-
-  (defun eqyiel/prettier-find-prettier-package-path ()
-    "Construct the path to prettier in the project root."
-    (let ((js-project-root (eqyiel/prettier-locate-js-project-root default-directory)))
-      (concat
-       js-project-root
-       "/node_modules"
-       "/"
-       (eqyiel/prettier-find-prettier-in-package-file
-        (concat js-project-root "/package.json")))))
-
-  (defun eqyiel/prettier-package-path-exists-p ()
-    "Construct the path to prettier in the project root."
-    (let* ((prettier-package-path (eqyiel/prettier-find-prettier-package-path)))
-      (and (file-readable-p prettier-package-path)
-           (file-exists-p prettier-package-path))))
-
-  (defun eqyiel/prettier-find-project-local-prettier-cmd ()
-    "Find the name of the local prettier command (something under
-  \"./node_modules/.bin\") if it exists."
-    (condition-case nil
-        (let* ((js-project-root (eqyiel/prettier-locate-js-project-root default-directory))
-               (prettier-package-name (eqyiel/prettier-find-prettier-in-package-file
-                                       (concat js-project-root "/package.json")))
-               (prettier-package-file (concat js-project-root "/node_modules/"
-                                              prettier-package-name "/package.json"))
-               (package-file-as-string (json-read-file prettier-package-file))
-               (local-prettier-cmd
-                (caar
-                 (delq nil
-                       (mapcar
-                        (lambda (element)
-                          (assoc
-                           element
-                           (cdr (assoc 'bin package-file-as-string))))
-                        '(prettier prettier-eslint))))))
-          (when local-prettier-cmd (symbol-name local-prettier-cmd)))
-      (error nil)))
-
-  (defun eqyiel/prettier-make-project-local-prettier-cmd-path ()
-    "Construct the path to the local prettier command (something under
-  \"./node_modules/.bin\") if it exists."
-    (let ((js-project-root (eqyiel/prettier-locate-js-project-root default-directory))
-          (local-prettier-cmd (eqyiel/prettier-find-project-local-prettier-cmd)))
-      (when local-prettier-cmd
-        (concat js-project-root "/node_modules/.bin/" local-prettier-cmd))))
-
-  (defun eqyiel/prettier-maybe-make-buffer-local-variables ()
-    "Set `prettier-js-command' to the prettier command in the project path if
-  found."
-    (let* ((local-prettier-cmd-path
-            (eqyiel/prettier-make-project-local-prettier-cmd-path)))
-      (when local-prettier-cmd-path
-        (set (make-local-variable 'prettier-js-command)
-             local-prettier-cmd-path))))
-
-  (defun eqyiel/prettier-js-mode-hook ()
-    "Maybe format buffer with prettier on save."
-    (when (eqyiel/prettier-should-format-with-prettier-p)
-      (progn
-        (prettier-js-mode)
-        ;; use the local prettier package if available
-        (eqyiel/prettier-maybe-make-buffer-local-variables))))
-
-  (use-package prettier-js
-    :init (progn
-            (add-hook 'js-mode-hook 'eqyiel/prettier-js-mode-hook)
-            (add-hook 'js2-mode-hook 'eqyiel/prettier-js-mode-hook)
-            (add-hook 'web-mode-hook
-                      (lambda ()
-                        (when (or (string-equal web-mode-content-type "javascript")
-                                  (string-equal web-mode-content-type "jsx"))
-                          (eqyiel/prettier-js-mode-hook)))))
-    :config (setq prettier-js-command "prettier-eslint")
-    :defer t
-    :ensure t)
-#+END_SRC
-
-** ~projectile~                                                      :melpa:
-#+begin_src emacs-lisp
-  (use-package projectile
-    :config
-    (progn
-      ;; monkeypatch `projectile-current-project-files' to use fd, it's much faster.
-      (defun eqyiel/projectile-current-project-files ()
-        "Return a list of files for the current project."
-        (let ((files (and projectile-enable-caching
-                          (gethash (projectile-project-root) projectile-projects-cache))))
-          ;; nothing is cached
-          (unless files
-            (when projectile-enable-caching
-              (message "Empty cache. Projectile is initializing cache..."))
-            (setq files
-                  (split-string
-                   (shell-command-to-string
-                    (concat
-                     "fd '' --hidden "
-                     (directory-file-name (projectile-project-root))))))
-            ;; cache the resulting list of files
-            (when projectile-enable-caching
-              (projectile-cache-project (projectile-project-root) files)))
-          (projectile-sort-files files))))
-    :init
-    (progn
-      (use-package ivy :ensure t)
-      (projectile-global-mode)
-      (advice-add
-       'projectile-current-project-files
-       :override
-       'eqyiel/projectile-current-project-files)
-      (setq projectile-completion-system 'ivy
-            projectile-globally-ignored-directories
-            (append '("dist" "node_modules")
-                    projectile-globally-ignored-directories)))
-    :bind ("<f5>" . projectile-compile-project)
-    :ensure t)
-#+end_src
-
-** ~python-mode~                                                   :builtin:
-#+begin_src emacs-lisp
-  (use-package python-mode
-    :bind
-    (:map inferior-python-mode-map
-          ("C-d" . eqyiel/comint-delchar-or-eof-or-kill-buffer))
-    :ensure nil)
-#+end_src
-
-** ~rainbow-mode~                                                     :elpa:
-#+begin_src emacs-lisp
-  (use-package rainbow-mode :pin gnu :ensure t)
-#+end_src
-
-** ~recentf~                                                       :builtin:
-#+begin_src emacs-lisp
-  (use-package recentf
-    :init
-    (progn
-      (require 'recentf)
-      (setq
-       recentf-save-file (concat eqyiel/xdg-cache-home "/emacs/.recentf")
-       recentf-max-saved-items 1000)
-      (recentf-mode))
-    :ensure nil
-    :demand)
 #+end_src
 
 ** ~savehist~                                                      :builtin:

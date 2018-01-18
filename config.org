@@ -773,7 +773,6 @@
          local-project-executable))))
 #+END_SRC
 
-
 * Packages
 ** ~aggressive-indent-mode~                                          :melpa:
 #+BEGIN_SRC emacs-lisp
@@ -1224,21 +1223,15 @@ specific ~eslint~ executable, but it should be easy to fix.
     :diminish flycheck-mode)
 #+end_src
 
-** ~flycheck-flow~                                            :melpa:broken:
+** ~flycheck-flow~                                                   :melpa:
 #+begin_src emacs-lisp
   (use-package flycheck-flow
     :ensure t
     :after flycheck
     :config
     (progn
-      (flycheck-add-mode 'javascript-eslint 'web-mode)
-      ;; this is the only way I could get both eslint and flow checker results
-      ;; simultaneously 💩
-      ;; (flycheck-add-next-checker 'javascript-flow '(t . javascript-flow-coverage))
-      ;; (flycheck-add-next-checker 'javascript-flow-coverage '(t . javascript-eslint))
-      ;; Disable coverage for now, because it runs even on files not annotated
-      ;; with ~@flow~
-      (flycheck-add-next-checker 'javascript-flow '(t . javascript-eslint))))
+      (flycheck-add-next-checker 'javascript-flow '(t . javascript-flow-coverage))
+      (flycheck-add-next-checker 'javascript-flow-coverage '(t . javascript-eslint))))
 #+end_src
 
 ** ~gist~                                                            :melpa:
@@ -2236,6 +2229,10 @@ Export ~org~ files to Github-flavoured markdown.
       (modify-syntax-entry ?# ". 1" rjsx-mode-syntax-table)
       (modify-syntax-entry ?! ". 2b" rjsx-mode-syntax-table))
     :init (progn
+            (require 'flycheck)
+            (require 'flycheck-flow)
+            (flycheck-add-mode 'javascript-flow 'rjsx-mode)
+            (flycheck-add-mode 'javascript-flow-coverage 'rjsx-mode)
             (add-to-list 'auto-mode-alist '("\\.js$" . rjsx-mode))
             (add-to-list 'auto-mode-alist '("\\.jsx$" . rjsx-mode)))
     :bind (:map rjsx-mode-map
@@ -2593,10 +2590,14 @@ This is a pretty good replacement  for ~longlines-mode~.
                   (set (make-local-variable 'flycheck-javascript-flow-executable)
                        local-project-flow-executable)))))))))
 
-
   (use-package web-mode
     :init
     (progn
+      (require 'flycheck)
+      (require 'flycheck-flow)
+      (flycheck-add-mode 'javascript-eslint 'web-mode)
+      (flycheck-add-mode 'javascript-flow 'web-mode)
+      (flycheck-add-mode 'javascript-flow-coverage 'web-mode)
       (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
       (add-hook 'web-mode-hook 'eqyiel/flycheck-web-mode-hook))
     :config

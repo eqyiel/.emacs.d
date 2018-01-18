@@ -637,7 +637,9 @@
 ** Functions for working with node projects
 
 #+BEGIN_EXAMPLE
- (eqyiel/node-find-dependency-in-package-file
+;; Examples
+
+(eqyiel/node-find-dependency-in-package-file
   (f-join (eqyiel/node-locate-js-project-root) "package.json")
   '(prettier prettier-eslint-cli))
  ;; => "prettier"
@@ -654,22 +656,33 @@
 #+END_EXAMPLE
 
 #+BEGIN_SRC emacs-lisp
+  (use-package dash :ensure t :demand)
   (use-package f :ensure t :demand)
   (use-package json :ensure t :demand)
 
   (defun eqyiel/node-locate-js-project-root ()
     "Find the dir containing package.json by walking up the dir tree from PATH.
   Returns current working directory if no package.json was found found."
-    (locate-dominating-file
-     (or (buffer-file-name) default-directory)
-     "package.json"))
+    (or (locate-dominating-file
+         (or (buffer-file-name) default-directory)
+         "package.json")
+        default-directory))
 
   (defun eqyiel/node-find-dependency-in-package-file (package-file dependency)
-    "Return t if prettier exists in PACKAGE-FILE.
+    "Return t if PACKAGE-FILE has DEPENDENCY.
 
   PACKAGE-FILE should be is the absolute path to \"package.json\".  DEPENDENCY
   should be a list of symbols in which case the first one that is found will
-  return or a string."
+  return or a string.
+
+  It's useful to use a list of symbols for two reasons:
+
+  - in the event that the package has a different \"bin\" key than its name in
+    package.json, for example flow is called \"flow-bin\" on NPM but its bin key
+    is \"flow\".
+  - in the event that there is a package that has a drop in replacement available
+    with a different name, like \"prettier\" and \"prettier-eslint-cli\".
+  "
     (condition-case nil
         ;; silence errors from `json-read-file' if package.json is malformed
         ;; (for example, while resolving merge conflicts)
@@ -687,7 +700,7 @@
                               (assoc (car element) package-file-as-string)))
                      (-mapcat
                       (lambda (item)
-                        (-concat `(,(cons 'dependency item)
+                        (-concat `(,(cons 'dependencies item)
                                    ,(cons 'devDependencies item))))
 
                       (if (listp dependency)
@@ -695,11 +708,11 @@
             (when node-dependency (symbol-name node-dependency))))
       (error nil)))
 
-  (defun eqyiel/node-package-path-exists-p (js-project-root resolved-dependency)
-    "Construct the path in JS-PROJECT-ROOT to RESOLVED-DEPENDENCY."
+  (defun eqyiel/node-package-path-exists-p (js-project-root dependency)
+    "Construct the path in JS-PROJECT-ROOT to DEPENDENCY."
     (let* ((dependency-package-path
             (eqyiel/node-find-dependency-package-path
-             js-project-root resolved-dependency)))
+             js-project-root dependency)))
       (and (f-readable-p dependency-package-path)
            (f-exists-p dependency-package-path))))
 
@@ -734,7 +747,7 @@
                (package-file-as-string (json-read-file dependency-package-file))
                (local-project-executable
                 (if (listp (cdr (assoc 'bin package-file-as-string)))
-                    (caar
+                    (cdar
                      (delq nil
                            (mapcar
                             (lambda (element)
@@ -744,7 +757,7 @@
                             (if (listp dependency)
                                 dependency (list (intern dependency))))))
                   (cdr (assoc 'bin package-file-as-string)))))
-          (if (symbolp local-project-executable)
+          (if (and local-project-executable (symbolp local-project-executable))
               (symbol-name local-project-executable)
             local-project-executable))
       (error nil)))
@@ -1174,6 +1187,10 @@ So diminish ~auto-fill-function~, not ~auto-fill-mode~.
 #+end_src
 
 ** ~eslint-fix~                                                      :melpa:
+
+This package is kind of crap right now because it doesn't let you set the path a
+specific ~eslint~ executable, but it should be easy to fix.
+
 #+begin_src emacs-lisp
   (use-package eslint-fix :after js-mode js2-mode web-mode)
 #+end_src
@@ -2194,9 +2211,24 @@ Export ~org~ files to Github-flavoured markdown.
       ;; This should be smarter, like the prettier thing
       (defun eqyiel/flycheck-rjsx-mode-hook ()
         (require 'flycheck)
-        (-when-let (root (locate-dominating-file default-directory "node_modules"))
-          (setq-local flycheck-javascript-eslint-executable (concat root "/node_modules/.bin/eslint"))
-          (setq-local flycheck-javascript-flow-executable (concat root "/node_modules/.bin/flow"))))
+        (require 'flycheck-flow)
+        (flycheck-mode)
+        (let ((js-project-root (eqyiel/node-locate-js-project-root)))
+          (progn
+            (when (eqyiel/node-should-use-package-p js-project-root '(eslint))
+              (let ((local-project-eslint-executable
+                     (eqyiel/node-find-project-local-executable-path
+                      js-project-root '(eslint))))
+                (when local-project-eslint-executable
+                  (set (make-local-variable 'flycheck-javascript-eslint-executable)
+                       local-project-eslint-executable))))
+            (when (eqyiel/node-should-use-package-p js-project-root '(flow flow-bin))
+              (let ((local-project-flow-executable
+                     (eqyiel/node-find-project-local-executable-path
+                      js-project-root '(flow flow-bin))))
+                (when local-project-flow-executable
+                  (set (make-local-variable 'flycheck-javascript-flow-executable)
+                       local-project-flow-executable)))))))
 
       (add-hook 'rjsx-mode-hook 'eqyiel/flycheck-rjsx-mode-hook)
 
@@ -2537,16 +2569,36 @@ This is a pretty good replacement  for ~longlines-mode~.
     (interactive)
     (rjsx-mode))
 
-  (defun eqyiel/web-mode-hook ()
+  (defun eqyiel/flycheck-web-mode-hook ()
     (when (or (string-equal web-mode-content-type "javascript")
               (string-equal web-mode-content-type "jsx"))
-      (flycheck-mode 1)))
+      (progn
+        (require 'flycheck)
+        (require 'flycheck-flow)
+        (flycheck-mode)
+        (let ((js-project-root (eqyiel/node-locate-js-project-root)))
+          (progn
+            (when (eqyiel/node-should-use-package-p js-project-root '(eslint))
+              (let ((local-project-eslint-executable
+                     (eqyiel/node-find-project-local-executable-path
+                      js-project-root '(eslint))))
+                (when local-project-eslint-executable
+                  (set (make-local-variable 'flycheck-javascript-eslint-executable)
+                       local-project-eslint-executable))))
+            (when (eqyiel/node-should-use-package-p js-project-root '(flow))
+              (let ((local-project-flow-executable
+                     (eqyiel/node-find-project-local-executable-path
+                      js-project-root '(flow))))
+                (when local-project-flow-executable
+                  (set (make-local-variable 'flycheck-javascript-flow-executable)
+                       local-project-flow-executable)))))))))
+
 
   (use-package web-mode
     :init
     (progn
       (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
-      (add-hook 'web-mode-hook 'eqyiel/web-mode-hook))
+      (add-hook 'web-mode-hook 'eqyiel/flycheck-web-mode-hook))
     :config
     (setq
      web-mode-enable-auto-indentation nil

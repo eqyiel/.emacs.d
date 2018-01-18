@@ -2618,7 +2618,8 @@ This is a pretty good replacement  for ~longlines-mode~.
     (:map web-mode-map
           ("C-M-s-\"" . eqyiel/toggle-web-mode-to-rjsx-mode)
           ("H-'" . eqyiel/toggle-web-mode-to-rjsx-mode)
-          ("M-j" . newline-and-indent))
+          ("M-j" . newline-and-indent)
+          ("C-c C-l" . flycheck-list-errors))
     :ensure t)
 #+end_src
 

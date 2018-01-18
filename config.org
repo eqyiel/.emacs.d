@@ -1230,8 +1230,11 @@ specific ~eslint~ executable, but it should be easy to fix.
     :after flycheck
     :config
     (progn
-      (flycheck-add-next-checker 'javascript-flow '(t . javascript-flow-coverage))
-      (flycheck-add-next-checker 'javascript-flow-coverage '(t . javascript-eslint))))
+      ;; if using flow-coverage
+      ;; (flycheck-add-next-checker 'javascript-flow '(t . javascript-flow-coverage))
+      ;; (flycheck-add-next-checker 'javascript-flow-coverage '(t . javascript-eslint))
+      ;; if just using flow
+      (flycheck-add-next-checker 'javascript-flow '(t . javascript-eslint))))
 #+end_src
 
 ** ~gist~                                                            :melpa:

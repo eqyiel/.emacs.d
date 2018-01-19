@@ -1200,6 +1200,23 @@ specific ~eslint~ executable, but it should be easy to fix.
     :bind (("C-=" . er/expand-region)))
 #+end_src
 
+** ~flow-minor-mode~                                                 :melpa:
+#+BEGIN_SRC emacs-lisp
+  (defun eqyiel/flow-minor-mode-hook ()
+    (when (eqyiel/node-should-use-package-p js-project-root '(flow flow-bin))
+      (let ((local-project-flow-executable
+             (eqyiel/node-find-project-local-executable-path
+              js-project-root '(flow flow-bin))))
+        (when local-project-flow-executable
+          (set (make-local-variable 'flow-minor-default-binary)
+               local-project-flow-executable)))))
+
+  (use-package flow-minor-mode
+    :config (add-hook 'flow-minor-mode-hook 'eqyiel/flow-minor-mode-hook)
+    :ensure t
+    :demand t)
+#+END_SRC
+
 ** ~flycheck~                                                        :melpa:
 #+begin_src emacs-lisp
   (use-package flycheck

@@ -1749,6 +1749,14 @@ Check out this for tips: https://vxlabs.com/2017/02/07/mu4e-0-9-18-e-mailing-wit
     :load-path "/run/current-system/sw/share/emacs/site-lisp/mu4e")
 #+end_src
 
+** ~mule~                                                          :builtin:
+#+BEGIN_SRC emacs-lisp
+  (use-package mule
+    :init (setq default-input-method "japanese")
+    :ensure nil
+    :demand t)
+#+END_SRC
+
 ** ~multiple-cursors~                                                :melpa:
 #+begin_src emacs-lisp
   (use-package multiple-cursors

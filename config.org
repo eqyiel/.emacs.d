@@ -1888,17 +1888,6 @@ A tool to insert a link in the clipboard as an ~org-mode~ link at point.
     :ensure t)
 #+end_src
 
-** ~org-mobile~                                                  :submodule:
-#+begin_src emacs-lisp
-  (use-package org-mobile
-    :config
-    (setq org-mobile-directory "~/owncloud/org"
-          org-mobile-inbox-for-pull
-          (concat eqyiel/org-directory "/from-mobile.org"))
-    :load-path "site-lisp/org-mode"
-    :ensure nil)
-#+end_src
-
 ** ~org-indent-mode~                                               :builtin:
 #+begin_src emacs-lisp
   (use-package org-indent

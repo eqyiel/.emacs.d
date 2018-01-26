@@ -1929,6 +1929,16 @@ A tool to insert a link in the clipboard as an ~org-mode~ link at point.
           (write-region (point-min) (point-max) target t nil nil t)))
       target))
 
+  (defun eqyiel/org-capture-prepare-finalize-hook ()
+    "Quality of life hack for for `org-capture' buffers.
+
+  This allows the use of `org-capture-finalize' without having the point on the
+  heading."
+    (org-back-to-heading))
+
+  (add-hook 'org-capture-prepare-finalize-hook
+            'eqyiel/org-capture-prepare-finalize-hook)
+
   (use-package org
     :config
     (setq

@@ -1,0 +1,6 @@
+[submodule "site-lisp/circe-notifications"]
+	path = site-lisp/circe-notifications
+	url = https://github.com/eqyiel/circe-notifications
+[submodule "site-lisp/flow-js2-mode"]
+	path = site-lisp/flow-js2-mode
+	url = git@github.com:Fuco1/flow-js2-mode.git

@@ -1,0 +1,11 @@
+#+title: ~/.emacs.d
+#+author: Ruben Maher
+#+email: r@rkm.id.au
+#+options: toc:nil num:nil
+
+What?  It's my =emacs= configuration.  If you're checking this out for the first
+time, be sure to to run =setup.sh=.
+
+Requires =git=, =gnutls=, =pass=[fn:0] and GNU Emacs >= 24.4.
+
+[fn:0] http://www.passwordstore.org/

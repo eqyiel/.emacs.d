@@ -1,5 +1,13 @@
-# Compiled
-*.elc
-
-# Packaging
-.cask
+.org-id-locations
+image-dired/
+*~
+ido.last
+games/
+url/
+session*
+config.el
+site-lisp/elpa
+eqyi-el/eqyiel-custom-junk.el
+projectile.cache
+projectile-bookmarks.eld
+.mc-lists.el

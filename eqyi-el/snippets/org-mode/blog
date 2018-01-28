@@ -1,0 +1,15 @@
+# -*- mode: snippet -*-
+# name: blog
+# key: blog
+# --
+#+TITLE: $1
+#+DATE: `(format-time-string "%FT%TZ" (current-time))`
+#+AUTHOR: `user-full-name`
+#+EMAIL: `user-mail-address`
+#+TAGS:
+#+ALIASES:
+#+DESCRIPTION:
+#+DRAFT: true
+#+STARTUP: showall
+
+$0

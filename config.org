@@ -661,10 +661,10 @@
   (use-package json :ensure t :demand)
 
   (defun eqyiel/node-locate-js-project-root ()
-    "Find the dir containing package.json by walking up the dir tree from PATH.
+    "Find the dir containing package.json starting with NODE_PATH.
   Returns current working directory if no package.json was found found."
     (or (locate-dominating-file
-         (or (buffer-file-name) default-directory)
+         (or (getenv "NODE_PATH") (buffer-file-name) default-directory)
          "package.json")
         default-directory))
 

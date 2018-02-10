@@ -661,11 +661,11 @@
   (use-package json :ensure t :demand)
 
   (defun eqyiel/node-locate-js-project-root ()
-    "Find the dir containing package.json starting with NODE_PATH.
-  Returns current working directory if no package.json was found found."
+    "Find the dir containing package.json starting with PATH.
+  Returns current working directory if no node_modules directory was found."
     (or (locate-dominating-file
-         (or (getenv "NODE_PATH") (buffer-file-name) default-directory)
-         "package.json")
+         (or (buffer-file-name) default-directory)
+         "node_modules")
         default-directory))
 
   (defun eqyiel/node-find-dependency-in-package-file (package-file dependency)

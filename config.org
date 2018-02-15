@@ -2147,6 +2147,7 @@ Export ~org~ files to Github-flavoured markdown.
   (use-package prettier-js
     :init (progn
             (add-hook 'js-mode-hook 'eqyiel/prettier-js-mode-hook)
+            (add-hook 'markdown-mode-hook 'eqyiel/prettier-js-mode-hook)
             (add-hook 'js2-mode-hook 'eqyiel/prettier-js-mode-hook)
             (add-hook 'web-mode-hook
                       (lambda ()

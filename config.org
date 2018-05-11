@@ -1,3 +1,7 @@
+#+BEGIN_SRC emacs-lisp
+   ;;; -*- lexical-binding: t -*-
+#+END_SRC
+
 * Variables
 #+begin_src emacs-lisp
   (defvar eqyiel/home-directory

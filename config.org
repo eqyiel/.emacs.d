@@ -1823,17 +1823,18 @@ Check out this for tips: https://vxlabs.com/2017/02/07/mu4e-0-9-18-e-mailing-wit
 ** ~nix-buffer~                                                      :melpa:
 #+BEGIN_SRC emacs-lisp
   (defun eqyiel/nix-buffer-find-file-hook ()
+    "Avoid using nix-buffer on slow connections (over tramp, for instance)."
     (when (not (file-remote-p (buffer-file-name)))
       (nix-buffer)))
 
   (use-package nix-buffer
-    :config (add-hook 'find-file-hook 'eqyiel/nix-buffer-find-file-hook)
-    :init (nix-buffer-update-directory-name
-           (f-join eqyiel/xdg-cache-home "emacs/nix-buffer"))
+    :config
+    (nix-buffer-update-directory-name
+     (f-join eqyiel/xdg-cache-home "emacs/nix-buffer"))
+    :hook (find-file . eqyiel/nix-buffer-find-file-hook)
     :demand t
     :ensure t)
 #+END_SRC
-
 
 ** ~nix-emacs~                                                     :subtree:
 #+begin_src emacs-lisp

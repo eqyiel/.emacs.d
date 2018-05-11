@@ -1500,6 +1500,50 @@ This package adds itself to ~auto-mode-alist~.
   (use-package legalese)
 #+end_src
 
+** ~lsp-javascript-flow~                                             :melpa:
+
+#+BEGIN_SRC emacs-lisp
+  (defun eqyiel/lsp-javascript-flow-find-executable ()
+    (let ((js-project-root (eqyiel/node-locate-js-project-root)))
+      (when (eqyiel/node-should-use-package-p
+             js-project-root '(flow-language-server))
+        (eqyiel/node-find-project-local-executable-path
+         js-project-root '(flow-language-server)))))
+
+  (defun eqyiel/lsp-javascript-flow-enable-maybe ()
+    (when (eqyiel/lsp-javascript-flow-find-executable)
+      (progn
+        (eqyiel/lsp-javascript-flow-enable)
+        (lsp-ui-mode))))
+
+  (use-package lsp-ui :defer t :ensure t)
+
+  (use-package lsp-mode
+    :ensure t
+    :requires flycheck
+    :demand t
+    :config (require 'lsp-ui)
+    :hook ((lsp-mode-hook) . lsp-ui-mode))
+
+  (use-package lsp-javascript-typescript
+    :ensure t
+    :requires lsp-mode
+    :demand t
+    :config (require 'lsp-javascript-flow)
+    :hook ((js-mode js2-mode rjsx-mode)
+           . eqyiel/lsp-javascript-flow-enable-maybe))
+
+  (lsp-define-stdio-client
+   eqyiel/lsp-javascript-flow "javascript"
+   lsp-javascript--get-root nil
+   :command-fn
+   (lambda ()
+     (list
+      (eqyiel/lsp-javascript-flow-find-executable)
+      "--stdio"
+      "--try-flow-bin")))
+#+END_SRC
+
 ** ~magit~                                                           :melpa:
 #+begin_src emacs-lisp
   (use-package magit

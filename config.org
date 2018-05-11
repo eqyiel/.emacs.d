@@ -1092,14 +1092,9 @@ So diminish ~auto-fill-function~, not ~auto-fill-mode~.
     :diminish company-mode)
 #+end_src
 
-** ~company-flow~                                                    :melpa:
+** ~company-lsp~                                                     :melpa:
 #+begin_src emacs-lisp
-(use-package company-flow :after company :demand :ensure t)
-#+end_src
-
-** ~company-tern~                                                    :melpa:
-#+begin_src emacs-lisp
-  (use-package company-tern :after company :demand :ensure t)
+  (use-package company-lsp :after company :ensure t)
 #+end_src
 
 ** ~counsel-projectile~                                              :melpa:
@@ -1382,8 +1377,6 @@ instead of ~js2-mode~ or ~web-mode~.
       (use-package web-mode)
       (use-package flycheck)
       (use-package company)
-      (use-package company-tern)
-      (use-package company-flow)
 
       (use-package flow-js2-mode
         :load-path "site-lisp/flow-js2-mode"
@@ -1391,19 +1384,15 @@ instead of ~js2-mode~ or ~web-mode~.
         :ensure nil
         :demand t)
 
-      (add-hook 'js2-mode-hook (lambda () (tern-mode t)))
-
       (defun eqyiel/toggle-js2-mode-to-web-mode ()
         (interactive)
         (web-mode))
 
       (defun eqyiel/company-js2-mode-hook ()
-        (require 'company-tern)
         (set (make-local-variable 'company-backends)
              '((company-files
-                company-flow
-                company-tern
-                company-yasnippet))))
+                company-lsp
+                company-keywords))))
 
       (add-hook 'js2-mode-hook 'eqyiel/company-js2-mode-hook)
 
@@ -1511,6 +1500,7 @@ This package adds itself to ~auto-mode-alist~.
          js-project-root '(flow-language-server)))))
 
   (defun eqyiel/lsp-javascript-flow-enable-maybe ()
+    ;; TODO: only enable if there is a valid @flow annotation
     (when (eqyiel/lsp-javascript-flow-find-executable)
       (progn
         (eqyiel/lsp-javascript-flow-enable)
@@ -2281,12 +2271,9 @@ Export ~org~ files to Github-flavoured markdown.
   (use-package rjsx-mode
     :config
     (progn
-      (use-package tern)
       (use-package web-mode)
       (use-package flycheck)
       (use-package company)
-      (use-package company-tern)
-      (use-package company-flow)
 
       (defun eqyiel/toggle-rjsx-mode-to-web-mode ()
         (interactive)
@@ -2297,12 +2284,11 @@ Export ~org~ files to Github-flavoured markdown.
       (defun eqyiel/company-rjsx-mode-hook ()
         (set (make-local-variable 'company-backends)
              '((company-files
-                company-flow
-                company-yasnippet))))
+                company-lsp
+                company-keywords))))
 
       (add-hook 'rjsx-mode-hook 'eqyiel/company-rjsx-mode-hook)
 
-      ;; This should be smarter, like the prettier thing
       (defun eqyiel/flycheck-rjsx-mode-hook ()
         (require 'flycheck)
         (require 'flycheck-flow)
@@ -2584,11 +2570,6 @@ This is a new one for me.  See [[http://oremacs.com/swiper/#key-bindings-for-sin
       (add-to-list 'swiper-font-lock-exclude 'nix-mode))
     :demand
     :ensure t)
-#+end_src
-
-** ~tern~                                                            :melpa:
-#+begin_src emacs-lisp
-  (use-package tern :diminish tern-mode :ensure t)
 #+end_src
 
 ** ~tiny~                                                            :melpa:

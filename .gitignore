@@ -12,3 +12,5 @@ projectile.cache
 projectile-bookmarks.eld
 .mc-lists.el
 var/
+workspace/
+eclipse.jdt.ls/

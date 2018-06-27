@@ -231,6 +231,8 @@
   (cond
    ((eq system-type 'darwin) ;; high dpi
     (set-face-attribute 'default nil :height 140 :family "DejaVu Sans Mono"))
+   ((eq system-type 'windows-nt) ;; dpi :(
+    (set-face-attribute 'default nil :height 100 :family "DejaVu Sans Mono"))
    (t
     (set-face-attribute 'default nil :height 120 :family "DejaVu Sans Mono")))
 
@@ -284,6 +286,8 @@
 
   (setq use-package-always-ensure t
         use-package-always-defer t)
+
+  (use-package use-package-chords :config (key-chord-mode t) :ensure t :demand)
 #+end_src
 
 * Utility functions
@@ -843,36 +847,59 @@ So diminish ~auto-fill-function~, not ~auto-fill-mode~.
 
 ** ~buffer-move~                                                     :melpa:
 #+begin_src emacs-lisp
+  ;; Caps lock and Menu keys are bound to Hyper, except on OSX and Windows which
+  ;; apparently can't into Hyper.  Use fake Hyper from Karabiner-elements and
+  ;; autohotkey instead, which is really M-s-S-C and Menu key respectively.
+  ;;
+  ;; See:
+  ;; http://www.tenshu.net/p/fake-hyper-key-for-osx.html
+  ;; https://github.com/tekezo/Karabiner-Elements/pull/170
+  ;; https://stackoverflow.com/questions/40435980/how-to-emulate-hyper-key-in-windows-10-using-autohotkey
+
+  (defvar eqyiel/hyper-prefix
+    (cond
+     ((eq system-type 'darwin)
+      "M-s-S-C")
+     (t
+      "H")))
+
+  ;; Bind Menu / "AppsKey" to Hyper on Windows, which is really Capslock bound to
+  ;; Menu / "AppsKey" by Autohotkey.
+  ;;
+  ;; http://ergoemacs.org/emacs/emacs_hyper_super_keys.html
+  (use-package w32-vars
+    :if (eq system-type 'windows-nt)
+    :config
+    (progn
+      ;; (setq w32-pass-lwindow-to-system nil) ; Left Windows key
+      ;; (setq w32-lwindow-modifier 'super)
+      ;; (setq w32-pass-rwindow-to-system nil) ; Right Windows key
+      ;; (setq w32-rwindow-modifier 'super)
+      (setq w32-pass-apps-to-system nil) ; Menu/App key
+      (setq w32-apps-modifier 'hyper))
+    :ensure nil
+    :demand)
+
   (use-package buffer-move
-    :bind
-    ("H-h" . windmove-left)
-    ("H-j" . windmove-down)
-    ("H-k" . windmove-up)
-    ("H-l" . windmove-right)
-    ("H-b" . shrink-window-horizontally)
-    ("H-f" . enlarge-window-horizontally)
-    ("H-n" . shrink-window)
-    ("H-p" . enlarge-window)
-    ("M-H-h" . buf-move-left)
-    ("M-H-j" . buf-move-down)
-    ("M-H-k" . buf-move-up)
-    ("M-H-l" . buf-move-right)
-    ;; Caps lock and Menu keys are bound to Hyper, except on OSX which apparently
-    ;; can't into Hyper.  Use fake Hyper from Karabiner-elements instead, which is
-    ;; really M-s-S-C.
-    ;;
-    ;; See:
-    ;; http://www.tenshu.net/p/fake-hyper-key-for-osx.html
-    ;; https://github.com/tekezo/Karabiner-Elements/pull/170
-    ("M-s-S-C-h" . windmove-left)
-    ("M-s-S-C-j" . windmove-down)
-    ("M-s-S-C-k" . windmove-up)
-    ("M-s-S-C-l" . windmove-right)
-    ("M-s-S-C-b" . shrink-window-horizontally)
-    ("M-s-S-C-f" . enlarge-window-horizontally)
-    ("M-s-S-C-n" . shrink-window)
-    ("M-s-S-C-p" . enlarge-window)
-    :ensure t)
+    ;; I don't think it's possible to do these guys with other hyper prefixes
+    ;; because they use up all the modifiers
+    :bind (("M-H-h" . buf-move-left)
+           ("M-H-j" . buf-move-down)
+           ("M-H-k" . buf-move-up)
+           ("M-H-l" . buf-move-right))
+    :config
+    (progn
+      ;; I don't think the :bind macro can be used here because of the value is
+      ;; not static
+      (bind-key (concat eqyiel/hyper-prefix "-h") 'windmove-left)
+      (bind-key (concat eqyiel/hyper-prefix "-j") 'windmove-down)
+      (bind-key (concat eqyiel/hyper-prefix "-k") 'windmove-up)
+      (bind-key (concat eqyiel/hyper-prefix "-l") 'windmove-right)
+      (bind-key (concat eqyiel/hyper-prefix "-b") 'shrink-window-horizontally)
+      (bind-key (concat eqyiel/hyper-prefix "-f") 'enlarge-window-horizontally)
+      (bind-key (concat eqyiel/hyper-prefix "-n") 'shrink-window)
+      (bind-key (concat eqyiel/hyper-prefix "-p") 'enlarge-window))
+    :demand)
 #+end_src
 
 ** ~c++-mode~                                                      :builtin:
@@ -1051,7 +1078,7 @@ So diminish ~auto-fill-function~, not ~auto-fill-mode~.
     :init
     (progn
       (use-package company-emoji :demand :ensure t)
-    
+
       (setq company-backends
             '((company-files
                company-yasnippet
@@ -1196,7 +1223,10 @@ specific ~eslint~ executable, but it should be easy to fix.
 ** ~expand-region~                                                   :melpa:
 #+begin_src emacs-lisp
   (use-package expand-region
-    :bind (("C-=" . er/expand-region)))
+    :chords ((("jk" . 'er/expand-region)
+              ("kj" . 'er/expand-region)))
+    :bind ("C-=" . er/expand-region)
+    :demand)
 #+end_src
 
 ** ~flow-minor-mode~                                                 :melpa:
@@ -1496,18 +1526,6 @@ This package adds itself to ~auto-mode-alist~.
       (setq js-indent-level 2
             json-reformat:indent-width 2))
     (add-hook 'json-mode-hook 'eqyiel/json-mode-hook))
-#+end_src
-
-** ~key-chord~                                                       :melpa:
-#+begin_src emacs-lisp
-  (use-package key-chord
-    :init
-    (progn
-      (use-package expand-region)
-      (key-chord-mode t)
-      (key-chord-define-global "jk" 'er/expand-region)
-      (key-chord-define-global "kj" 'er/expand-region))
-    :demand)
 #+end_src
 
 ** ~legalese~                                                        :melpa:
@@ -2420,20 +2438,6 @@ Export ~org~ files to Github-flavoured markdown.
     :ensure t)
 #+end_src
 
-** ~solarized-theme~                                                 :melpa:
-#+BEGIN_SRC emacs-lisp
-  (use-package solarized-theme
-    :init
-    (progn
-      (setq custom-safe-themes '("d677ef584c6dfc0697901a44b885cc18e206f05114c8a3b7fde674fce6180879" default)
-            solarized-use-variable-pitch nil
-            solarized-scale-org-headlines nil)
-      (load-theme 'solarized-light))
-    :ensure t
-    :demand t)
-
-#+END_SRC
-
 ** ~shell-mode~                                                    :builtin:
 #+begin_src emacs-lisp
   (use-package shell
@@ -2492,6 +2496,20 @@ Export ~org~ files to Github-flavoured markdown.
     :ensure t
     :diminish smartparens-mode)
 #+end_src
+
+** ~solarized-theme~                                                 :melpa:
+#+BEGIN_SRC emacs-lisp
+  (use-package solarized-theme
+    :init
+    (progn
+      (setq custom-safe-themes '("d677ef584c6dfc0697901a44b885cc18e206f05114c8a3b7fde674fce6180879" default)
+            solarized-use-variable-pitch nil
+            solarized-scale-org-headlines nil)
+      (load-theme 'solarized-light))
+    :ensure t
+    :demand t)
+
+#+END_SRC
 
 ** ~sql-indent~                                                      :melpa:
 #+begin_src emacs-lisp
@@ -2654,6 +2672,11 @@ This is a new one for me.  See [[http://oremacs.com/swiper/#key-bindings-for-sin
     :ensure nil)
 #+end_src
 
+** ~unfill~                                                          :melpa:
+#+begin_src emacs-lisp
+  (use-package unfill :demand t :ensure t :bind ("M-q" . unfill-toggle))
+#+end_src
+
 ** ~uniquify~                                                      :builtin:
 #+begin_src emacs-lisp
   (use-package uniquify
@@ -2661,11 +2684,6 @@ This is a new one for me.  See [[http://oremacs.com/swiper/#key-bindings-for-sin
     (setq uniquify-buffer-name-style 'forward)
     :ensure nil
     :demand)
-#+end_src
-
-** ~unfill~                                                          :melpa:
-#+begin_src emacs-lisp
-  (use-package unfill :demand t :ensure t :bind ("M-q" . unfill-toggle))
 #+end_src
 
 ** ~visual-fill-column~                                              :melpa:

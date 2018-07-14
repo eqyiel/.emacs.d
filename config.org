@@ -1274,6 +1274,16 @@ specific ~eslint~ executable, but it should be easy to fix.
     :init (add-hook 'c-mode-common-hook 'google-set-c-style))
 #+end_src
 
+** ~groovy-mode~                                                     :melpa:
+
+This is pretty much exclusively for the sake of editing ~build.gradle~ files.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package groovy-mode)
+
+  (add-to-list 'auto-mode-alist '("\\.gradle\\'" . groovy-mode))
+#+END_SRC
+
 ** ~help-at-pt~                                                    :builtin:
 #+begin_src emacs-lisp
   (use-package help-at-pt

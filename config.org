@@ -1437,6 +1437,20 @@ instead of ~js2-mode~ or ~web-mode~.
   (add-to-list 'auto-mode-alist '("\\.gml\\'" . js-mode))
   (add-to-list 'auto-mode-alist '("\\.yy\\'" . js-mode))
   (add-to-list 'auto-mode-alist '("\\.yyp\\'" . js-mode))
+
+  (defun eqyiel/pseudo-gml-mode-hook ()
+    (let
+        ((extension (file-name-extension (buffer-file-name))))
+      (when
+          (or
+           (string-equal extension "yy")
+           (string-equal extension "yyp"))
+        ;; Game Maker strips the final newline when writing to these files.
+        ;; Prevent Emacs from adding one automatically upon save for cleaner
+        ;; diffs.
+        (setq-local require-final-newline nil))))
+
+  (add-hook 'js-mode-hook 'eqyiel/pseudo-gml-mode-hook)
 #+END_SRC
 
 ** ~js2-mode~                                                        :melpa:

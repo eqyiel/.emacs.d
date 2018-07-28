@@ -2040,6 +2040,37 @@ A tool to insert a link in the clipboard as an ~org-mode~ link at point.
 ** ~org-mode~                                                      :builtin:
 
 #+begin_src emacs-lisp
+  (defconst eqyiel/org-iso8601-date-format "[%FT%T%z]")
+
+  (defun eqyiel/org-insert-created-property ()
+    "Insert CREATED property at point in ISO 8601 format."
+    (interactive)
+    (org-set-property
+     "CREATED"
+     (format-time-string eqyiel/org-iso8601-date-format (current-time))))
+
+  (defun eqyiel/org-iso8601ify-date-string (date)
+    "Try to change DATE to ISO 8601 format."
+    (format-time-string eqyiel/org-iso8601-date-format (date-to-time date)))
+
+  (defun eqyiel/org-agenda-skip-non-toplevel-headings ()
+    "`org-agenda-skip-function' that skips over all but top level headings."
+    (unless (= 1 (nth 1 (org-heading-components)))
+         (org-end-of-subtree)))
+
+  (defun eqyiel/org-iso8601ify-created-properties (query)
+    "Change CREATED timestamps to ISO 8601 format for entries matching QUERY."
+    (org-map-entries
+     (lambda ()
+       (let ((target-property "CREATED"))
+         (org-entry-put
+          (point)
+          target-property
+          (eqyiel/org-iso8601ify-date-string
+           (org-entry-get (point) target-property)))))
+     query 'agenda
+     'eqyiel/org-agenda-skip-non-toplevel-headings))
+
   (defun eqyiel/org-prev-visible-heading (arg)
     "Move to the previous visible heading.
 
@@ -2117,7 +2148,16 @@ A tool to insert a link in the clipboard as an ~org-mode~ link at point.
   :CREATED: %U
   :END:
   "
-        :empty-lines 1 :kill-buffer t))
+        :empty-lines 1 :kill-buffer t)
+       ("b" "Blog"
+       entry (file ,(eqyiel/maybe-create-agenda-file-with-category "Blog"))
+       "* %?
+  :PROPERTIES:
+  :CREATED: %U
+  :DRAFT: t
+  :END:
+  "
+       :empty-lines 1 :kill-buffer t))
      org-log-done 'time
      ;; remove scheduled date and deadline when changing state from TODO
      org-after-todo-state-change-hook

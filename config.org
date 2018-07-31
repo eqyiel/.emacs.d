@@ -1223,8 +1223,8 @@ specific ~eslint~ executable, but it should be easy to fix.
 ** ~expand-region~                                                   :melpa:
 #+begin_src emacs-lisp
   (use-package expand-region
-    :chords ((("jk" . 'er/expand-region)
-              ("kj" . 'er/expand-region)))
+    :chords ((("jk" . er/expand-region)
+              ("kj" . er/expand-region)))
     :bind ("C-=" . er/expand-region)
     :demand)
 #+end_src

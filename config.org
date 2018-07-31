@@ -1498,7 +1498,8 @@ instead of ~js2-mode~ or ~web-mode~.
           (setq-local js2-strict-trailing-comma-warning nil)
           (setq-local js2-strict-var-hides-function-arg-warning nil)
           (setq-local js2-strict-var-redeclaration-warning nil)
-          (activate-flow-js2-mode)))
+          (activate-flow-js2-mode)
+          (rainbow-mode)))
 
       (add-hook 'js2-mode-hook 'eqyiel/js2-mode-hook)
       (add-hook 'js2-jsx2-mode-hook 'eqyiel/js2-mode-hook)

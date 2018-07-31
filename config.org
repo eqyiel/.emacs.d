@@ -2154,8 +2154,7 @@ A tool to insert a link in the clipboard as an ~org-mode~ link at point.
        entry (file ,(eqyiel/maybe-create-agenda-file-with-category "Blog"))
        "* %?
   :PROPERTIES:
-  :CREATED: %U
-  :DRAFT: t
+  :CREATED: %(format-time-string eqyiel/org-iso8601-date-format (current-time))
   :END:
   "
        :empty-lines 1 :kill-buffer t))

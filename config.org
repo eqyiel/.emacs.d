@@ -2597,10 +2597,6 @@ Export ~org~ files to Github-flavoured markdown.
 
 #+END_SRC
 
-** ~sql-indent~                                                      :melpa:
-#+begin_src emacs-lisp
-  (use-package sql-indent :ensure t)
-#+end_src
 
 ** ~subword~                                                       :builtin:
 #+begin_src emacs-lisp

@@ -666,15 +666,32 @@
 #+BEGIN_SRC emacs-lisp
   (use-package dash :ensure t :demand)
   (use-package f :ensure t :demand)
+  (use-package s :ensure t :demand)
   (use-package json :ensure t :demand)
 
-  (defun eqyiel/node-locate-js-project-root ()
-    "Find the dir containing package.json starting with PATH.
+  ;; TODO: this will only return the root of a workspace only.  That is not always
+  ;; desirable.  Instead, this should return a list of `js-project-roots', but
+  ;; there is a bunch of other refactoring I have to do to make that work.
+  (defun eqyiel/node-locate-js-project-root (&optional directory)
+    "Find the dir containing package.json starting with DIRECTORY.
   Returns current working directory if no node_modules directory was found."
-    (or (locate-dominating-file
-         (or (buffer-file-name) default-directory)
-         "node_modules")
-        default-directory))
+    (let* ((node-modules-dir "node_modules")
+           (actual-default-directory
+            (or (if (boundp 'directory) directory nil)
+                (buffer-file-name)
+                default-directory))
+           (dominating-file
+            (or (locate-dominating-file actual-default-directory node-modules-dir)
+                actual-default-directory))
+           (parent-dominating-file
+            (if dominating-file
+                (locate-dominating-file
+                 (or (f-dirname dominating-file) actual-default-directory)
+                 node-modules-dir)
+              default-directory)))
+      (if (or (not parent-dominating-file) (s-equals? dominating-file parent-dominating-file))
+          dominating-file
+        (eqyiel/node-locate-js-project-root parent-dominating-file))))
 
   (defun eqyiel/node-find-dependency-in-package-file (package-file dependency)
     "Return t if PACKAGE-FILE has DEPENDENCY.

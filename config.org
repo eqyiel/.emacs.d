@@ -613,6 +613,31 @@
        (rx (any " _")) actual-delimiter
        (downcase (replace-regexp-in-string "[^A-Za-z0-9 ]" "" string)))))
 
+  (defun eqyiel/get-last-messages-buffer-message ()
+    "Get the last line logged to the messages buffer."
+    (save-excursion
+      (set-buffer "*Messages*")
+      (save-excursion
+        (forward-line (- 1))
+        (backward-char)
+        (let ((end (point)))
+          (forward-line 0)
+          (buffer-substring-no-properties (point) end)))))
+
+  (defun eqyiel/eslint-get-rule-violation-at-point ()
+    (interactive)
+    "Get the last eslint rule violation that was logged to `*Messages*'.
+
+  This is a hack and it depends on the violated rule being logged within square
+  brackets like [react/require-default-props]"
+    (let* ((target-message (eqyiel/get-last-messages-buffer-message))
+           (eslint-rule (and (string-match "\\[\\(.*\\)\\]" target-message)
+                             (match-string 1 target-message))))
+      (if eslint-rule (progn
+                        (kill-new eslint-rule)
+                        (message "Saved to kill ring: %s" eslint-rule))
+        (message "No eslint warnings found at point."))))
+
   (defun eqyiel/psql ()
     (interactive)
     (require 'sql)

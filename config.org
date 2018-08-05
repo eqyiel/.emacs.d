@@ -513,21 +513,6 @@
 
   (bind-key "C-x C-k" 'eqyiel/delete-file-and-buffer)
 
-  (defun eqyiel/sprunge-region ()
-    "Send the current region to sprunge.us and save the URL returned to the
-        kill-ring."
-    (interactive)
-    (if (use-region-p)
-        (let ((filename (substring (shell-command-to-string "mktemp") 0 -1)))
-          (write-region (region-beginning) (region-end) filename)
-          (let ((url (substring (shell-command-to-string
-                                 (concat "curl -s -F 'sprunge=<"
-                                         filename "' http://sprunge.us")) 0 -1)))
-            (shell-command (concat "rm " filename))
-            (kill-new url)
-            (message "Saved %s to kill ring." url)))
-      (message "Mark a region first.")))
-
   (defun eqyiel/rotn-region (n)
     "Decode a caesar cipher.  Adapted from `rot13' to shift by N."
     (interactive "NHow many? ")

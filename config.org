@@ -1600,32 +1600,25 @@ This package adds itself to ~auto-mode-alist~.
 
   (defun eqyiel/lsp-javascript-flow-enable-maybe ()
     (interactive)
-    ;; TODO: only enable if there is a valid @flow annotation
-    (when (eqyiel/lsp-javascript-flow-find-executable)
-      (progn
-        ;; Run nix-buffer if necessary to put things like node in PATH
-        (eqyiel/nix-buffer-find-file-hook)
-        (eqyiel/lsp-javascript-flow-enable)
-        (lsp-ui-mode))))
+    (let ((flow-server-executable (eqyiel/lsp-javascript-flow-find-executable)))
+      (when (flow-minor-tag-present-p)
+        (if flow-server-executable
+            (progn
+              ;; Run nix-buffer if necessary to put things like node in PATH
+              (eqyiel/nix-buffer-find-file-hook)
+              (setq-local lsp-javascript-flow-server-args '("--try-flow-bin"))
+              (setq-local lsp-javascript-flow-server flow-server-executable)
+              (lsp-javascript-flow-enable)
+              (lsp-ui-mode))
+          (message "// @flow tag present, but no flow-language-server found in project")))))
 
-  (defun eqyiel/lsp-javascript-flow-define-stdio-client ()
-    (list
-     (eqyiel/lsp-javascript-flow-find-executable)
-     "--stdio"
-     "--try-flow-bin"))
-
-  (use-package lsp-javascript-typescript
+  (use-package lsp-javascript-flow
     :ensure t
     :requires lsp-mode
+    :config (use-package flow-minor-mode :ensure t :demand t)
     :demand t
-    :config (require 'lsp-javascript-flow)
     :hook ((js-mode js2-mode rjsx-mode)
            . eqyiel/lsp-javascript-flow-enable-maybe))
-
-  (lsp-define-stdio-client
-   eqyiel/lsp-javascript-flow "javascript"
-   lsp-javascript--get-root nil
-   :command-fn 'eqyiel/lsp-javascript-flow-define-stdio-client)
 
   (defun eqyiel/lsp-java-enable-maybe ()
     (interactive)

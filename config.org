@@ -2356,6 +2356,7 @@ Export ~org~ files to Github-flavoured markdown.
 #+END_SRC
 
 ** ~projectile~                                                      :melpa:
+
 #+begin_src emacs-lisp
   (use-package projectile
     :config
@@ -2363,8 +2364,10 @@ Export ~org~ files to Github-flavoured markdown.
       ;; monkeypatch `projectile-current-project-files' to use fd, it's much faster.
       (defun eqyiel/projectile-current-project-files ()
         "Return a list of files for the current project."
-        (let ((files (and projectile-enable-caching
-                          (gethash (projectile-project-root) projectile-projects-cache))))
+        (let ((files
+               (and projectile-enable-caching
+                    (gethash (projectile-project-root)
+                             projectile-projects-cache))))
           ;; nothing is cached
           (unless files
             (when projectile-enable-caching
@@ -2378,9 +2381,13 @@ Export ~org~ files to Github-flavoured markdown.
             ;; cache the resulting list of files
             (when projectile-enable-caching
               (projectile-cache-project (projectile-project-root) files)))
+
           (projectile-sort-files files))))
     :init
     (progn
+      ;; Default keybinding was changed from "C-c p" to "C-c C-p" in
+      ;; https://github.com/bbatsov/projectile/commit/b90b950eead64b171d528098d186c19804739aa0
+      (setq projectile-keymap-prefix (kbd "C-c p"))
       (use-package ivy :ensure t)
       (projectile-global-mode)
       (advice-add

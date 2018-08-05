@@ -677,7 +677,7 @@
   Returns current working directory if no node_modules directory was found."
     (let* ((package-file "package.json")
            (actual-default-directory
-            (or (if (boundp 'directory) directory nil)
+            (or directory
                 (buffer-file-name)
                 default-directory))
            (dominating-file
@@ -688,7 +688,7 @@
                 (locate-dominating-file
                  (or (f-dirname dominating-file) actual-default-directory)
                  package-file)
-              default-directory)))
+              actual-default-directory)))
       (if (or (not parent-dominating-file) (s-equals? dominating-file parent-dominating-file))
           dominating-file
         (eqyiel/node-locate-js-project-root parent-dominating-file))))

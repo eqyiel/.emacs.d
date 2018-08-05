@@ -2094,7 +2094,7 @@ A tool to insert a link in the clipboard as an ~org-mode~ link at point.
 
   (defun eqyiel/maybe-create-agenda-file-with-category (category)
     (let ((target
-           (format "%s/%s-%s.org"
+           (format "%s/%s.org"
                    eqyiel/org-directory
                    (eqyiel/slugify category "_")
                    (eqyiel/slugify (system-name) "_"))))
@@ -2135,7 +2135,7 @@ A tool to insert a link in the clipboard as an ~org-mode~ link at point.
      org-export-babel-evaluate nil
      org-export-default-language "en"
      org-capture-templates
-     `(("t" "Todo" entry (file ,(eqyiel/maybe-create-agenda-file-with-category "Todo"))
+     `(("t" "Todo" entry (file ,(eqyiel/maybe-create-agenda-file-with-category "todo"))
         "* TODO %?
   SCHEDULED: %(org-insert-time-stamp (org-read-date nil t \"+0d\"))
   :PROPERTIES:
@@ -2144,7 +2144,7 @@ A tool to insert a link in the clipboard as an ~org-mode~ link at point.
   "
         :empty-lines 1 :kill-buffer t)
        ("s" "Shopping"
-        entry (file ,(eqyiel/maybe-create-agenda-file-with-category "Shopping"))
+        entry (file ,(eqyiel/maybe-create-agenda-file-with-category "shopping"))
         "* TODO %?
   SCHEDULED: %(org-insert-time-stamp (org-read-date nil t \"+0d\"))
   :PROPERTIES:
@@ -2153,7 +2153,7 @@ A tool to insert a link in the clipboard as an ~org-mode~ link at point.
   "
         :empty-lines 1 :kill-buffer t)
        ("m" "Media"
-        entry (file ,(eqyiel/maybe-create-agenda-file-with-category "Media"))
+        entry (file ,(eqyiel/maybe-create-agenda-file-with-category "media"))
         "* %?
   :PROPERTIES:
   :CREATED: %U
@@ -2161,8 +2161,8 @@ A tool to insert a link in the clipboard as an ~org-mode~ link at point.
   "
         :empty-lines 1 :kill-buffer t)
        ("b" "Blog"
-       entry (file ,(eqyiel/maybe-create-agenda-file-with-category "Blog"))
-       "* %?
+       entry (file ,(eqyiel/maybe-create-agenda-file-with-category "blog"))
+       "* TODO %?
   :PROPERTIES:
   :CREATED: %(format-time-string eqyiel/org-iso8601-date-format (current-time))
   :END:

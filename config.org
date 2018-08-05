@@ -675,19 +675,19 @@
   (defun eqyiel/node-locate-js-project-root (&optional directory)
     "Find the dir containing package.json starting with DIRECTORY.
   Returns current working directory if no node_modules directory was found."
-    (let* ((node-modules-dir "node_modules")
+    (let* ((package-file "package.json")
            (actual-default-directory
             (or (if (boundp 'directory) directory nil)
                 (buffer-file-name)
                 default-directory))
            (dominating-file
-            (or (locate-dominating-file actual-default-directory node-modules-dir)
+            (or (locate-dominating-file actual-default-directory package-file)
                 actual-default-directory))
            (parent-dominating-file
             (if dominating-file
                 (locate-dominating-file
                  (or (f-dirname dominating-file) actual-default-directory)
-                 node-modules-dir)
+                 package-file)
               default-directory)))
       (if (or (not parent-dominating-file) (s-equals? dominating-file parent-dominating-file))
           dominating-file

@@ -1322,7 +1322,7 @@ specific ~eslint~ executable, but it should be easy to fix.
        gh-vals
        (plist-put
         gh-vals
-        :token (password-store-get "tokens/eqyiel@github.com:gist")))))
+        :token (password-store-get "tokens/github.com/eqyiel/gist")))))
 #+END_SRC
 
 ** ~google-c-style~                                                  :melpa:

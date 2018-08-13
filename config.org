@@ -1325,6 +1325,12 @@ specific ~eslint~ executable, but it should be easy to fix.
         :token (password-store-get "tokens/github.com/eqyiel/gist")))))
 #+END_SRC
 
+** ~go-mode~                                                         :melpa:
+
+#+BEGIN_SRC emacs-lisp
+  (use-package go-mode)
+#+END_SRC
+
 ** ~google-c-style~                                                  :melpa:
 #+begin_src emacs-lisp
   (use-package google-c-style

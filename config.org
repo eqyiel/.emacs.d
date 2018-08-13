@@ -1328,7 +1328,8 @@ specific ~eslint~ executable, but it should be easy to fix.
 ** ~go-mode~                                                         :melpa:
 
 #+BEGIN_SRC emacs-lisp
-  (use-package go-mode)
+  (use-package go-mode
+    :hook (before-save . gofmt-before-save))
 #+END_SRC
 
 ** ~google-c-style~                                                  :melpa:

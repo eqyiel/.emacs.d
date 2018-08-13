@@ -1336,6 +1336,11 @@ specific ~eslint~ executable, but it should be easy to fix.
   (use-package google-translate)
 #+END_SRC
 
+** ~graphql-mode~                                                    :melpa:
+#+BEGIN_SRC emacs-lisp
+  (use-package graphql-mode)
+#+END_SRC
+
 ** ~groovy-mode~                                                     :melpa:
 
 This is pretty much exclusively for the sake of editing ~build.gradle~ files.
@@ -2348,6 +2353,7 @@ Export ~org~ files to Github-flavoured markdown.
             (add-hook 'js-mode-hook 'eqyiel/prettier-js-mode-hook)
             (add-hook 'markdown-mode-hook 'eqyiel/prettier-js-mode-hook)
             (add-hook 'js2-mode-hook 'eqyiel/prettier-js-mode-hook)
+            (add-hook 'graphql-mode-hook 'eqyiel/prettier-js-mode-hook)
             (add-hook 'web-mode-hook
                       (lambda ()
                         (when (or (string-equal web-mode-content-type "javascript")

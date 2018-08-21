@@ -156,7 +156,7 @@
    (concat
     (directory-file-name
      (expand-file-name user-emacs-directory))
-    "/eqyi-el/eqyiel-custom-junk.el"))
+    "/eqyiel-custom-junk.el"))
 
   ;; No really.
   (eval-after-load "kkc"
@@ -263,10 +263,10 @@
   (require 'package)
   (setq package-enable-at-startup nil
         package-user-dir "~/.emacs.d/site-lisp/elpa"
+        package-gnupghome-dir "~/.emacs.d/site-lisp/elpa/gnupg"
         package-archives
-        '(("elpy" . "http://jorgenschaefer.github.io/packages/")
-          ("gnu" . "http://elpa.gnu.org/packages/")
-          ("melpa" . "https://melpa.org/packages/")))
+        '(("gnu" . "https://elpa.gnu.org/packages")
+          ("melpa" . "https://melpa.org/packages")))
   (package-initialize)
 
   ;; Bootstrap `use-package' and its dependencies if they are not already
@@ -1962,15 +1962,10 @@ Check out this for tips: https://vxlabs.com/2017/02/07/mu4e-0-9-18-e-mailing-wit
 ** ~nix-emacs~                                                     :subtree:
 #+begin_src emacs-lisp
   (use-package company-nixos-options
-    :after (company nix-mode)
-    :demand
-    :ensure nil
-    :load-path "site-lisp/travisbhartwell/nix-emacs")
+    :after (company nix-mode))
 
   (use-package nixos-options
-    :ensure nil
-    :after nix-mode
-    :load-path "site-lisp/travisbhartwell/nix-emacs")
+    :after nix-mode)
 #+end_src
 
 ** ~nix-mode~                                                      :subtree:
@@ -2913,7 +2908,7 @@ This package adds itself to ~auto-mode-alist~.
       (require 'warnings)
       (setq
        yas-snippet-dirs
-       `(,(concat (directory-file-name user-emacs-directory) "/eqyi-el/snippets")
+       `(,(concat (directory-file-name user-emacs-directory) "/snippets")
          yas-installed-snippets-dir)
        yas-prompt-functions '(yas-ido-prompt))
       ;; Warning (yasnippet): ‘Snippet’ modified buffer in a backquote expression.

@@ -1497,7 +1497,6 @@ instead of ~js2-mode~ or ~web-mode~.
   (use-package js2-mode
     :config
     (progn
-      (use-package tern)
       (use-package web-mode)
       (use-package flycheck)
       (use-package company)

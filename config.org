@@ -265,8 +265,8 @@
         package-user-dir "~/.emacs.d/site-lisp/elpa"
         package-gnupghome-dir "~/.emacs.d/site-lisp/elpa/gnupg"
         package-archives
-        '(("gnu" . "https://elpa.gnu.org/packages")
-          ("melpa" . "https://melpa.org/packages")))
+        '(("gnu" . "https://elpa.gnu.org/packages/")
+          ("melpa" . "https://melpa.org/packages/")))
   (package-initialize)
 
   ;; Bootstrap `use-package' and its dependencies if they are not already

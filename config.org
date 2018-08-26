@@ -654,37 +654,27 @@
 
 ** Functions for working with node projects
 
-#+BEGIN_EXAMPLE
-;; Examples
-
-(eqyiel/node-find-dependency-in-package-file
-  (f-join (eqyiel/node-locate-js-project-root) "package.json")
-  '(prettier prettier-eslint-cli))
- ;; => "prettier"
-
-(eqyiel/node-find-dependency-in-package-file
-  (f-join (eqyiel/node-locate-js-project-root) "package.json")
-  "lodash")
- ;; => "lodash"
-
-(eqyiel/node-find-dependency-in-package-file
-  (f-join (eqyiel/node-locate-js-project-root) "package.json")
-  "react")
- ;; => nil
-#+END_EXAMPLE
-
 #+BEGIN_SRC emacs-lisp
   (use-package dash :ensure t :demand)
   (use-package f :ensure t :demand)
   (use-package s :ensure t :demand)
   (use-package json :ensure t :demand)
 
-  ;; TODO: this will only return the root of a workspace only.  That is not always
-  ;; desirable.  Instead, this should return a list of `js-project-roots', but
-  ;; there is a bunch of other refactoring I have to do to make that work.
-  (defun eqyiel/node-locate-js-project-root (&optional directory)
-    "Find the dir containing package.json starting with DIRECTORY.
-  Returns current working directory if no node_modules directory was found."
+  (defun eqyiel/node-json-read-file-safely (json-file)
+    "Read JSON-FILE and return its contents or nil if it was malformed."
+    (condition-case nil
+        ;; silence errors from `json-read-file' if package.json is malformed
+        ;; (for example, while resolving merge conflicts)
+        (when (and (f-readable-p json-file)
+                   (f-exists-p json-file))
+          (json-read-file json-file))
+      (error nil)))
+
+  (defun eqyiel/node-find-js-project-roots (&optional directory js-project-roots)
+    "Find JS-PROJECT-ROOTS (containing package.json) starting with DIRECTORY.
+
+  Returns a list of candidate directories, including the current working directory
+  if no package.json was found."
     (let* ((package-file "package.json")
            (actual-default-directory
             (or directory
@@ -699,9 +689,12 @@
                  (or (f-dirname dominating-file) actual-default-directory)
                  package-file)
               actual-default-directory)))
-      (if (or (not parent-dominating-file) (s-equals? dominating-file parent-dominating-file))
-          dominating-file
-        (eqyiel/node-locate-js-project-root parent-dominating-file))))
+      (if (or (not parent-dominating-file)
+              (s-equals? dominating-file parent-dominating-file))
+          (reverse (cons dominating-file js-project-roots))
+        (eqyiel/node-find-js-project-roots
+         parent-dominating-file
+         (cons dominating-file js-project-roots)))))
 
   (defun eqyiel/node-find-dependency-in-package-file (package-file dependency)
     "Return t if PACKAGE-FILE has DEPENDENCY.
@@ -716,32 +709,24 @@
     package.json, for example flow is called \"flow-bin\" on NPM but its bin key
     is \"flow\".
   - in the event that there is a package that has a drop in replacement available
-    with a different name, like \"prettier\" and \"prettier-eslint-cli\".
-  "
-    (condition-case nil
-        ;; silence errors from `json-read-file' if package.json is malformed
-        ;; (for example, while resolving merge conflicts)
-        (when (and (f-readable-p package-file)
-                   (f-exists-p package-file))
-          (let* ((package-file-as-string
-                  (json-read-file package-file))
-                 (node-dependency
-                  (caar
-                   (delq
-                    nil
-                    (mapcar
-                     (lambda (element)
-                       (assoc (cdr element)
-                              (assoc (car element) package-file-as-string)))
-                     (-mapcat
-                      (lambda (item)
-                        (-concat `(,(cons 'dependencies item)
-                                   ,(cons 'devDependencies item))))
+    with a different name, like \"prettier\" and \"prettier-eslint-cli\"."
+    (let* ((package (eqyiel/node-json-read-file-safely package-file))
+           (node-dependency
+            (caar
+             (delq
+              nil
+              (mapcar
+               (lambda (element)
+                 (assoc (cdr element)
+                        (assoc (car element) package)))
+               (-mapcat
+                (lambda (item)
+                  (-concat `(,(cons 'dependencies item)
+                             ,(cons 'devDependencies item))))
 
-                      (if (listp dependency)
-                          dependency (list (intern dependency)))))))))
-            (when node-dependency (symbol-name node-dependency))))
-      (error nil)))
+                (if (listp dependency)
+                    dependency (list (intern dependency)))))))))
+      (when node-dependency (symbol-name node-dependency))))
 
   (defun eqyiel/node-package-path-exists-p (js-project-root dependency)
     "Construct the path in JS-PROJECT-ROOT to DEPENDENCY."
@@ -751,16 +736,24 @@
       (and (f-readable-p dependency-package-path)
            (f-exists-p dependency-package-path))))
 
-  (defun eqyiel/node-should-use-package-p (js-project-root dependency)
-    "Check JS-PROJECT-ROOT has DEPENDENCY in both package.json and node_modules.
+  (defun eqyiel/node-should-use-package-p (js-project-roots dependency)
+    "Check JS-PROJECT-ROOTS for DEPENDENCY in both package.json and node_modules.
+
   DEPENDENCY should be a list of symbols (in which case the first one that is
-  found will return) or a string."
-    (let ((resolved-dependency
-           (eqyiel/node-find-dependency-in-package-file
-            (f-join js-project-root "package.json") dependency)))
-      (and resolved-dependency
-           (eqyiel/node-package-path-exists-p
-            js-project-root resolved-dependency))))
+  found will return) or a string.  If there are multiple JS-PROJECT-ROOTS with
+  that dependency, the nearest one will be used."
+    (car
+     (delq
+      nil
+      (mapcar
+       (lambda (js-project-root)
+         (let ((resolved-dependency
+                (eqyiel/node-find-dependency-in-package-file
+                 (f-join js-project-root "package.json") dependency)))
+           (and resolved-dependency
+                (eqyiel/node-package-path-exists-p
+                 js-project-root resolved-dependency))))
+       js-project-roots))))
 
   (defun eqyiel/node-find-dependency-package-path (js-project-root dependency)
     "Using JS-PROJECT-ROOT, get the path to the first resolved DEPENDENCY."
@@ -797,15 +790,26 @@
             local-project-executable))
       (error nil)))
 
-  (defun eqyiel/node-find-project-local-executable-path (js-project-root dependency)
-    "Make path in JS-PROJECT-ROOT for executable DEPENDENCY."
-    (let* ((local-project-executable
-            (eqyiel/node-find-project-local-executable
-             js-project-root dependency)))
-      (when local-project-executable
-        (f-join
-         (eqyiel/node-find-dependency-package-path js-project-root dependency)
-         local-project-executable))))
+  (defun eqyiel/node-find-project-local-executable-path (js-project-roots dependency)
+    "Make path to executable DEPENDENCY for directories in JS-PROJECT-ROOTS.
+
+  DEPENDENCY should be a list of symbols (in which case the first one that is
+  found will return) or a string.  If there are multiple JS-PROJECT-ROOTS with
+  that dependency, the nearest one will be used."
+    (car
+     (delq
+      nil
+      (mapcar
+       (lambda (js-project-root)
+         (let* ((local-project-executable
+                 (eqyiel/node-find-project-local-executable
+                  js-project-root dependency)))
+           (when local-project-executable
+             (f-join
+              (eqyiel/node-find-dependency-package-path
+               js-project-root dependency)
+              local-project-executable))))
+       js-project-roots))))
 #+END_SRC
 
 * Packages
@@ -1259,11 +1263,11 @@ specific ~eslint~ executable, but it should be easy to fix.
 ** ~flow-minor-mode~                                                 :melpa:
 #+BEGIN_SRC emacs-lisp
   (defun eqyiel/flow-minor-mode-hook ()
-    (let ((js-project-root (eqyiel/node-locate-js-project-root)))
-      (when (eqyiel/node-should-use-package-p js-project-root '(flow flow-bin))
+    (let ((js-project-roots (eqyiel/node-find-js-project-roots)))
+      (when (eqyiel/node-should-use-package-p js-project-roots '(flow flow-bin))
         (let ((local-project-flow-executable
                (eqyiel/node-find-project-local-executable-path
-                js-project-root '(flow flow-bin))))
+                js-project-roots '(flow flow-bin))))
           (when local-project-flow-executable
             (set (make-local-variable 'flow-minor-default-binary)
                  local-project-flow-executable))))))
@@ -1613,11 +1617,11 @@ This package adds itself to ~auto-mode-alist~.
     :config (require 'lsp-ui))
 
   (defun eqyiel/lsp-javascript-flow-find-executable ()
-    (let ((js-project-root (eqyiel/node-locate-js-project-root)))
+    (let ((js-project-roots (eqyiel/node-find-js-project-roots)))
       (when (eqyiel/node-should-use-package-p
-             js-project-root '(flow-language-server))
+             js-project-roots '(flow-language-server))
         (eqyiel/node-find-project-local-executable-path
-         js-project-root '(flow-language-server)))))
+         js-project-roots '(flow-language-server)))))
 
   (defun eqyiel/lsp-javascript-flow-enable-maybe ()
     (interactive)
@@ -2337,14 +2341,14 @@ Export ~org~ files to Github-flavoured markdown.
   (defun eqyiel/prettier-js-mode-hook ()
     "Maybe format buffer with prettier on save."
     (require 'prettier-js)
-    (let ((js-project-root (eqyiel/node-locate-js-project-root)))
-      (when (eqyiel/node-should-use-package-p js-project-root '(prettier))
+    (let ((js-project-roots (eqyiel/node-find-js-project-roots)))
+      (when (eqyiel/node-should-use-package-p js-project-roots '(prettier))
         (progn
           (prettier-js-mode)
           ;; prefer the project's local prettier package before any global one
           (let ((local-project-prettier-executable
                  (eqyiel/node-find-project-local-executable-path
-                  js-project-root '(prettier))))
+                  js-project-roots '(prettier))))
             (when local-project-prettier-executable
               (set (make-local-variable 'prettier-js-command)
                    local-project-prettier-executable)))))))
@@ -2467,19 +2471,19 @@ Export ~org~ files to Github-flavoured markdown.
         (require 'flycheck)
         (require 'flycheck-flow)
         (flycheck-mode)
-        (let ((js-project-root (eqyiel/node-locate-js-project-root)))
+        (let ((js-project-roots (eqyiel/node-find-js-project-roots)))
           (progn
-            (when (eqyiel/node-should-use-package-p js-project-root '(eslint))
+            (when (eqyiel/node-should-use-package-p js-project-roots '(eslint))
               (let ((local-project-eslint-executable
                      (eqyiel/node-find-project-local-executable-path
-                      js-project-root '(eslint))))
+                      js-project-roots '(eslint))))
                 (when local-project-eslint-executable
                   (set (make-local-variable 'flycheck-javascript-eslint-executable)
                        local-project-eslint-executable))))
-            (when (eqyiel/node-should-use-package-p js-project-root '(flow flow-bin))
+            (when (eqyiel/node-should-use-package-p js-project-roots '(flow flow-bin))
               (let ((local-project-flow-executable
                      (eqyiel/node-find-project-local-executable-path
-                      js-project-root '(flow flow-bin))))
+                      js-project-roots '(flow flow-bin))))
                 (when local-project-flow-executable
                   (set (make-local-variable 'flycheck-javascript-flow-executable)
                        local-project-flow-executable)))))))
@@ -2829,19 +2833,19 @@ This is a pretty good replacement  for ~longlines-mode~.
         (require 'flycheck)
         (require 'flycheck-flow)
         (flycheck-mode)
-        (let ((js-project-root (eqyiel/node-locate-js-project-root)))
+        (let ((js-project-roots (eqyiel/node-find-js-project-roots)))
           (progn
-            (when (eqyiel/node-should-use-package-p js-project-root '(eslint))
+            (when (eqyiel/node-should-use-package-p js-project-roots '(eslint))
               (let ((local-project-eslint-executable
                      (eqyiel/node-find-project-local-executable-path
-                      js-project-root '(eslint))))
+                      js-project-roots '(eslint))))
                 (when local-project-eslint-executable
                   (set (make-local-variable 'flycheck-javascript-eslint-executable)
                        local-project-eslint-executable))))
-            (when (eqyiel/node-should-use-package-p js-project-root '(flow))
+            (when (eqyiel/node-should-use-package-p js-project-roots '(flow))
               (let ((local-project-flow-executable
                      (eqyiel/node-find-project-local-executable-path
-                      js-project-root '(flow))))
+                      js-project-roots '(flow))))
                 (when local-project-flow-executable
                   (set (make-local-variable 'flycheck-javascript-flow-executable)
                        local-project-flow-executable)))))))))

@@ -2750,6 +2750,64 @@ This is a new one for me.  See [[http://oremacs.com/swiper/#key-bindings-for-sin
     :ensure t)
 #+end_src
 
+** ~tide~                                                            :melpa:
+
+#+BEGIN_SRC emacs-lisp
+  (defun eqyiel/ts-check-tag-present-p ()
+    "Return true if the '// @ts-check' tag is present in the current buffer."
+    (save-excursion
+      (goto-char (point-min))
+      (let (stop found)
+        (while (not stop)
+          (when (not (re-search-forward "[^\n[:space:]]" nil t))
+            (setq stop t))
+          (if (equal (point) (point-min))
+              (setq stop t)
+            (backward-char))
+          (cond ((or (looking-at "//+[ ]*@ts-check")
+                     (looking-at "/\\**[ ]*@ts-check"))
+                 (setq found t)
+                 (setq stop t))
+                ((looking-at "//")
+                 (forward-line))
+                ((looking-at "/\\*")
+                 (when (not (re-search-forward "*/" nil t))
+                   (setq stop t)))
+                (t (setq stop t))))
+        found)))
+
+  (defun eqyiel/ts-tsserver-find-executable ()
+    (let ((js-project-roots (eqyiel/node-find-js-project-roots)))
+      (when (eqyiel/node-should-use-package-p
+             js-project-roots '(typescript tsserver))
+        (eqyiel/node-find-project-local-executable-path
+         js-project-roots '(typescript tsserver)))))
+
+  (defun eqyiel/ts-enable-maybe ()
+    (interactive)
+    (let ((tsserver-executable (eqyiel/ts-tsserver-find-executable)))
+      (when (and (or (string-equal "ts" (file-name-extension (buffer-file-name)))
+                     (string-equal "tsx" (file-name-extension (buffer-file-name)))
+                     (eqyiel/ts-check-tag-present-p))
+                 (or (locate-dominating-file (buffer-file-name) "jsconfig.json")
+                     (locate-dominating-file (buffer-file-name) "tsconfig.json")))
+        (if tsserver-executable
+            (progn
+              ;; Run nix-buffer if necessary to put things like node in PATH
+              (eqyiel/nix-buffer-find-file-hook)
+              (setq-local tide-tsserver-executable tsserver-executable)
+              (tide-setup)
+              (tide-hl-identifier-mode))
+          (message "// @ts-check tag, tsconfig.json or jsconfig.json present, but no typescript package in project")))))
+
+  (use-package tide
+    :ensure t
+    :after (company flycheck)
+    :config (flycheck-add-next-checker 'javascript-eslint 'jsx-tide 'append)
+    :hook (((js2-mode web-mode rjsx-mode) . eqyiel/ts-enable-maybe)
+           (before-save . tide-format-before-save)))
+#+END_SRC
+
 ** ~tiny~                                                            :melpa:
 #+begin_src emacs-lisp
   (use-package tiny

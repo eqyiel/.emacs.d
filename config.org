@@ -2358,6 +2358,7 @@ Export ~org~ files to Github-flavoured markdown.
             (add-hook 'js-mode-hook 'eqyiel/prettier-js-mode-hook)
             (add-hook 'markdown-mode-hook 'eqyiel/prettier-js-mode-hook)
             (add-hook 'js2-mode-hook 'eqyiel/prettier-js-mode-hook)
+            (add-hook 'typescript-mode-hook 'eqyiel/prettier-js-mode-hook)
             (add-hook 'graphql-mode-hook 'eqyiel/prettier-js-mode-hook)
             (add-hook 'web-mode-hook
                       (lambda ()
@@ -2777,35 +2778,50 @@ This is a new one for me.  See [[http://oremacs.com/swiper/#key-bindings-for-sin
         found)))
 
   (defun eqyiel/ts-tsserver-find-executable ()
+    "Find tsserver executable in node_modules, if it exists."
     (let ((js-project-roots (eqyiel/node-find-js-project-roots)))
       (when (eqyiel/node-should-use-package-p
              js-project-roots '(typescript tsserver))
         (eqyiel/node-find-project-local-executable-path
          js-project-roots '(typescript tsserver)))))
 
-  (defun eqyiel/ts-enable-maybe ()
-    (interactive)
+  (defun eqyiel/ts-should-enable ()
+    "Return t if this looks like a typescript project."
     (let ((tsserver-executable (eqyiel/ts-tsserver-find-executable)))
-      (when (and (or (string-equal "ts" (file-name-extension (buffer-file-name)))
-                     (string-equal "tsx" (file-name-extension (buffer-file-name)))
-                     (eqyiel/ts-check-tag-present-p))
-                 (or (locate-dominating-file (buffer-file-name) "jsconfig.json")
-                     (locate-dominating-file (buffer-file-name) "tsconfig.json")))
-        (if tsserver-executable
-            (progn
-              ;; Run nix-buffer if necessary to put things like node in PATH
-              (eqyiel/nix-buffer-find-file-hook)
-              (setq-local tide-tsserver-executable tsserver-executable)
-              (tide-setup)
-              (tide-hl-identifier-mode))
-          (message "// @ts-check tag, tsconfig.json or jsconfig.json present, but no typescript package in project")))))
+      (and (or (string-equal "ts" (file-name-extension (buffer-file-name)))
+               (string-equal "tsx" (file-name-extension (buffer-file-name)))
+               (eqyiel/ts-check-tag-present-p))
+           (or (locate-dominating-file (buffer-file-name) "jsconfig.json")
+               (locate-dominating-file (buffer-file-name) "tsconfig.json"))
+           tsserver-executable)))
+
+  (defun eqyiel/ts-tide-enable-maybe ()
+    "Use `tide' if this is a typescript project and tsc is configured."
+    (interactive)
+    (when (eqyiel/ts-should-enable)
+      (progn
+        ;; Run nix-buffer if necessary to put things like node in PATH
+        (eqyiel/nix-buffer-find-file-hook)
+        (setq-local tide-tsserver-executable (eqyiel/ts-tsserver-find-executable))
+        (tide-setup)
+        (tide-hl-identifier-mode))))
+
+  (defun eqyiel/ts-maybe-format-before-save ()
+    "Use tsfmt if this is a typescript project and prettier is not configured."
+    (interactive)
+    (let* ((js-project-roots (eqyiel/node-find-js-project-roots))
+          (should-use-ts (eqyiel/ts-should-enable))
+          (should-use-prettier
+           (eqyiel/node-should-use-package-p js-project-roots '(prettier))))
+      (when (and should-use-ts (not should-use-prettier))
+        (tide-format-before-save))))
 
   (use-package tide
     :ensure t
     :after (company flycheck)
     :config (flycheck-add-next-checker 'javascript-eslint 'jsx-tide 'append)
-    :hook (((js2-mode web-mode rjsx-mode) . eqyiel/ts-enable-maybe)
-           (before-save . tide-format-before-save)))
+    :hook (((js2-mode web-mode rjsx-mode typescript-mode) . eqyiel/ts-tide-enable-maybe)
+           (before-save . eqyiel/ts-maybe-format-before-save)))
 #+END_SRC
 
 ** ~tiny~                                                            :melpa:

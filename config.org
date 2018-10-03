@@ -129,7 +129,8 @@
   ;; Stop nagging me to enable these useful commands.
   (dolist (x '(dired-find-alternate-file
                upcase-region
-               downcase-region))
+               downcase-region
+               narrow-to-region))
     (put x 'disabled nil))
 
   ;; Don't litter my ~/.emacs.d.

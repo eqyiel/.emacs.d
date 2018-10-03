@@ -368,7 +368,7 @@
     (forward-line -1)
     (indent-for-tab-command))
 
-  (bind-key "H-O" 'eqyiel/open-line-above)
+  (bind-key "C-S-o" 'eqyiel/open-line-above)
 
   (defun eqyiel/comint-delchar-or-eof-or-kill-buffer (arg)
     "C-d on an empty line in the shell terminates the process.

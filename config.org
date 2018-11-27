@@ -1679,7 +1679,8 @@ This package adds itself to ~auto-mode-alist~.
     (progn
       (setq magit-completing-read-function 'ivy-completing-read))
     :bind
-    (("<f8>" . magit-status)))
+    (("<f8>" . magit-status)
+     ("C-x g" . magit-status)))
 #+end_src
 
 ** ~markdown-mode~                                                   :melpa:

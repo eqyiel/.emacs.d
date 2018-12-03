@@ -2821,6 +2821,10 @@ This is a new one for me.  See [[http://oremacs.com/swiper/#key-bindings-for-sin
   (use-package tide
     :ensure t
     :after (company flycheck)
+    :init
+    (progn
+      (add-to-list 'auto-mode-alist '("\\.ts$" . typescript-mode))
+      (add-to-list 'auto-mode-alist '("\\.tsx$" . typescript-mode)))
     :config (flycheck-add-next-checker 'javascript-eslint 'jsx-tide 'append)
     :hook (((js2-mode web-mode rjsx-mode typescript-mode) . eqyiel/ts-tide-enable-maybe)
            (before-save . eqyiel/ts-maybe-format-before-save)))

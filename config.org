@@ -1316,6 +1316,14 @@ specific ~eslint~ executable, but it should be easy to fix.
       (flycheck-add-next-checker 'javascript-flow '(t . javascript-eslint))))
 #+end_src
 
+** ~geben~                                                           :melpa:
+
+PHP debugger thing.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package geben)
+#+END_SRC
+
 ** ~gist~                                                            :melpa:
 #+BEGIN_SRC emacs-lisp
   (use-package gist

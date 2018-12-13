@@ -598,7 +598,7 @@
       (eqyiel/sort-words reverse beg end)))
 
   (global-set-key [f9] 'eqyiel/sort-lines-or-words)
-  (global-set-key (kbd "C-x 9") 'eqyiel/sort-lines-or-words)
+  (global-set-key (kbd "C-c 9") 'eqyiel/sort-lines-or-words)
 
   ;; Make life better in SSH sessions
   (defun eqyiel/copy-to-clipboard (beg end &optional region)

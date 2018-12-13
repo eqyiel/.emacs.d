@@ -1784,8 +1784,8 @@ Check out this for tips: https://vxlabs.com/2017/02/07/mu4e-0-9-18-e-mailing-wit
       (setq
        mu4e-get-mail-command
        (if (eq system-type 'darwin)
-           "mbsync ruben@mangochutney.com.au"
-         "mbsync -a"))
+           "mbsync r-maher@mercari.com"
+         "mbsync ruben@maher.fyi"))
       (use-package org-mu4e :defer t :ensure nil :config (setq org-mu4e-convert-to-html t))
       (use-package simple :ensure nil :config (setq mail-user-agent 'mu4e-user-agent))
       (setq mu4e-change-filenames-when-moving t) ;; needed for mbsync?
@@ -1880,7 +1880,7 @@ Check out this for tips: https://vxlabs.com/2017/02/07/mu4e-0-9-18-e-mailing-wit
                             ("/ruben@maher.fyi/Trash"   . ?t)
                             ("/ruben@maher.fyi/Sent"    . ?s)))))
               ,(make-mu4e-context
-                :name "flinders"
+                :name "flinders.edu.au"
                 :match-func
                 (lambda (msg)
                   (when msg
@@ -1905,7 +1905,7 @@ Check out this for tips: https://vxlabs.com/2017/02/07/mu4e-0-9-18-e-mailing-wit
                             ("/ruben@maher.fyi/Trash"   . ?t)
                             ("/ruben@maher.fyi/Sent"    . ?s)))))
               ,(make-mu4e-context
-                :name "mercari"
+                :name "kouzoh"
                 :match-func
                 (lambda (msg)
                   (when msg
@@ -1918,14 +1918,14 @@ Check out this for tips: https://vxlabs.com/2017/02/07/mu4e-0-9-18-e-mailing-wit
                             "/r-maher@mercari.com/Sent Mail"
                             "/r-maher@mercari.com/All Mail"))
                         (mu4e-drafts-folder . "/r-maher@mercari.com/Drafts")
-                        (mu4e-trash-folder . "/r-maher@mercari.com/Bin")
+                        (mu4e-trash-folder . "/r-maher@mercari.com/Trash")
                         ;; GMail already takes care of keeping copies in the sent
                         ;; folder
                         (mu4e-sent-messages-behavior . delete)
                         (mu4e-maildir-shortcuts
-                         . (("/r-maher@mercari.com/All Mail"  . ?i)
+                         . (("/r-maher@mercari.com/Inbox"  . ?i)
                             ("/r-maher@mercari.com/Drafts"    . ?d)
-                            ("/r-maher@mercari.com/Bin"       . ?t)
+                            ("/r-maher@mercari.com/Trash"     . ?t)
                             ("/r-maher@mercari.com/Sent Mail" . ?s))))))))
     :init (use-package org-mu4e :ensure nil :demand)
     :bind (("<f4>" . mu4e)

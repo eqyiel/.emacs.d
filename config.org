@@ -1905,28 +1905,28 @@ Check out this for tips: https://vxlabs.com/2017/02/07/mu4e-0-9-18-e-mailing-wit
                             ("/ruben@maher.fyi/Trash"   . ?t)
                             ("/ruben@maher.fyi/Sent"    . ?s)))))
               ,(make-mu4e-context
-                :name "mangochutney"
+                :name "mercari"
                 :match-func
                 (lambda (msg)
                   (when msg
                     (string= (mu4e-message-field msg :maildir)
-                             "/ruben@mangochutney.com.au")))
-                :vars `((user-mail-address . "ruben@mangochutney.com.au")
-                        (mu4e-sent-folder . "/ruben@mangochutney.com.au/Sent Mail")
+                             "/r-maher@mercari.com")))
+                :vars `((user-mail-address . "r-maher@mercari.com")
+                        (mu4e-sent-folder . "/r-maher@mercari.com/Sent Mail")
                         (mu4e-refile-folder
                          . ,(eqyiel/mu4e-refile-sent-items-to-sent-folder
-                            "/ruben@mangochutney.com.au/Sent Mail"
-                            "/ruben@mangochutney.com.au/All Mail"))
-                        (mu4e-drafts-folder . "/ruben@mangochutney.com.au/Drafts")
-                        (mu4e-trash-folder . "/ruben@mangochutney.com.au/Bin")
+                            "/r-maher@mercari.com/Sent Mail"
+                            "/r-maher@mercari.com/All Mail"))
+                        (mu4e-drafts-folder . "/r-maher@mercari.com/Drafts")
+                        (mu4e-trash-folder . "/r-maher@mercari.com/Bin")
                         ;; GMail already takes care of keeping copies in the sent
                         ;; folder
                         (mu4e-sent-messages-behavior . delete)
                         (mu4e-maildir-shortcuts
-                         . (("/ruben@mangochutney.com.au/All Mail"  . ?i)
-                            ("/ruben@mangochutney.com.au/Drafts"    . ?d)
-                            ("/ruben@mangochutney.com.au/Bin"       . ?t)
-                            ("/ruben@mangochutney.com.au/Sent Mail" . ?s))))))))
+                         . (("/r-maher@mercari.com/All Mail"  . ?i)
+                            ("/r-maher@mercari.com/Drafts"    . ?d)
+                            ("/r-maher@mercari.com/Bin"       . ?t)
+                            ("/r-maher@mercari.com/Sent Mail" . ?s))))))))
     :init (use-package org-mu4e :ensure nil :demand)
     :bind (("<f4>" . mu4e)
            ("C-x m" . mu4e-compose-new))

@@ -2807,7 +2807,8 @@ This is a new one for me.  See [[http://oremacs.com/swiper/#key-bindings-for-sin
   (defun eqyiel/ts-should-enable ()
     "Return t if this looks like a typescript project."
     (let ((tsserver-executable (eqyiel/ts-tsserver-find-executable)))
-      (and (or (string-equal "ts" (file-name-extension (buffer-file-name)))
+      (and (buffer-file-name) ;; can be nil, in ediff buffers for example
+           (or (string-equal "ts" (file-name-extension (buffer-file-name)))
                (string-equal "tsx" (file-name-extension (buffer-file-name)))
                (eqyiel/ts-check-tag-present-p))
            (or (locate-dominating-file (buffer-file-name) "jsconfig.json")

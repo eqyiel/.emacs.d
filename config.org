@@ -167,6 +167,7 @@
   (setq apropos-do-all t
         inhibit-startup-message t
         ediff-window-setup-function 'ediff-setup-windows-plain
+        ediff-custom-diff-options "-u"
         read-buffer-completion-ignore-case t
         read-file-name-completion-ignore-case t
         scroll-error-top-bottom t

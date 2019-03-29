@@ -121,8 +121,6 @@
   (eval-after-load "warnings"
     '(setq display-warning-minimum-level :error))
 
-  (setq initial-buffer-choice (remember-notes))
-
   (if (eq system-type 'darwin)
       (setq browse-url-browser-function 'browse-url-default-macosx-browser)
     (setq browse-url-browser-function 'browse-url-generic

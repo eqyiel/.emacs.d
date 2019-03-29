@@ -16,3 +16,5 @@ workspace/
 eclipse.jdt.ls/
 nix-buffer/
 notes
+transient/
+geben/

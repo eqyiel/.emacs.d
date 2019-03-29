@@ -245,10 +245,10 @@
         ;; This doesn't actually work anymore.
         ;; See:
         ;; lunaryorn.com/posts/bye-bye-emojis-emacs-hates-macos.html
-        ;; (set-fontset-font t 'symbol (font-spec :family "Apple Color Emoji")
-        ;;                   frame 'prepend)
-        (set-fontset-font t 'symbol (font-spec :family "Noto Emoji")
-                        frame 'prepend)
+        (set-fontset-font t 'symbol (font-spec :family "Apple Color Emoji")
+                          frame 'prepend)
+        ;; (set-fontset-font t 'symbol (font-spec :family "Noto Emoji")
+        ;;                 frame 'prepend)
       ;; GNU/Linux
       (set-fontset-font t 'symbol (font-spec :family "Noto Emoji")
                         frame 'prepend)))

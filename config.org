@@ -2712,7 +2712,7 @@ This is a new one for me.  See [[http://oremacs.com/swiper/#key-bindings-for-sin
   (defun eqyiel/counsel-projectile-rg-around (orig-fun &rest args)
     "If `projectile-counsel-rg' throws an error, fallback to regular `counsel-rg'."
     (when (not (condition-case nil (apply orig-fun args) (error nil)))
-      (apply 'counsel-ag args)))
+      (apply 'counsel-rg args)))
 
   (advice-add 'counsel-projectile-rg :around 'eqyiel/counsel-projectile-rg-around)
 

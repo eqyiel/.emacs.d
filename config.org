@@ -2705,6 +2705,7 @@ This is a new one for me.  See [[http://oremacs.com/swiper/#key-bindings-for-sin
      ("<f2> u" . counsel-unicode-char)
      ("C-c g" . counsel-git)
      ("C-c j" . counsel-git-grep)
+     ("C-c K" . eqyiel/counsel-rg-from-current-directory)
      ("C-x l" . counsel-locate))
     :demand
     :ensure t)
@@ -2715,6 +2716,10 @@ This is a new one for me.  See [[http://oremacs.com/swiper/#key-bindings-for-sin
       (apply 'counsel-rg args)))
 
   (advice-add 'counsel-projectile-rg :around 'eqyiel/counsel-projectile-rg-around)
+
+  (defun eqyiel/counsel-rg-from-current-directory ()
+    (interactive)
+    (apply 'counsel-rg `(nil ,default-directory)))
 
   (use-package avy
     :bind (("C-:" . avy-goto-char)

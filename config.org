@@ -62,7 +62,7 @@
 
   (defvar eqyiel/gpg-key-id "FDAD61AB3311FA17")
 
-  (defvar eqyiel/timezone "Australia/Adelaide")
+  (defvar eqyiel/timezone "Asia/Tokyo")
 #+end_src
 
 * Make cache and data directories if they don't exist

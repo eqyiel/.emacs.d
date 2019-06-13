@@ -1427,12 +1427,10 @@ This is pretty much exclusively for the sake of editing ~build.gradle~ files.
 ** ~info~                                                          :builtin:
 #+begin_src emacs-lisp
   (use-package info
-    :init
-    (add-hook
-     'Info-mode-hook
-     (lambda ()
-       (setq Info-additional-directory-list
-             Info-default-directory-list)))
+    :hook
+    (Info-mode-hook
+     . (lambda ()
+         (setq Info-additional-directory-list Info-default-directory-list)))
     :bind
     (:map Info-mode-map
           ;; Let me use S-SPC to scroll backwards in info mode.

@@ -1404,6 +1404,26 @@ This is pretty much exclusively for the sake of editing ~build.gradle~ files.
     :ensure nil)
 #+end_src
 
+** ~ibuffer~                                                       :builtin:
+
+#+BEGIN_SRC emacs-lisp
+  (use-package ibuffer
+    :bind (("C-x C-b" . ibuffer))
+    :ensure nil)
+#+END_SRC
+
+** ~ibuffer-projectile~                                              :melpa:
+
+#+BEGIN_SRC emacs-lisp
+  (use-package ibuffer-projectile
+    :hook
+    (ibuffer-hook . (lambda ()
+      (ibuffer-projectile-set-filter-groups)
+      (unless (eq ibuffer-sorting-mode 'alphabetic)
+        (ibuffer-do-sort-by-alphabetic))))
+    :ensure nil)
+#+END_SRC
+
 ** ~info~                                                          :builtin:
 #+begin_src emacs-lisp
   (use-package info

@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: todo
+# key: todo
+# --
+TODO (eqyiel@`(format-time-string "%F" (current-time))`): $0

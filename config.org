@@ -2797,8 +2797,8 @@ This is a new one for me.  See [[http://oremacs.com/swiper/#key-bindings-for-sin
 
   (use-package swiper
     :bind
-    (("C-s" . swiper)
-     ("C-r" . swiper))
+    (("C-s" . swiper-isearch)
+     ("C-r" . swiper-isearch))
     :init
     (progn
       (use-package ivy :ensure t)

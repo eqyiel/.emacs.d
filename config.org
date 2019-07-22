@@ -1160,6 +1160,14 @@ So diminish ~auto-fill-function~, not ~auto-fill-mode~.
   (use-package company-lsp :after company :demand t)
 #+end_src
 
+** ~company-posframe~                                                :melpa:
+#+BEGIN_SRC emacs-lisp
+  (use-package company-posframe
+    :after company
+    :demand t
+    :config (company-posframe-mode t))
+#+END_SRC
+
 ** ~counsel-projectile~                                              :melpa:
 #+BEGIN_SRC emacs-lisp
   (use-package counsel-projectile
@@ -2350,7 +2358,9 @@ A tool to insert a link in the clipboard as an ~org-mode~ link at point.
       (add-hook 'org-mode-hook 'turn-on-auto-fill))
     :bind
     (("<f12>" . org-capture)
+     ("C-c 0" . org-capture)
      ("<f7>" . org-agenda)
+     ("C-c 7" . org-agenda)
      :map org-mode-map
      ("M-p" . eqyiel/org-prev-visible-heading)
      ("M-n" . org-next-visible-heading))
@@ -2654,7 +2664,7 @@ Export ~org~ files to Github-flavoured markdown.
       (setq custom-safe-themes '("d677ef584c6dfc0697901a44b885cc18e206f05114c8a3b7fde674fce6180879" default)
             solarized-use-variable-pitch nil
             solarized-scale-org-headlines nil)
-      (load-theme 'solarized-light))
+      (load-theme 'solarized-light t))
     :ensure t
     :demand t)
 

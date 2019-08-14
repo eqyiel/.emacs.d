@@ -1725,6 +1725,9 @@ This package adds itself to ~auto-mode-alist~.
 ** ~markdown-mode~                                                   :melpa:
 #+begin_src emacs-lisp
   (use-package markdown-mode
+    :config
+    (progn
+      (setq markdown-command "pandoc -f markdown -t html -s --mathjax --highlight-style=pygments"))
     :init
     (progn
       (add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))

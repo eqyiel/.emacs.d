@@ -1273,6 +1273,14 @@ specific ~eslint~ executable, but it should be easy to fix.
     :demand)
 #+end_src
 
+** ~fasd~                                                            :melpa:
+
+#+BEGIN_SRC emacs-lisp
+  (use-package fasd
+    :bind ("C-z" . fasd-find-file)
+    :init (global-fasd-mode 1))
+#+END_SRC
+
 ** ~flow-minor-mode~                                                 :melpa:
 #+BEGIN_SRC emacs-lisp
   (defun eqyiel/flow-minor-mode-hook ()

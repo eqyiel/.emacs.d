@@ -60,8 +60,6 @@
       (expand-file-name eqyiel/home-directory))
      "/sync/org"))
 
-  (defvar eqyiel/gpg-key-id "FDAD61AB3311FA17")
-
   (defvar eqyiel/timezone "Asia/Tokyo")
 #+end_src
 
@@ -1719,8 +1717,7 @@ This package adds itself to ~auto-mode-alist~.
     :init (use-package ivy :ensure t)
     :config
     (progn
-      (setq magit-completing-read-function 'ivy-completing-read)
-      (setq magit-commit-arguments `(,(concat "--gpg-sign=" eqyiel/gpg-key-id))))
+      (setq magit-completing-read-function 'ivy-completing-read))
     :bind
     (("<f8>" . magit-status)
      ("C-x g" . magit-status)))

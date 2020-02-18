@@ -2247,14 +2247,6 @@ A tool to insert a link in the clipboard as an ~org-mode~ link at point.
   "
        :empty-lines 1 :kill-buffer t))
      org-log-done 'time
-     ;; remove scheduled date and deadline when changing state from TODO
-     org-after-todo-state-change-hook
-     (lambda ()
-       (when (not org-state)
-         (progn
-           ;; as if I were running C-u M-x org-schedule and C-u M-x org-deadline
-           (execute-extended-command '(4) "org-schedule")
-           (execute-extended-command '(4) "org-deadline"))))
      ;; add slugified CATEGORY to tags
      org-capture-before-finalize-hook
      (lambda ()

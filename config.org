@@ -2145,7 +2145,7 @@ A tool to insert a link in the clipboard as an ~org-mode~ link at point.
   (defun eqyiel/org-agenda-skip-non-toplevel-headings ()
     "`org-agenda-skip-function' that skips over all but top level headings."
     (unless (= 1 (nth 1 (org-heading-components)))
-         (org-end-of-subtree)))
+      (org-end-of-subtree)))
 
   (defun eqyiel/org-iso8601ify-created-properties (query)
     "Change CREATED timestamps to ISO 8601 format for entries matching QUERY."
@@ -2170,21 +2170,17 @@ A tool to insert a link in the clipboard as an ~org-mode~ link at point.
     (org-with-limited-levels
      (outline-previous-visible-heading arg)))
 
-  (defun eqyiel/maybe-create-agenda-file-with-category (category)
+  (defun eqyiel/create-org-file-path (filename)
+    (format "%s/%s" eqyiel/org-directory filename))
+
+  (defun eqyiel/maybe-create-org-agenda-file (filename)
     (let ((target
-           (format "%s/%s.org"
-                   eqyiel/org-directory
-                   (eqyiel/slugify category "_")
-                   (eqyiel/slugify (system-name) "_"))))
-      (unless (and (file-exists-p target)
-                   (file-readable-p target)
-                   (file-writable-p target))
-        (with-temp-buffer
-          (insert
-           (format "#+CATEGORY: %s\n#+STARTUP: showall"
-                   (eqyiel/slugify category "_")))
-          (write-region (point-min) (point-max) target t nil nil t)))
-      target))
+           (eqyiel/create-org-file-path filename)))
+      (progn (unless (and (file-exists-p target)
+                          (file-readable-p target)
+                          (file-writable-p target))
+               (with-temp-buffer (write-file target)))
+             target)))
 
   (defun eqyiel/org-capture-prepare-finalize-hook ()
     "Quality of life hack for for `org-capture' buffers.
@@ -2228,39 +2224,14 @@ A tool to insert a link in the clipboard as an ~org-mode~ link at point.
      org-export-babel-evaluate nil
      org-export-default-language "en"
      org-capture-templates
-     `(("t" "Todo" entry (file ,(eqyiel/maybe-create-agenda-file-with-category "todo"))
+     `(("t" "Todo" entry (file ,(eqyiel/maybe-create-org-agenda-file "inbox.org"))
         "* TODO %?
-  SCHEDULED: %(org-insert-time-stamp (org-read-date nil t \"+0d\"))
+  SCHEDULED: %T
   :PROPERTIES:
   :CREATED: %U
   :END:
   "
-        :empty-lines 1 :kill-buffer t)
-       ("s" "Shopping"
-        entry (file ,(eqyiel/maybe-create-agenda-file-with-category "shopping"))
-        "* TODO %?
-  SCHEDULED: %(org-insert-time-stamp (org-read-date nil t \"+0d\"))
-  :PROPERTIES:
-  :CREATED: %U
-  :END:
-  "
-        :empty-lines 1 :kill-buffer t)
-       ("m" "Media"
-        entry (file ,(eqyiel/maybe-create-agenda-file-with-category "media"))
-        "* %?
-  :PROPERTIES:
-  :CREATED: %U
-  :END:
-  "
-        :empty-lines 1 :kill-buffer t)
-       ("b" "Blog"
-       entry (file ,(eqyiel/maybe-create-agenda-file-with-category "blog"))
-       "* TODO %?
-  :PROPERTIES:
-  :CREATED: %(format-time-string eqyiel/org-iso8601-date-format (current-time))
-  :END:
-  "
-       :empty-lines 1 :kill-buffer t))
+        :empty-lines 1 :kill-buffer t))
      org-log-done 'time
      org-capture-before-finalize-hook 'eqyiel/org-capture-before-finalize-hook
      ;; realign tags after capture

@@ -1159,11 +1159,16 @@ So diminish ~auto-fill-function~, not ~auto-fill-mode~.
 #+end_src
 
 ** ~company-posframe~                                                :melpa:
+
+Seems to be broken right now, throws an error like
+~company-pseudo-tooltip-unless-just-one-frontend~ for any completion while this
+is enabled.
+
 #+BEGIN_SRC emacs-lisp
-  (use-package company-posframe
-    :after company
-    :demand t
-    :config (company-posframe-mode t))
+  ;; (use-package company-posframe
+  ;;   :after company
+  ;;   :demand t
+  ;;   :config (company-posframe-mode t))
 #+END_SRC
 
 ** ~counsel-projectile~                                              :melpa:

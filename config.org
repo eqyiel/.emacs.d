@@ -2196,6 +2196,21 @@ A tool to insert a link in the clipboard as an ~org-mode~ link at point.
   (add-hook 'org-capture-prepare-finalize-hook
             'eqyiel/org-capture-prepare-finalize-hook)
 
+  (defun eqyiel/org-capture-before-finalize-hook ()
+    "Add slugified category to tags.
+  That is: if a file has a \"#+CATEGORY: test\" header or a subtree has a
+  CATEGORY in its properties drawer, set the tags of the captured item to
+  those categories (slugified)."
+    (let ((tags
+           (delq nil
+                 (cons
+                  (delq "" (list (eqyiel/slugify (org-get-category) "_")))
+                  (org-get-tags)))))
+      (when tags
+        (progn
+          (org-set-tags-to tags)
+          (org-align-all-tags)))))
+
   (use-package org
     :config
     (setq
@@ -2247,14 +2262,7 @@ A tool to insert a link in the clipboard as an ~org-mode~ link at point.
   "
        :empty-lines 1 :kill-buffer t))
      org-log-done 'time
-     ;; add slugified CATEGORY to tags
-     org-capture-before-finalize-hook
-     (lambda ()
-       (progn
-         (org-set-tags-to
-          (delq nil (cons (eqyiel/slugify (org-get-category) "_")
-                          (org-get-tags))))
-         (org-align-all-tags)))
+     org-capture-before-finalize-hook 'eqyiel/org-capture-before-finalize-hook
      ;; realign tags after capture
      org-capture-after-finalize-hook 'org-align-all-tags
      org-agenda-custom-commands

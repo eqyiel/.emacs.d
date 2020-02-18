@@ -54,11 +54,22 @@
       (expand-file-name eqyiel/home-directory))
      "/downloads"))
 
+  (defvar eqyiel/env
+    (if (and
+         (eq system-type 'darwin)
+         (string-equal
+          (shell-command-to-string "printf %s \"$(hostname)\"")
+          "PC2218"))
+        'work
+      'home))
+
   (defvar eqyiel/org-directory
     (concat
      (directory-file-name
       (expand-file-name eqyiel/home-directory))
-     "/sync/org"))
+     (if (eq eqyiel/env 'work)
+         "/sync/org"
+       "/org")))
 
   (defvar eqyiel/timezone "Asia/Tokyo")
 #+end_src

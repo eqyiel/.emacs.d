@@ -664,6 +664,20 @@
         ;; if required environment not set, fall back to interactive login
         (sql-postgres)
       (switch-to-buffer (sql-comint-postgres 'postgres sql-postgres-options))))
+
+  (defun eqyiel/create-markdown-diary-entry-for-today ()
+    (interactive)
+    (let ((target-file-name
+           (concat
+            (directory-file-name (expand-file-name eqyiel/home-directory))
+            "/sync/diary/" (format-time-string "%F.md" (current-time)))))
+      (unless (file-exists-p target-file-name)
+        (save-excursion
+          (find-file target-file-name)
+          (insert (concat "#" (format-time-string " %A %F%n%n" (current-time))))))
+      (find-file target-file-name)))
+
+
 #+end_src
 
 ** Functions for working with node projects

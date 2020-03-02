@@ -3041,8 +3041,7 @@ This package adds itself to ~auto-mode-alist~.
       (require 'warnings)
       (setq
        yas-snippet-dirs
-       `(,(concat (directory-file-name user-emacs-directory) "/snippets")
-         yas-installed-snippets-dir)
+       `(,(concat (directory-file-name user-emacs-directory) "/snippets"))
        yas-prompt-functions '(yas-ido-prompt))
       ;; Warning (yasnippet): ‘Snippet’ modified buffer in a backquote expression.
       ;; To hide this warning, add (yasnippet backquote-change) to

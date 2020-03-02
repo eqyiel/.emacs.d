@@ -2232,6 +2232,11 @@ A tool to insert a link in the clipboard as an ~org-mode~ link at point.
           (org-set-tags-to tags)
           (org-align-all-tags)))))
 
+  (defun eqyiel/org-remove-deadline ()
+    "Remove deadline from the entry at point."
+    (interactive)
+    (execute-extended-command '(4) "org-deadline"))
+
   (use-package org
     :config
     (setq

@@ -2236,6 +2236,146 @@ A tool to insert a link in the clipboard as an ~org-mode~ link at point.
     "Remove deadline from the entry at point."
     (interactive)
     (execute-extended-command '(4) "org-deadline"))
+  (defun eqyiel/org-md-export-to-markdown (&optional async subtreep visible-only)
+        "Export current buffer to a Markdown file.
+
+  If narrowing is active in the current buffer, only export its
+  narrowed part.
+
+  If a region is active, export that region.
+
+  A non-nil optional argument ASYNC means the process should happen
+  asynchronously.  The resulting file should be accessible through
+  the `org-export-stack' interface.
+
+  When optional argument SUBTREEP is non-nil, export the sub-tree
+  at point, extracting information from the headline properties
+  first.
+
+  When optional argument VISIBLE-ONLY is non-nil, don't export
+  contents of hidden elements.
+
+  Return output file's name."
+        (interactive)
+        (let ((outfile (org-export-output-file-name ".md" subtreep)))
+          (org-export-to-file 'md outfile async subtreep visible-only)))
+
+      (defun eqyiel/org-md-publish-to-md (plist filename pub-dir)
+        "Publish an org file to Markdown.
+
+  FILENAME is the filename of the Org file to be published.  PLIST
+  is the property list for the given project.  PUB-DIR is the
+  publishing directory.
+
+  Return output file name."
+        (org-publish-org-to 'rkm-md filename ".md" plist pub-dir))
+
+  (defun eqyiel/org-md-headline (headline contents info)
+    "Transcode HEADLINE element into Markdown format.
+  CONTENTS is the headline contents.  INFO is a plist used as
+  a communication channel."
+    (unless (org-element-property :footnote-section-p headline)
+      (let* ((level (org-export-get-relative-level headline info))
+             (title (org-export-data (org-element-property :title headline) info))
+             (todo (and (plist-get info :with-todo-keywords)
+                        (let ((todo (org-element-property :todo-keyword
+                                                          headline)))
+                          (and todo (concat (org-export-data todo info) " ")))))
+             (tags (and (plist-get info :with-tags)
+                        (let ((tag-list (org-export-get-tags headline info)))
+                          (and tag-list
+                               (concat "     " (org-make-tag-string tag-list))))))
+             (priority
+              (and (plist-get info :with-priority)
+                   (let ((char (org-element-property :priority headline)))
+                     (and char (format "[#%c] " char)))))
+             ;; Headline text without tags.
+             (heading (concat todo priority title))
+             (style (plist-get info :md-headline-style)))
+        (cond
+         ;; Cannot create a headline.  Fall-back to a list.
+         ((or (org-export-low-level-p headline info)
+              (not (memq style '(atx setext)))
+              (and (eq style 'atx) (> level 6))
+              (and (eq style 'setext) (> level 2)))
+          (let ((bullet
+                 (if (not (org-export-numbered-headline-p headline info)) "-"
+                   (concat (number-to-string
+                            (car (last (org-export-get-headline-number
+                                        headline info))))
+                           "."))))
+            (concat bullet (make-string (- 4 (length bullet)) ?\s) heading tags "\n\n"
+                    (and contents (replace-regexp-in-string "^" "    " contents)))))
+         (t
+          (let ((anchor
+                 (and (org-md--headline-referred-p headline info)
+                      (format "<a id=\"%s\"></a>"
+                              (or (org-element-property :CUSTOM_ID headline)
+                                  (org-export-get-reference headline info))))))
+            (concat (org-md--headline-title style level heading anchor tags)
+                    contents)))))))
+
+
+  ;; https://emacs.stackexchange.com/questions/52057/export-only-visible-entries-of-sparse-tree
+  (defun eqyiel/org-match-sparse-tree (match &optional match-body parents-body)
+    "Create a custom sparse tree that only shows matched headings and parents.
+    For MATCH see `org-match-sparse-tree'.
+    If MATCH-BODY is non-nil the bodies of the matches are shown.
+    If PARENTS-BODY is non-nil the bodies of the parents are shown.
+
+  `org-highlight-sparse-tree-matches' is t by default, but required."
+    ;; Create the sparse tree.
+    (org-match-sparse-tree nil match)
+    (let ((pt-first (save-excursion
+                      (org-first-headline-recenter)
+                      (move-beginning-of-line nil)
+                      (point)))
+          (hls org-occur-highlights))
+      ;; Hide everything.
+      (outline-flag-region pt-first (point-max) t)
+      ;; For each occur highlight overlay (the matches).
+      (dolist (hl hls)
+        (save-excursion
+          (goto-char (overlay-start hl))
+          ;; Unhide match.
+          (outline-show-heading)
+          (when match-body (outline-show-entry))
+          ;; Unhide parents.
+          (while (org-up-heading-safe)
+            (outline-show-entry)
+            (when parents-body (outline-show-entry))))))
+    ;; Hide all archived subtrees again.
+    (org-hide-archived-subtrees (point-min) (point-max)))
+
+  (defun eqyiel/org-export-before-processing-hook (backend)
+  "BACKEND is one of `org-export-backends`."
+    (if (eq backend 'rkm-md)
+        (flush-lines (concat "\\[" (substring org-ts-regexp 1 -1) "\\]"))
+      nil))
+  ;; (org-export-to-buffer 'rkm-md "*Markdown output*" nil nil t nil nil nil)
+
+  (defun eqyiel/create-markdown-report-for-yesterday ()
+    (interactive)
+    (eqyiel/org-match-sparse-tree
+     "+CLOSED<=<-1d>+CLOSED>=<today>" t)
+    (org-export-to-buffer 'rkm-md "*Markdown output*" nil nil t nil nil nil))
+
+  (defun eqyiel/create-markdown-report-for-today ()
+    (interactive)
+    (eqyiel/org-match-sparse-tree
+     (concat "TODO={DONE\\|CANCELLED\\|WAITING}"
+             "+CLOSED>=\""
+             (format-time-string "[%Y-%m-%d %a %H:%M]" (current-time))
+             "\"") t)
+     ;; (concat "TODO={DONE\\|CANCELLED\\|WAITING}"
+     ;;         "+CLOSED>=\""
+     ;;         (format-time-string "[%Y-%m-%d %a %H:%M]" (current-time))
+     ;;         "\"") t)
+     ;; (concat "+TODO=\"DONE\""
+     ;;         "+CLOSED>=\""
+     ;;         (format-time-string "[%Y-%m-%d]" (current-time))
+     ;;         "\"") t)
+    (org-export-to-buffer 'rkm-md "*Markdown output*" nil nil t nil nil nil))
 
   (use-package org
     :config
@@ -2243,6 +2383,8 @@ A tool to insert a link in the clipboard as an ~org-mode~ link at point.
      org-adapt-indentation t
      org-image-actual-width '(400)
      org-directory eqyiel/org-directory
+     org-todo-keywords
+     '((sequence "TODO(t@)" "WAITING(w@)" "|" "DONE(d@)" "DEFERRED(.@)" "CANCELLED(x@)" ))
      org-log-done 'time
      org-agenda-files
      (file-expand-wildcards
@@ -2253,6 +2395,7 @@ A tool to insert a link in the clipboard as an ~org-mode~ link at point.
      org-confirm-babel-evaluate nil
      org-export-babel-evaluate nil
      org-export-default-language "en"
+     org-export-before-processing-hook '(eqyiel/org-export-before-processing-hook)
      org-capture-templates
      `(("t" "Todo" entry (file ,(eqyiel/maybe-create-org-agenda-file "inbox.org"))
         "* TODO %?
@@ -2262,14 +2405,23 @@ A tool to insert a link in the clipboard as an ~org-mode~ link at point.
   :END:
   "
         :empty-lines 1 :kill-buffer t))
-     org-log-done 'time
      org-capture-before-finalize-hook 'eqyiel/org-capture-before-finalize-hook
      ;; realign tags after capture
      org-capture-after-finalize-hook 'org-align-all-tags
+     org-highlight-sparse-tree-matches t
      org-agenda-custom-commands
      '(("n" "Agenda and all TODOs"
         ((agenda "")
-         (alltodo "")))))
+         (alltodo "")))
+       ("d" "Tasks done yesterday"
+        ((tags
+          (concat "+TODO=\"DONE\""
+                  "+CLOSED>=\""
+                  (format-time-string "[%Y-%m-%d]" (time-subtract (current-time) (days-to-time 1)))
+                  "\""))))
+       ("x" "Tasks done today"
+        ((tags (concat "+TODO=\"DONE\"" "+CLOSED>=\"" (format-time-string "[%Y-%m-%d]" (current-time)) "\""))))))
+
     :init
     (progn
       (defvar eqyiel/org-src-lang-modes
@@ -2365,7 +2517,28 @@ A tool to insert a link in the clipboard as an ~org-mode~ link at point.
          (emacs-lisp . t)
          (shell . t)))
 
-      (add-hook 'org-mode-hook 'turn-on-auto-fill))
+      (add-hook 'org-mode-hook 'turn-on-auto-fill)
+
+      (require 'ox-gfm)
+      (org-export-define-derived-backend 'rkm-md 'gfm
+        :filters-alist '((:filter-parse-tree . org-md-separate-elements))
+        :menu-entry
+        '(?R "Export to Markdown"
+             ((?R "To temporary buffer"
+                  (lambda (a s v b) (org-gfm-export-as-markdown a s v)))
+              (?g "To file" (lambda (a s v b) (org-gfm-export-to-markdown a s v)))
+              (?o "To file and open"
+                  (lambda (a s v b)
+                    (if a (org-gfm-export-to-markdown t s v)
+                      (org-open-file (org-gfm-export-to-markdown nil s v)))))))
+        :translate-alist '((inner-template . org-gfm-inner-template)
+                           (paragraph . org-gfm-paragraph)
+                           (headline . eqyiel/org-md-headline)
+                           (strike-through . org-gfm-strike-through)
+                           (src-block . org-gfm-src-block)
+                           (table-cell . org-gfm-table-cell)
+                           (table-row . org-gfm-table-row)
+                           (table . org-gfm-table))))
     :bind
     (("<f12>" . org-capture)
      ("C-c 0" . org-capture)
@@ -2383,8 +2556,7 @@ A tool to insert a link in the clipboard as an ~org-mode~ link at point.
 Export ~org~ files to Github-flavoured markdown.
 
 #+begin_src emacs-lisp
-  (use-package ox-gfm
-    :ensure t)
+  (use-package ox-gfm :demand)
 #+end_src
 
 ** ~pass~                                                            :melpa:

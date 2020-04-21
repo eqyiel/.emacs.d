@@ -1747,7 +1747,9 @@ This package adds itself to ~auto-mode-alist~.
     :init (use-package ivy :ensure t)
     :config
     (progn
-      (setq magit-completing-read-function 'ivy-completing-read))
+      (setq
+       magit-completing-read-function 'ivy-completing-read
+       magit-save-repository-buffers 'dontask))
     :bind
     (("<f8>" . magit-status)
      ("C-x g" . magit-status)))

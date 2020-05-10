@@ -1672,6 +1672,59 @@ This package adds itself to ~auto-mode-alist~.
     (add-hook 'json-mode-hook 'eqyiel/json-mode-hook))
 #+end_src
 
+** ~kubernetes-mode~                                                 :melpa:
+
+#+BEGIN_SRC emacs-lisp
+  (defvar eqyiel/kubernetes-namespaces nil)
+
+  (defun eqyiel/kubernetes-kubectl-around (orig-fun &rest orig-args)
+    "Don't have permission to list all namespaces.  This is a hack to use a
+  predetermined list of namespaces, with `eqyiel/kubernetes-namespaces' set in
+  dir-locals."
+    (let ((type (nth 1 (nth 2 orig-args))))
+      (if (and (stringp type) (s-equals-p type "namespaces"))
+          (let* ((on-success (nth 3 orig-args))
+                 (buf (generate-new-buffer "kubectl"))
+                 (command `("printf"
+                            "%s"
+                            ,(json-encode
+                              `(( apiVersion . "v1" )
+                                (items . ,(mapcar (lambda (namespace)
+                                                   `((metadata . ((name . ,namespace))))) eqyiel/kubernetes-namespaces))
+                                (kind . "List")
+                                (metadata . ((resourceVersion . "")
+                                             (selfLink . ""))))))))
+
+                 (make-process
+                   :name "kubectl"
+                   :buffer buf
+                   :command command
+                   :noquery t
+                   :sentinel
+                   (lambda (process &rest args)
+                     (funcall on-success buf)
+                     (kubernetes-process-kill-quietly process))))
+        (apply orig-fun orig-args))))
+
+  (advice-add 'kubernetes-kubectl :around 'eqyiel/kubernetes-kubectl-around)
+
+  (defun eqyiel/kubernetes-overview (orig-fun &rest orig-args)
+    "Prevent use of `kubernetes-overview' in contexts where
+  `eqyiel/kubernetes-namespaces' is nil."
+    (if eqyiel/kubernetes-namespaces
+        (apply orig-fun orig-args)
+      (message "`eqyiel/kubernetes-namespaces' is nil, doing nothing")))
+
+  (advice-add 'kubernetes-overview :around 'eqyiel/kubernetes-overview)
+
+  (use-package kubernetes
+    :config
+    ;; Emacs hangs if this updates too frequently.  Use "g" to update.
+    (setq kubernetes-poll-frequency 3600
+          kubernetes-redraw-frequency 3600)
+    :commands (kubernetes-overview))
+#+END_SRC
+
 ** ~legalese~                                                        :melpa:
 #+begin_src emacs-lisp
   (use-package legalese)
@@ -2660,7 +2713,7 @@ Export ~org~ files to Github-flavoured markdown.
 
 ** ~rainbow-mode~                                                     :elpa:
 #+begin_src emacs-lisp
-  (use-package rainbow-mode :pin gnu :ensure t)
+  (use-package rainbow-mode :ensure t)
 #+end_src
 
 ** ~recentf~                                                       :builtin:

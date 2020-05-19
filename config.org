@@ -1675,7 +1675,7 @@ This package adds itself to ~auto-mode-alist~.
 ** ~kubernetes-mode~                                                 :melpa:
 
 #+BEGIN_SRC emacs-lisp
-  (defvar eqyiel/kubernetes-namespaces nil)
+  (defvar eqyiel/kubernetes-namespaces '("minikube"))
 
   (defun eqyiel/kubernetes-kubectl-around (orig-fun &rest orig-args)
     "Don't have permission to list all namespaces.  This is a hack to use a

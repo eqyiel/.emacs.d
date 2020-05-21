@@ -674,7 +674,16 @@
           (insert (concat "#" (format-time-string " %A %F%n%n" (current-time))))))
       (find-file target-file-name)))
 
+  (defun eqyiel/yank-rectangle-with-insert ()
+  "Like `yank-rectangle', but inserts lines rather than inserting amongst following lines.
 
+  https://emacs.stackexchange.com/questions/19461/insert-lines-when-yanking-rectangle-rather-than-inserting-among-following-lines"
+    (interactive)
+    (narrow-to-region (point) (mark))
+    (yank-rectangle)
+    (widen))
+
+  (global-set-key (kbd "C-x r C-y") 'eqyiel/yank-rectangle-with-insert)
 #+end_src
 
 ** Functions for working with node projects

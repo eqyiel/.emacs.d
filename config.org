@@ -3,7 +3,7 @@
 #+END_SRC
 
 * Variables
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (defvar eqyiel/home-directory
     (or (and (getenv "HOME")
              (directory-file-name
@@ -72,19 +72,19 @@
        "/org")))
 
   (defvar eqyiel/timezone "Asia/Tokyo")
-#+end_src
+#+END_SRC
 
 * Make cache and data directories if they don't exist
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (when (not (car (file-attributes (concat eqyiel/xdg-cache-home "/emacs"))))
     (make-directory (concat eqyiel/xdg-cache-home "/emacs")))
 
   (when (not (car (file-attributes (concat eqyiel/xdg-data-home "/emacs"))))
     (make-directory (concat eqyiel/xdg-data-home "/emacs")))
-#+end_src
+#+END_SRC
 
 * General defaults
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (setq user-full-name "Ruben Maher"
         user-mail-address "ruben@maher.fyi"
         mail-host-address "maher.fyi")
@@ -237,10 +237,10 @@
   (setq mac-option-modifier 'meta
         mac-command-modifier 'super)
 
-#+end_src
+#+END_SRC
 
 * Fonts
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (cond
    ((eq system-type 'darwin) ;; high dpi
     (set-face-attribute 'default nil :height 140 :family "DejaVu Sans Mono"))
@@ -269,10 +269,10 @@
   ;; Hook for when a frame is created with emacsclient
   ;; see https://www.gnu.org/software/emacs/manual/html_node/elisp/Creating-Frames.html
   (add-hook 'after-make-frame-functions 'eqyiel/set-emoji-font)
-#+end_src
+#+END_SRC
 
 * Bootstrap ~use-package~
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (require 'package)
   (setq package-enable-at-startup nil
         package-user-dir "~/.emacs.d/site-lisp/elpa"
@@ -298,10 +298,10 @@
         use-package-always-defer t)
 
   (use-package use-package-chords :config (key-chord-mode t) :demand)
-#+end_src
+#+END_SRC
 
 * Utility functions
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (use-package dash :demand)
 
   (use-package s :demand)
@@ -684,7 +684,7 @@
     (widen))
 
   (global-set-key (kbd "C-x r C-y") 'eqyiel/yank-rectangle-with-insert)
-#+end_src
+#+END_SRC
 
 ** Functions for working with node projects
 
@@ -869,7 +869,7 @@ text!/.
 ** ~auth-password-store~                                             :melpa:
 Note that is this is included as ~auth-source-pass~ in Emacs 26 and up.
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (use-package auth-source-pass
     :after auth-source
     :init
@@ -883,7 +883,7 @@ Note that is this is included as ~auth-source-pass~ in Emacs 26 and up.
                    '("\\.com.gpg$" . fundamental-mode)))
     :ensure nil
     :demand)
-#+end_src
+#+END_SRC
 ** ~auto-fill-mode~                                                :builtin:
 This is here just so it can be diminished.
 
@@ -896,19 +896,19 @@ is named by ~auto-fill-function~.
 
 So diminish ~auto-fill-function~, not ~auto-fill-mode~.
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (use-package simple :ensure nil :diminish auto-fill-function)
-#+end_src
+#+END_SRC
 
 ** ~beacon~                                                          :melpa:
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (use-package beacon
     :init (beacon-mode t)
     :diminish beacon-mode)
-#+end_src
+#+END_SRC
 
 ** ~buffer-move~                                                     :melpa:
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   ;; Caps lock and Menu keys are bound to Hyper, except on OSX and Windows which
   ;; apparently can't into Hyper.  Use fake Hyper from Karabiner-elements and
   ;; autohotkey instead, which is really M-s-S-C and Menu key respectively.
@@ -962,18 +962,18 @@ So diminish ~auto-fill-function~, not ~auto-fill-mode~.
       (bind-key (concat eqyiel/hyper-prefix "-n") 'shrink-window)
       (bind-key (concat eqyiel/hyper-prefix "-p") 'enlarge-window))
     :demand)
-#+end_src
+#+END_SRC
 
 ** ~c++-mode~                                                      :builtin:
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (use-package c++-mode
     :config (c-set-offset 'arglist-cont-nonempty '+)
     :bind (:map c++-mode-map ("C-c C-l" . flycheck-list-errors))
     :ensure nil)
-#+end_src
+#+END_SRC
 
 ** ~calfw~                                                           :melpa:
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (defun eqyiel/open-calendar ()
     (interactive)
     (cfw:open-calendar-buffer
@@ -988,11 +988,11 @@ So diminish ~auto-fill-function~, not ~auto-fill-mode~.
   (use-package calfw-org
     :commands (cfw:org-create-source)
     :ensure calfw)
-#+end_src
+#+END_SRC
 
 ** ~circe~                                                           :melpa:
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
     (defun eqyiel/irc ()
       "Connect to IRC."
       (interactive)
@@ -1118,17 +1118,17 @@ So diminish ~auto-fill-function~, not ~auto-fill-mode~.
         (add-hook 'circe-server-connected-hook
                   'enable-circe-notifications)
         (add-hook 'lui-mode-hook 'eqyiel/circe-set-margin)))
-#+end_src
+#+END_SRC
 
 ** ~column-enforce-mode~                                             :melpa:
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (use-package column-enforce-mode
     :init (add-hook 'prog-mode-hook 'column-enforce-mode)
     :diminish column-enforce-mode)
-#+end_src
+#+END_SRC
 
 ** ~company~                                                         :melpa:
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (use-package company
     :config
     (setq company-minimum-prefix-length 1
@@ -1177,12 +1177,12 @@ So diminish ~auto-fill-function~, not ~auto-fill-mode~.
       (global-company-mode))
     :bind (("M-/" . company-complete))
     :diminish company-mode)
-#+end_src
+#+END_SRC
 
 ** ~company-lsp~                                                     :melpa:
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (use-package company-lsp :after company :demand t)
-#+end_src
+#+END_SRC
 
 ** ~company-posframe~                                                :melpa:
 
@@ -1206,7 +1206,7 @@ is enabled.
 #+END_SRC
 
 ** ~css-mode~                                                      :builtin:
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (use-package css-mode
     :init
     (progn
@@ -1216,10 +1216,10 @@ is enabled.
         (rainbow-turn-on))
       (add-hook 'css-mode-hook 'eqyiel/css-mode-hook))
     :ensure nil)
-#+end_src
+#+END_SRC
 
 ** ~dired~                                                         :builtin:
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (defun eqyiel/dired-back-to-top ()
     "Taken from: http://whattheemacsd.com/setup-dired.el-02.html"
     (interactive)
@@ -1259,7 +1259,7 @@ is enabled.
      ("M-<" . eqyiel/dired-back-to-top)
      ("M->" . eqyiel/dired-jump-to-bottom))
     :ensure nil)
-#+end_src
+#+END_SRC
 
 ** ~direnv~                                                          :melpa:
 #+BEGIN_SRC emacs-lisp
@@ -1271,35 +1271,35 @@ is enabled.
 #+END_SRC
 
 ** ~dtrt-indent~                                                     :melpa:
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (use-package dtrt-indent :init (dtrt-indent-mode) :demand)
-#+end_src
+#+END_SRC
 
 ** ~emojify~                                                         :melpa:
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
     (use-package emojify
       :config
       (setq emojify-display-style 'unicode
             emojify-composed-text-p nil))
-#+end_src
+#+END_SRC
 
 ** ~eslint-fix~                                                      :melpa:
 
 This package is kind of crap right now because it doesn't let you set the path a
 specific ~eslint~ executable, but it should be easy to fix.
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (use-package eslint-fix :after js-mode js2-mode web-mode)
-#+end_src
+#+END_SRC
 
 ** ~expand-region~                                                   :melpa:
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (use-package expand-region
     :chords ((("jk" . er/expand-region)
               ("kj" . er/expand-region)))
     :bind ("C-=" . er/expand-region)
     :demand)
-#+end_src
+#+END_SRC
 
 ** ~fasd~                                                            :melpa:
 
@@ -1327,7 +1327,7 @@ specific ~eslint~ executable, but it should be easy to fix.
 #+END_SRC
 
 ** ~flycheck~                                                        :melpa:
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (use-package flycheck
     :config
     (progn
@@ -1347,10 +1347,10 @@ specific ~eslint~ executable, but it should be easy to fix.
     :bind ("C-c C-l" . flycheck-list-errors)
     :demand
     :diminish flycheck-mode)
-#+end_src
+#+END_SRC
 
 ** ~flycheck-flow~                                                   :melpa:
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (use-package flycheck-flow
     :after flycheck
     :config
@@ -1360,7 +1360,7 @@ specific ~eslint~ executable, but it should be easy to fix.
       ;; (flycheck-add-next-checker 'javascript-flow-coverage '(t . javascript-eslint))
       ;; if just using flow
       (flycheck-add-next-checker 'javascript-flow '(t . javascript-eslint))))
-#+end_src
+#+END_SRC
 
 ** ~geben~                                                           :melpa:
 
@@ -1391,10 +1391,10 @@ PHP debugger thing.
 #+END_SRC
 
 ** ~google-c-style~                                                  :melpa:
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (use-package google-c-style
     :init (add-hook 'c-mode-common-hook 'google-set-c-style))
-#+end_src
+#+END_SRC
 
 ** ~google-translate~                                                :melpa:
 #+BEGIN_SRC emacs-lisp
@@ -1417,24 +1417,24 @@ This is pretty much exclusively for the sake of editing ~build.gradle~ files.
 #+END_SRC
 
 ** ~help-at-pt~                                                    :builtin:
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (use-package help-at-pt
     :config
     (setq help-at-pt-timer-delay 0.1
           help-at-pt-display-when-idle t)
     :ensure nil
     :demand)
-#+end_src
+#+END_SRC
 
 ** ~highlight-indentation~                                           :melpa:
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (use-package highlight-indentation
     :init (add-hook 'prog-mode-hook 'highlight-indentation-mode)
     :diminish highlight-indentation-mode)
-#+end_src
+#+END_SRC
 
 ** ~html-mode~                                                     :builtin:
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (use-package html-mode
     :init
     (progn
@@ -1443,7 +1443,7 @@ This is pretty much exclusively for the sake of editing ~build.gradle~ files.
         (rainbow-turn-on))
       (add-hook 'html-mode-hook 'eqyiel/html-mode-hook))
     :ensure nil)
-#+end_src
+#+END_SRC
 
 ** ~ibuffer~                                                       :builtin:
 
@@ -1466,7 +1466,7 @@ This is pretty much exclusively for the sake of editing ~build.gradle~ files.
 #+END_SRC
 
 ** ~info~                                                          :builtin:
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (use-package info
     :hook
     (Info-mode-hook
@@ -1477,7 +1477,7 @@ This is pretty much exclusively for the sake of editing ~build.gradle~ files.
           ;; Let me use S-SPC to scroll backwards in info mode.
           ("S-SPC" . Info-scroll-down))
     :ensure nil)
-#+end_src
+#+END_SRC
 
 ** ~isearch~                                                       :builtin:
 
@@ -1493,7 +1493,7 @@ can't do well (like searching for a substring in a long command in
 #+END_SRC
 
 ** ~ispell~                                                        :builtin:
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (use-package ispell
     :init
     (add-hook 'text-mode-hook 'turn-on-flyspell)
@@ -1510,14 +1510,14 @@ can't do well (like searching for a substring in a long command in
                 (when (file-exists-p (directory-file-name nix-aspell-dict-dir))
                   nix-aspell-dict-dir)))))
     :ensure nil)
-#+end_src
+#+END_SRC
 
 ** ~js-mode~                                                       :builtin:
 
 I don't really use this, but configure it in case I ever activate it by accident
 instead of ~js2-mode~ or ~web-mode~.
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (use-package js-mode
     :config
     (progn
@@ -1526,7 +1526,7 @@ instead of ~js2-mode~ or ~web-mode~.
       (modify-syntax-entry ?# ". 1" js-mode-syntax-table)
       (modify-syntax-entry ?! ". 2b" js-mode-syntax-table))
     :ensure nil)
-#+end_src
+#+END_SRC
 
 ** ~java-mode~                                                     :builtin:
 
@@ -1569,7 +1569,7 @@ instead of ~js2-mode~ or ~web-mode~.
 #+END_SRC
 
 ** ~js2-mode~                                                        :melpa:
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (use-package js2-mode
     :config
     (progn
@@ -1629,12 +1629,12 @@ instead of ~js2-mode~ or ~web-mode~.
     (:map js2-mode-map
           ("C-M-s-\"" . eqyiel/toggle-js2-mode-to-web-mode)
           ("H-'" . eqyiel/toggle-js2-mode-to-web-mode)))
-#+end_src
+#+END_SRC
 
 ** ~json-mode~                                                       :melpa:
 This package adds itself to ~auto-mode-alist~.
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (use-package json-mode
     :bind (:map json-mode-map
                 ("C-c C-c" . eqyiel/json-run-jq)
@@ -1669,7 +1669,7 @@ This package adds itself to ~auto-mode-alist~.
       (setq js-indent-level 2
             json-reformat:indent-width 2))
     (add-hook 'json-mode-hook 'eqyiel/json-mode-hook))
-#+end_src
+#+END_SRC
 
 ** ~kubernetes-mode~                                                 :melpa:
 
@@ -1725,9 +1725,9 @@ This package adds itself to ~auto-mode-alist~.
 #+END_SRC
 
 ** ~legalese~                                                        :melpa:
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (use-package legalese)
-#+end_src
+#+END_SRC
 
 ** ~lsp-mode~                                                        :melpa:
 
@@ -1788,7 +1788,7 @@ This package adds itself to ~auto-mode-alist~.
 #+END_SRC
 
 ** ~magit~                                                           :melpa:
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (use-package magit
     :init (use-package ivy)
     :config
@@ -1799,10 +1799,10 @@ This package adds itself to ~auto-mode-alist~.
     :bind
     (("<f8>" . magit-status)
      ("C-x g" . magit-status)))
-#+end_src
+#+END_SRC
 
 ** ~markdown-mode~                                                   :melpa:
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (use-package markdown-mode
     :config
     (progn
@@ -1811,14 +1811,14 @@ This package adds itself to ~auto-mode-alist~.
     (progn
       (add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
       (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))))
-#+end_src
+#+END_SRC
 
 ** ~matrix-client~                                                   :melpa:
 This is no longer on MELPA unfortunately.  This is how I found out that MELPA
 will be contacted on each startup if the package you want to install has
 vanished.
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   ;; (use-package matrix-client
   ;;   :init
   ;;   (defun eqyiel/launch-matrix-client ()
@@ -1826,10 +1826,10 @@ vanished.
   ;;     (matrix-client "eqyiel"))
   ;;   :config
   ;;   (setq matrix-homeserver-base-url "https://matrix.rkm.id.au"))
-#+end_src
+#+END_SRC
 
 ** ~message~                                                       :builtin:
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (use-package message
     :init
     (setq
@@ -1843,13 +1843,13 @@ vanished.
      message-kill-buffer-on-exit t)
     :defer t
     :ensure nil)
-#+end_src
+#+END_SRC
 
 ** ~mu4e~                                                           :system:
 
 Check out this for tips: https://vxlabs.com/2017/02/07/mu4e-0-9-18-e-mailing-with-emacs-now-even-better/
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (defun eqyiel/mu4e-any-message-field-at-point (msg header)
     "Quick & dirty way to get an arbitrary header HEADER from MSG.
 
@@ -2046,7 +2046,7 @@ Check out this for tips: https://vxlabs.com/2017/02/07/mu4e-0-9-18-e-mailing-wit
     :demand
     :ensure nil
     :load-path "/run/current-system/sw/share/emacs/site-lisp/mu4e")
-#+end_src
+#+END_SRC
 
 ** ~mule~                                                          :builtin:
 #+BEGIN_SRC emacs-lisp
@@ -2057,7 +2057,7 @@ Check out this for tips: https://vxlabs.com/2017/02/07/mu4e-0-9-18-e-mailing-wit
 #+END_SRC
 
 ** ~multiple-cursors~                                                :melpa:
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (use-package multiple-cursors
     :config
     (setq
@@ -2069,7 +2069,7 @@ Check out this for tips: https://vxlabs.com/2017/02/07/mu4e-0-9-18-e-mailing-wit
            ("C-<" . mc/mark-previous-like-this)
            ("C-8" . mc/mark-all-like-this)
            ("C-*" . mc/mark-all-like-this)))
-#+end_src
+#+END_SRC
 
 ** ~nix-buffer~                                                      :melpa:
 #+BEGIN_SRC emacs-lisp
@@ -2087,12 +2087,12 @@ Check out this for tips: https://vxlabs.com/2017/02/07/mu4e-0-9-18-e-mailing-wit
 #+END_SRC
 
 ** ~nix-mode~                                                        :melpa:
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (use-package nix-mode
     :ensure nil
     :commands (nix-mode nix-repl-show nix-format-buffer)
     :init (add-to-list 'auto-mode-alist '("\\.nix\\'" . nix-mode)))
-#+end_src
+#+END_SRC
 
 ** ~nix-shell~                                                       :melpa:
 
@@ -2110,13 +2110,13 @@ Check out this for tips: https://vxlabs.com/2017/02/07/mu4e-0-9-18-e-mailing-wit
 #+END_SRC
 
 ** ~nixos-options~                                                   :melpa:
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (use-package company-nixos-options
     :after (company nix-mode))
 
   (use-package nixos-options
     :after nix-mode)
-#+end_src
+#+END_SRC
 
 ** ~nixpkgs-fmt~                                                     :melpa:
 
@@ -2133,7 +2133,7 @@ Check out this for tips: https://vxlabs.com/2017/02/07/mu4e-0-9-18-e-mailing-wit
 #+END_SRC
 
 ** ~nodejs-repl~                                                     :melpa:
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (defun eqyiel/nodejs-repl-nix-buffer-around (orig-fun &rest args)
     "Allow ORIG-FUN to find `nodejs-repl-command' given by `nix-buffer'."
     (let ((nodejs-repl-command (executable-find "node")))
@@ -2141,7 +2141,7 @@ Check out this for tips: https://vxlabs.com/2017/02/07/mu4e-0-9-18-e-mailing-wit
 
   (use-package nodejs-repl
     :config (advice-add 'nodejs-repl :around 'eqyiel/nodejs-repl-nix-buffer-around))
-#+end_src
+#+END_SRC
 
 ** ~omnisharp~                                                       :melpa:
 #+BEGIN_SRC emacs-lisp
@@ -2162,7 +2162,7 @@ todo keywords ~DONE~.  Negating a regular expression is [[https://stackoverflow.
 so the only thing left to do is advise ~org-caldav-skip-function~ so that I can
 use ~AND~ instead of ~OR~.
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (use-package org-caldav
     :config
     (progn
@@ -2189,7 +2189,7 @@ use ~AND~ instead of ~OR~.
        org-caldav-skip-conditions t ; must be truthy to run `org-caldav-skip-function'
        org-icalendar-timezone eqyiel/timezone
        org-icalendar-use-scheduled '(event-if-todo))))
-#+end_src
+#+END_SRC
 
 ** ~org-cliplink~                                                    :melpa:
 A tool to insert a link in the clipboard as an ~org-mode~ link at point.
@@ -2199,23 +2199,23 @@ A tool to insert a link in the clipboard as an ~org-mode~ link at point.
 #+END_SRC
 
 ** ~org-download~                                                    :melpa:
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (use-package org-download
     :config (setq org-download-method 'attach))
-#+end_src
+#+END_SRC
 
 ** ~org-indent-mode~                                               :builtin:
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (use-package org-indent
     :load-path "site-lisp/org-mode"
     :diminish org-indent-mode
     :ensure nil
     :demand)
-#+end_src
+#+END_SRC
 
 ** ~org-mode~                                                      :builtin:
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (defconst eqyiel/org-iso8601-date-format "[%FT%T%z]")
 
   (defun eqyiel/org-insert-created-property ()
@@ -2612,24 +2612,24 @@ A tool to insert a link in the clipboard as an ~org-mode~ link at point.
     :ensure nil
     :load-path "site-lisp/org-mode"
     :demand)
-#+end_src
+#+END_SRC
 
 ** ~ox-gfm~                                                          :melpa:
 Export ~org~ files to Github-flavoured markdown.
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (use-package ox-gfm :demand)
-#+end_src
+#+END_SRC
 
 ** ~pass~                                                            :melpa:
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (use-package pass :demand)
-#+end_src
+#+END_SRC
 
 ** ~php-mode~                                                        :melpa:
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (use-package php-mode)
-#+end_src
+#+END_SRC
 
 ** ~prettier-emacs~                                                  :melpa:
 #+BEGIN_SRC emacs-lisp
@@ -2666,7 +2666,7 @@ Export ~org~ files to Github-flavoured markdown.
 
 ** ~projectile~                                                      :melpa:
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (use-package projectile
     :config
     (progn
@@ -2708,24 +2708,24 @@ Export ~org~ files to Github-flavoured markdown.
             (append '("dist" "node_modules")
                     projectile-globally-ignored-directories)))
     :bind ("<f5>" . projectile-compile-project))
-#+end_src
+#+END_SRC
 
 ** ~python-mode~                                                   :builtin:
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (use-package python-mode
     :bind
     (:map inferior-python-mode-map
           ("C-d" . eqyiel/comint-delchar-or-eof-or-kill-buffer))
     :ensure nil)
-#+end_src
+#+END_SRC
 
 ** ~rainbow-mode~                                                     :elpa:
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (use-package rainbow-mode)
-#+end_src
+#+END_SRC
 
 ** ~recentf~                                                       :builtin:
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (use-package recentf
     :init
     (progn
@@ -2736,7 +2736,7 @@ Export ~org~ files to Github-flavoured markdown.
       (recentf-mode))
     :ensure nil
     :demand)
-#+end_src
+#+END_SRC
 
 ** ~rjsx-mode~                                                       :melpa:
 #+BEGIN_SRC emacs-lisp
@@ -2797,10 +2797,10 @@ Export ~org~ files to Github-flavoured markdown.
     :bind (:map rjsx-mode-map
                 ("C-M-s-\"" . eqyiel/toggle-rjsx-mode-to-web-mode)
                 ("H-'" . eqyiel/toggle-rjsx-mode-to-web-mode)))
-#+end_src
+#+END_SRC
 
 ** ~savehist~                                                      :builtin:
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (use-package savehist
     :init
     (savehist-mode 1)
@@ -2811,10 +2811,10 @@ Export ~org~ files to Github-flavoured markdown.
      history-length 10000)
     :ensure nil
     :demand)
-#+end_src
+#+END_SRC
 
 ** ~saveplace~                                                     :builtin:
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (use-package saveplace
     :init
     (progn
@@ -2823,10 +2823,10 @@ Export ~org~ files to Github-flavoured markdown.
       (setq-default save-place t))
     :ensure nil
     :demand)
-#+end_src
+#+END_SRC
 
 ** ~scss-mode~                                                       :melpa:
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (use-package scss-mode
     :init
     (add-hook
@@ -2835,19 +2835,19 @@ Export ~org~ files to Github-flavoured markdown.
        (set (make-local-variable 'comment-start) "//")
        (set (make-local-variable 'comment-end) "")
        (set (make-local-variable 'comment-continue) "//"))))
-#+end_src
+#+END_SRC
 
 ** ~shell-mode~                                                    :builtin:
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (use-package shell
     :bind
     (:map shell-mode-map
           ("C-d" . eqyiel/comint-delchar-or-eof-or-kill-buffer))
     :ensure nil)
-#+end_src
+#+END_SRC
 
 ** ~shell-script-mode~                                             :builtin:
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (defun eqyiel/setup-sh-mode ()
     (setq sh-basic-offset 2
           sh-indentation 2))
@@ -2855,15 +2855,15 @@ Export ~org~ files to Github-flavoured markdown.
   (use-package shell-script-mode
     :init (add-hook 'sh-mode-hook 'eqyiel/setup-sh-mode)
     :ensure nil)
-#+end_src
+#+END_SRC
 
 ** ~skewer-mode~                                                     :melpa:
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (use-package skewer-mode)
-#+end_src
+#+END_SRC
 
 ** ~smartparens~                                                     :melpa:
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (defun eqyiel/get-derived-mode-parents (mode)
     (when (and mode (boundp 'derived-mode-parents))
       (cons mode (derived-mode-parents (get mode 'derived-mode-parent)))))
@@ -2893,7 +2893,7 @@ Export ~org~ files to Github-flavoured markdown.
       (sp-local-pair 'org-mode "/" "/"))
     :demand
     :diminish smartparens-mode)
-#+end_src
+#+END_SRC
 
 ** ~solarized-theme~                                                 :melpa:
 #+BEGIN_SRC emacs-lisp
@@ -2914,16 +2914,16 @@ Export ~org~ files to Github-flavoured markdown.
 #+END_SRC
 
 ** ~subword~                                                       :builtin:
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (use-package subword
     :init (global-subword-mode 1)
     :diminish subword-mode
     :ensure nil
     :demand)
-#+end_src
+#+END_SRC
 
 ** ~swift-mode~                                                      :melpa:
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (use-package swift-mode
     :config
     (progn
@@ -2946,13 +2946,13 @@ Export ~org~ files to Github-flavoured markdown.
     (progn '((add-to-list 'flycheck-checkers 'swift)
              (add-to-list 'flycheck-checkers 'swiftlint)
              (flycheck-add-next-checker 'swiftlint '(t . swift)))))
-#+end_src
+#+END_SRC
 
 ** ~swiper~ and friends                                              :melpa:
 
 This is a new one for me.  See [[http://oremacs.com/swiper/#key-bindings-for-single-selection-action-then-exit-minibuffer][here]] for more info on key bindings.
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (use-package smex
     :config
     (setq
@@ -3051,7 +3051,7 @@ This is a new one for me.  See [[http://oremacs.com/swiper/#key-bindings-for-sin
       (use-package ivy)
       (add-to-list 'swiper-font-lock-exclude 'nix-mode))
     :demand)
-#+end_src
+#+END_SRC
 
 ** ~tide~                                                            :melpa:
 
@@ -3146,13 +3146,13 @@ This is a new one for me.  See [[http://oremacs.com/swiper/#key-bindings-for-sin
 #+END_SRC
 
 ** ~tiny~                                                            :melpa:
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (use-package tiny
     :bind (("H-;" . tiny-expand)))
-#+end_src
+#+END_SRC
 
 ** ~tramp~                                                         :builtin:
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (use-package tramp
     :config
     (setq
@@ -3172,26 +3172,26 @@ This is a new one for me.  See [[http://oremacs.com/swiper/#key-bindings-for-sin
       (add-to-list 'tramp-default-proxies-alist '(".*" "\\`root\\'" "/ssh:%h:"))
       (add-to-list 'tramp-default-proxies-alist '("\\`localhost\\'" "\\`root\\'" nil)))
     :ensure nil)
-#+end_src
+#+END_SRC
 
 ** ~unfill~                                                          :melpa:
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (use-package unfill :demand t :bind ("M-q" . unfill-toggle))
-#+end_src
+#+END_SRC
 
 ** ~uniquify~                                                      :builtin:
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (use-package uniquify
     :config
     (setq uniquify-buffer-name-style 'forward)
     :ensure nil
     :demand)
-#+end_src
+#+END_SRC
 
 ** ~visual-fill-column~                                              :melpa:
 This is a pretty good replacement  for ~longlines-mode~.
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (defun eqyiel/longlines-mode ()
     "Replacement for the deprecated `longlines-mode'."
     (interactive)
@@ -3205,10 +3205,10 @@ This is a pretty good replacement  for ~longlines-mode~.
     :commands (visual-fill-column-mode)
     :config (require 'simple)
     :demand)
-#+end_src
+#+END_SRC
 
 ** ~web-mode~                                                        :melpa:
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (defun eqyiel/toggle-web-mode-to-js2-mode ()
     (interactive)
     (require 'js2-mode)
@@ -3274,33 +3274,33 @@ This is a pretty good replacement  for ~longlines-mode~.
           ("H-'" . eqyiel/toggle-web-mode-to-rjsx-mode)
           ("M-j" . newline-and-indent)
           ("C-c C-l" . flycheck-list-errors)))
-#+end_src
+#+END_SRC
 
 ** ~winner~                                                        :builtin:
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (use-package winner
     :config (winner-mode t)
     :ensure nil
     :demand)
-#+end_src
+#+END_SRC
 
 ** ~ws-butler~                                                       :melpa:
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (use-package ws-butler
     :init (ws-butler-global-mode)
     :diminish ws-butler-mode
     :demand)
-#+end_src
+#+END_SRC
 
 ** ~yaml-mode~                                                       :melpa:
 This package adds itself to ~auto-mode-alist~.
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (use-package yaml-mode)
-#+end_src
+#+END_SRC
 
 ** ~yasnippet~                                                       :melpa:
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (use-package yasnippet
     :init
     (progn
@@ -3318,4 +3318,4 @@ This package adds itself to ~auto-mode-alist~.
     :bind (("C-c TAB" . yas-expand))
     :diminish yas-minor-mode
     :demand t)
-#+end_src
+#+END_SRC

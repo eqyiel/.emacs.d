@@ -2100,7 +2100,30 @@ Check out this for tips: https://vxlabs.com/2017/02/07/mu4e-0-9-18-e-mailing-wit
     :ensure t)
 #+END_SRC
 
-** ~nix-emacs~                                                     :subtree:
+** ~nix-mode~                                                        :melpa:
+#+begin_src emacs-lisp
+  (use-package nix-mode
+    :ensure nil
+    :commands (nix-mode nix-repl-show nix-format-buffer)
+    :init (add-to-list 'auto-mode-alist '("\\.nix\\'" . nix-mode)))
+#+end_src
+
+** ~nix-shell~                                                       :melpa:
+
+#+BEGIN_SRC emacs-lisp
+  (use-package nix-shell
+    :ensure nil
+    :commands nix-shell)
+#+END_SRC
+
+** ~nix-update~                                                      :melpa:
+
+#+BEGIN_SRC emacs-lisp
+  (use-package nix-update
+    :commands nix-update-fetch)
+#+END_SRC
+
+** ~nixos-options~                                                   :melpa:
 #+begin_src emacs-lisp
   (use-package company-nixos-options
     :after (company nix-mode))
@@ -2109,19 +2132,14 @@ Check out this for tips: https://vxlabs.com/2017/02/07/mu4e-0-9-18-e-mailing-wit
     :after nix-mode)
 #+end_src
 
-** ~nix-mode~                                                      :subtree:
-#+begin_src emacs-lisp
-  (use-package nix-mode
-    :ensure nil
-    :commands (nix-mode nix-repl-show nix-format-buffer)
-    :init (add-to-list 'auto-mode-alist '("\\.nix\\'" . nix-mode))
-    :load-path "site-lisp/nixos/nix-mode")
+** ~nixpkgs-fmt~                                                     :melpa:
 
-  (use-package nix-shell
+#+BEGIN_SRC emacs-lisp
+  (use-package nixpkgs-fmt
     :ensure nil
-    :commands nix-shell
-    :load-path "site-lisp/nixos/nix-mode")
-#+end_src
+    :hook (nix-mode-hook . nixpkgs-fmt-on-save-mode)
+    :commands nixpkgs-fmt-on-save-mode)
+#+END_SRC
 
 ** ~no-littering~                                                    :melpa:
 #+BEGIN_SRC emacs-lisp
@@ -2145,7 +2163,6 @@ Check out this for tips: https://vxlabs.com/2017/02/07/mu4e-0-9-18-e-mailing-wit
   (use-package omnisharp
     :hook (csharp-mode . omnisharp-mode))
 #+END_SRC
-
 
 ** ~org-caldav~                                                      :melpa:
 

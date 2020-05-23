@@ -297,14 +297,14 @@
   (setq use-package-always-ensure t
         use-package-always-defer t)
 
-  (use-package use-package-chords :config (key-chord-mode t) :ensure t :demand)
+  (use-package use-package-chords :config (key-chord-mode t) :demand)
 #+end_src
 
 * Utility functions
 #+begin_src emacs-lisp
-  (use-package dash :ensure t :demand)
+  (use-package dash :demand)
 
-  (use-package s :ensure t :demand)
+  (use-package s :demand)
 
   (defun eqyiel/kill-region-or-backward-kill-word (&optional arg region)
     "`kill-region' if the region is active, otherwise `backward-kill-word'
@@ -689,10 +689,10 @@
 ** Functions for working with node projects
 
 #+BEGIN_SRC emacs-lisp
-  (use-package dash :ensure t :demand)
-  (use-package f :ensure t :demand)
-  (use-package s :ensure t :demand)
-  (use-package json :ensure t :demand)
+  (use-package dash :demand)
+  (use-package f :demand)
+  (use-package s :demand)
+  (use-package json :demand)
 
   (defun eqyiel/node-json-read-file-safely (json-file)
     "Read JSON-FILE and return its contents or nil if it was malformed."
@@ -850,8 +850,7 @@
 ** ~aggressive-indent-mode~                                          :melpa:
 #+BEGIN_SRC emacs-lisp
   (use-package aggressive-indent
-    :config (global-aggressive-indent-mode 1)
-    :ensure t)
+    :config (global-aggressive-indent-mode 1))
 #+END_SRC
 ** ~atomic-chrome~                                                   :melpa:
 
@@ -861,7 +860,6 @@ text!/.
 #+BEGIN_SRC emacs-lisp
   (use-package atomic-chrome
     :init (atomic-chrome-start-server)
-    :ensure t
     :demand)
 #+END_SRC
 
@@ -906,8 +904,7 @@ So diminish ~auto-fill-function~, not ~auto-fill-mode~.
 #+begin_src emacs-lisp
   (use-package beacon
     :init (beacon-mode t)
-    :diminish beacon-mode
-    :ensure t)
+    :diminish beacon-mode)
 #+end_src
 
 ** ~buffer-move~                                                     :melpa:
@@ -986,8 +983,7 @@ So diminish ~auto-fill-function~, not ~auto-fill-mode~.
   (use-package calfw
     :commands (cfw:open-calendar-buffer)
     :config
-    (setq calendar-mark-holidays-flag t)
-    :ensure t)
+    (setq calendar-mark-holidays-flag t))
 
   (use-package calfw-org
     :commands (cfw:org-create-source)
@@ -1081,7 +1077,7 @@ So diminish ~auto-fill-function~, not ~auto-fill-mode~.
         (require 'circe-chanop)
         (require 'circe-color-nicks)
 
-        (use-package alert :ensure t :defer t)
+        (use-package alert :defer t)
 
         (use-package circe-notifications
           :load-path "site-lisp/circe-notifications"
@@ -1121,8 +1117,7 @@ So diminish ~auto-fill-function~, not ~auto-fill-mode~.
         ;;           'eqyiel/circe-wait-for-authentication)
         (add-hook 'circe-server-connected-hook
                   'enable-circe-notifications)
-        (add-hook 'lui-mode-hook 'eqyiel/circe-set-margin))
-      :ensure t)
+        (add-hook 'lui-mode-hook 'eqyiel/circe-set-margin)))
 #+end_src
 
 ** ~column-enforce-mode~                                             :melpa:
@@ -1142,7 +1137,7 @@ So diminish ~auto-fill-function~, not ~auto-fill-mode~.
           company-tooltip-align-annotations t)
     :init
     (progn
-      (use-package company-emoji :demand :ensure t)
+      (use-package company-emoji :demand)
 
       (setq company-backends
             '((company-files
@@ -1207,8 +1202,7 @@ is enabled.
   (use-package counsel-projectile
     :after (projectile counsel)
     :demand
-    :bind ("C-c k" . counsel-projectile-rg)
-    :ensure t)
+    :bind ("C-c k" . counsel-projectile-rg))
 #+END_SRC
 
 ** ~css-mode~                                                      :builtin:
@@ -1329,7 +1323,6 @@ specific ~eslint~ executable, but it should be easy to fix.
 
   (use-package flow-minor-mode
     :config (add-hook 'flow-minor-mode-hook 'eqyiel/flow-minor-mode-hook)
-    :ensure t
     :demand t)
 #+END_SRC
 
@@ -1359,7 +1352,6 @@ specific ~eslint~ executable, but it should be easy to fix.
 ** ~flycheck-flow~                                                   :melpa:
 #+begin_src emacs-lisp
   (use-package flycheck-flow
-    :ensure t
     :after flycheck
     :config
     (progn
@@ -1381,7 +1373,6 @@ PHP debugger thing.
 ** ~gist~                                                            :melpa:
 #+BEGIN_SRC emacs-lisp
   (use-package gist
-    :ensure t
     :config
     (let ((gh-vals (cdar gh-profile-alist)))
       (setf
@@ -1588,7 +1579,7 @@ instead of ~js2-mode~ or ~web-mode~.
 
       (use-package flow-js2-mode
         :load-path "site-lisp/flow-js2-mode"
-        :config (use-package flow-minor-mode :ensure t :demand t)
+        :config (use-package flow-minor-mode :demand t)
         :ensure nil
         :demand t)
 
@@ -1645,7 +1636,6 @@ This package adds itself to ~auto-mode-alist~.
 
 #+begin_src emacs-lisp
   (use-package json-mode
-    :ensure t
     :bind (:map json-mode-map
                 ("C-c C-c" . eqyiel/json-run-jq)
                 ("C-c C-m" . eqyiel/json-minify))
@@ -1742,10 +1732,9 @@ This package adds itself to ~auto-mode-alist~.
 ** ~lsp-mode~                                                        :melpa:
 
 #+BEGIN_SRC emacs-lisp
-  (use-package lsp-ui :defer t :ensure t)
+  (use-package lsp-ui :defer t)
 
   (use-package lsp-mode
-    :ensure t
     :requires flycheck nix-buffer
     :demand t
     :config (require 'lsp-ui))
@@ -1772,7 +1761,6 @@ This package adds itself to ~auto-mode-alist~.
     flow-minor-mode
     :hook ((js-mode js2-mode rjsx-mode)
            . eqyiel/lsp-javascript-flow-enable-maybe)
-    :ensure t
     :demand t)
 
   (defun eqyiel/lsp-java-enable-maybe ()
@@ -1796,14 +1784,13 @@ This package adds itself to ~auto-mode-alist~.
       (lsp-ui-mode)))
 
   (use-package lsp-java
-    :ensure t
     :hook (java-mode . eqyiel/lsp-java-enable-maybe))
 #+END_SRC
 
 ** ~magit~                                                           :melpa:
 #+begin_src emacs-lisp
   (use-package magit
-    :init (use-package ivy :ensure t)
+    :init (use-package ivy)
     :config
     (progn
       (setq
@@ -1895,7 +1882,7 @@ Check out this for tips: https://vxlabs.com/2017/02/07/mu4e-0-9-18-e-mailing-wit
   (use-package mu4e
     :config
     (progn
-      (use-package org-mime :ensure t :demand t)
+      (use-package org-mime :demand t)
       (defun eqyiel/htmlize-and-send ()
         "When in an org-mu4e-compose-org-mode message, htmlize and send it."
         (interactive)
@@ -2096,8 +2083,7 @@ Check out this for tips: https://vxlabs.com/2017/02/07/mu4e-0-9-18-e-mailing-wit
     (nix-buffer-update-directory-name
      (f-join eqyiel/xdg-cache-home "emacs/nix-buffer"))
     :hook (find-file . eqyiel/nix-buffer-find-file-hook)
-    :demand t
-    :ensure t)
+    :demand t)
 #+END_SRC
 
 ** ~nix-mode~                                                        :melpa:
@@ -2143,7 +2129,7 @@ Check out this for tips: https://vxlabs.com/2017/02/07/mu4e-0-9-18-e-mailing-wit
 
 ** ~no-littering~                                                    :melpa:
 #+BEGIN_SRC emacs-lisp
-  (use-package no-littering :ensure t)
+  (use-package no-littering)
 #+END_SRC
 
 ** ~nodejs-repl~                                                     :melpa:
@@ -2154,8 +2140,7 @@ Check out this for tips: https://vxlabs.com/2017/02/07/mu4e-0-9-18-e-mailing-wit
       (funcall orig-fun)))
 
   (use-package nodejs-repl
-    :config (advice-add 'nodejs-repl :around 'eqyiel/nodejs-repl-nix-buffer-around)
-    :ensure t)
+    :config (advice-add 'nodejs-repl :around 'eqyiel/nodejs-repl-nix-buffer-around))
 #+end_src
 
 ** ~omnisharp~                                                       :melpa:
@@ -2179,7 +2164,6 @@ use ~AND~ instead of ~OR~.
 
 #+begin_src emacs-lisp
   (use-package org-caldav
-    :ensure t
     :config
     (progn
       (advice-add
@@ -2211,14 +2195,13 @@ use ~AND~ instead of ~OR~.
 A tool to insert a link in the clipboard as an ~org-mode~ link at point.
 
 #+BEGIN_SRC emacs-lisp
-(use-package org-cliplink :ensure t :bind (("H-i" . org-cliplink)))
+(use-package org-cliplink :bind (("H-i" . org-cliplink)))
 #+END_SRC
 
 ** ~org-download~                                                    :melpa:
 #+begin_src emacs-lisp
   (use-package org-download
-    :config (setq org-download-method 'attach)
-    :ensure t)
+    :config (setq org-download-method 'attach))
 #+end_src
 
 ** ~org-indent-mode~                                               :builtin:
@@ -2640,7 +2623,7 @@ Export ~org~ files to Github-flavoured markdown.
 
 ** ~pass~                                                            :melpa:
 #+begin_src emacs-lisp
-  (use-package pass :ensure t :demand)
+  (use-package pass :demand)
 #+end_src
 
 ** ~php-mode~                                                        :melpa:
@@ -2678,8 +2661,7 @@ Export ~org~ files to Github-flavoured markdown.
                                   (string-equal web-mode-content-type "jsx"))
                           (eqyiel/prettier-js-mode-hook)))))
     :config (setq prettier-js-command "prettier")
-    :defer t
-    :ensure t)
+    :defer t)
 #+END_SRC
 
 ** ~projectile~                                                      :melpa:
@@ -2715,7 +2697,7 @@ Export ~org~ files to Github-flavoured markdown.
       ;; Default keybinding was changed from "C-c p" to "C-c C-p" in
       ;; https://github.com/bbatsov/projectile/commit/b90b950eead64b171d528098d186c19804739aa0
       (setq projectile-keymap-prefix (kbd "C-c p"))
-      (use-package ivy :ensure t)
+      (use-package ivy)
       (projectile-global-mode)
       (advice-add
        'projectile-current-project-files
@@ -2725,8 +2707,7 @@ Export ~org~ files to Github-flavoured markdown.
             projectile-globally-ignored-directories
             (append '("dist" "node_modules")
                     projectile-globally-ignored-directories)))
-    :bind ("<f5>" . projectile-compile-project)
-    :ensure t)
+    :bind ("<f5>" . projectile-compile-project))
 #+end_src
 
 ** ~python-mode~                                                   :builtin:
@@ -2740,7 +2721,7 @@ Export ~org~ files to Github-flavoured markdown.
 
 ** ~rainbow-mode~                                                     :elpa:
 #+begin_src emacs-lisp
-  (use-package rainbow-mode :ensure t)
+  (use-package rainbow-mode)
 #+end_src
 
 ** ~recentf~                                                       :builtin:
@@ -2815,8 +2796,7 @@ Export ~org~ files to Github-flavoured markdown.
             (add-to-list 'auto-mode-alist '("\\.jsx$" . rjsx-mode)))
     :bind (:map rjsx-mode-map
                 ("C-M-s-\"" . eqyiel/toggle-rjsx-mode-to-web-mode)
-                ("H-'" . eqyiel/toggle-rjsx-mode-to-web-mode))
-    :ensure t)
+                ("H-'" . eqyiel/toggle-rjsx-mode-to-web-mode)))
 #+end_src
 
 ** ~savehist~                                                      :builtin:
@@ -2854,8 +2834,7 @@ Export ~org~ files to Github-flavoured markdown.
      (lambda () ;; use // instead of /* */
        (set (make-local-variable 'comment-start) "//")
        (set (make-local-variable 'comment-end) "")
-       (set (make-local-variable 'comment-continue) "//")))
-    :ensure t)
+       (set (make-local-variable 'comment-continue) "//"))))
 #+end_src
 
 ** ~shell-mode~                                                    :builtin:
@@ -2913,7 +2892,6 @@ Export ~org~ files to Github-flavoured markdown.
       (sp-local-pair 'org-mode "_" "_")
       (sp-local-pair 'org-mode "/" "/"))
     :demand
-    :ensure t
     :diminish smartparens-mode)
 #+end_src
 
@@ -2926,7 +2904,6 @@ Export ~org~ files to Github-flavoured markdown.
             solarized-use-variable-pitch nil
             solarized-scale-org-headlines nil)
       (load-theme 'solarized-light t))
-    :ensure t
     :demand t)
 
 #+END_SRC
@@ -2963,8 +2940,7 @@ Export ~org~ files to Github-flavoured markdown.
              (warning line-start (file-name) ":" line ":" column ": "
                       "warning: " (message) line-end))
 
-            :modes swift-mode))
-        :ensure t)
+            :modes swift-mode)))
       (setq swift-indent-offset 2))
     :init
     (progn '((add-to-list 'flycheck-checkers 'swift)
@@ -2982,11 +2958,10 @@ This is a new one for me.  See [[http://oremacs.com/swiper/#key-bindings-for-sin
     (setq
      smex-save-file
      (concat eqyiel/xdg-cache-home "/emacs/smex-items"))
-    :demand
-    :ensure t)
+    :demand)
 
   (use-package counsel
-    :init (use-package ivy :ensure t)
+    :init (use-package ivy)
     :config
     ;; Override `counsel-rg-base-command' with the flag to follow symlinks, but do
     ;; it in a way that won't change the output if evaluated twice by getting the
@@ -3013,8 +2988,7 @@ This is a new one for me.  See [[http://oremacs.com/swiper/#key-bindings-for-sin
      ("C-c j" . counsel-git-grep)
      ("C-c K" . eqyiel/counsel-rg-from-current-directory)
      ("C-x l" . counsel-locate))
-    :demand
-    :ensure t)
+    :demand)
 
   (defun eqyiel/counsel-projectile-rg-around (orig-fun &rest args)
     "If `projectile-counsel-rg' throws an error, fallback to regular `counsel-rg'."
@@ -3035,7 +3009,6 @@ This is a new one for me.  See [[http://oremacs.com/swiper/#key-bindings-for-sin
            ("M-g e" . avy-goto-word-0)
            ("M-g o" . avy-org-refile-as-child)
            ("M-g j" . avy-org-goto-heading-timer))
-    :ensure t
     :demand)
 
   (use-package ivy
@@ -3067,8 +3040,7 @@ This is a new one for me.  See [[http://oremacs.com/swiper/#key-bindings-for-sin
      ("C-r" . ivy-previous-line)
      ("C-s" . ivy-next-line))
     :demand
-    :diminish ivy-mode
-    :ensure t)
+    :diminish ivy-mode)
 
   (use-package swiper
     :bind
@@ -3076,10 +3048,9 @@ This is a new one for me.  See [[http://oremacs.com/swiper/#key-bindings-for-sin
      ("C-r" . swiper-isearch))
     :init
     (progn
-      (use-package ivy :ensure t)
+      (use-package ivy)
       (add-to-list 'swiper-font-lock-exclude 'nix-mode))
-    :demand
-    :ensure t)
+    :demand)
 #+end_src
 
 ** ~tide~                                                            :melpa:
@@ -3149,7 +3120,6 @@ This is a new one for me.  See [[http://oremacs.com/swiper/#key-bindings-for-sin
         (tide-format-before-save))))
 
   (use-package tide
-    :ensure t
     :after (typescript-mode company flycheck)
     :init
     (progn
@@ -3206,7 +3176,7 @@ This is a new one for me.  See [[http://oremacs.com/swiper/#key-bindings-for-sin
 
 ** ~unfill~                                                          :melpa:
 #+begin_src emacs-lisp
-  (use-package unfill :demand t :ensure t :bind ("M-q" . unfill-toggle))
+  (use-package unfill :demand t :bind ("M-q" . unfill-toggle))
 #+end_src
 
 ** ~uniquify~                                                      :builtin:
@@ -3234,7 +3204,6 @@ This is a pretty good replacement  for ~longlines-mode~.
   (use-package visual-fill-column
     :commands (visual-fill-column-mode)
     :config (require 'simple)
-    :ensure t
     :demand)
 #+end_src
 
@@ -3304,8 +3273,7 @@ This is a pretty good replacement  for ~longlines-mode~.
           ("C-M-s-\"" . eqyiel/toggle-web-mode-to-rjsx-mode)
           ("H-'" . eqyiel/toggle-web-mode-to-rjsx-mode)
           ("M-j" . newline-and-indent)
-          ("C-c C-l" . flycheck-list-errors))
-    :ensure t)
+          ("C-c C-l" . flycheck-list-errors)))
 #+end_src
 
 ** ~winner~                                                        :builtin:
@@ -3321,15 +3289,14 @@ This is a pretty good replacement  for ~longlines-mode~.
   (use-package ws-butler
     :init (ws-butler-global-mode)
     :diminish ws-butler-mode
-    :demand
-    :ensure t)
+    :demand)
 #+end_src
 
 ** ~yaml-mode~                                                       :melpa:
 This package adds itself to ~auto-mode-alist~.
 
 #+begin_src emacs-lisp
-  (use-package yaml-mode :ensure t)
+  (use-package yaml-mode)
 #+end_src
 
 ** ~yasnippet~                                                       :melpa:
@@ -3350,6 +3317,5 @@ This package adds itself to ~auto-mode-alist~.
       (yas-global-mode t))
     :bind (("C-c TAB" . yas-expand))
     :diminish yas-minor-mode
-    :demand t
-    :ensure t)
+    :demand t)
 #+end_src

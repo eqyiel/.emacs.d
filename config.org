@@ -273,31 +273,46 @@
 
 * Bootstrap ~use-package~
 #+BEGIN_SRC emacs-lisp
-  (require 'package)
-  (setq package-enable-at-startup nil
-        package-user-dir "~/.emacs.d/site-lisp/elpa"
-        package-gnupghome-dir "~/.emacs.d/site-lisp/elpa/gnupg"
-        package-archives nil)
+    (require 'package)
+    (setq package-enable-at-startup nil
+          package-user-dir "~/.emacs.d/site-lisp/elpa"
+          package-gnupghome-dir "~/.emacs.d/site-lisp/elpa/gnupg"
+          package-archives nil)
 
-  ;; Bootstrap `use-package' and its dependencies if they are not already
-  ;; available.
-  (let ((dependencies '(use-package diminish bind-key)))
-    (unless (seq-reduce (lambda (prev next) (and prev next))
-                        (mapcar 'package-installed-p dependencies) t)
-      (package-refresh-contents)
-      (dolist (package dependencies)
-        (unless (package-installed-p package)
-          (package-install package)))))
+    ;; Bootstrap `use-package' and its dependencies if they are not already
+    ;; available.
+    (let ((dependencies '(use-package diminish bind-key)))
+      (unless (seq-reduce (lambda (prev next) (and prev next))
+                          (mapcar 'package-installed-p dependencies) t)
+        (package-refresh-contents)
+        (dolist (package dependencies)
+          (unless (package-installed-p package)
+            (package-install package)))))
 
-  (eval-when-compile
-    (require 'use-package))
-  (require 'diminish)
-  (require 'bind-key)
+    (eval-when-compile
+      (require 'use-package))
+    (require 'diminish)
+    (require 'bind-key)
 
-  (setq use-package-always-ensure t
-        use-package-always-defer t)
+    (setq use-package-always-ensure nil
+          use-package-always-defer t
+          ;; When using :hook omit the "-hook" suffix if you specify the hook
+          ;; explicitly, as this is appended by default. For example the following
+          ;; code will not work as it attempts to add to the prog-mode-hook-hook
+          ;; which does not exist:
+          ;; ;; DOES NOT WORK
+          ;; (use-package ace-jump-mode
+          ;;   :hook (prog-mode-hook . ace-jump-mode))
+          ;; If you do not like this behaviour, set use-package-hook-name-suffix
+          ;; to nil. By default the value of this variable is "-hook".
+          ;;
+          ;; https://github.com/jwiegley/use-package/tree/d2640fec376a8458a669e7526e63e5870d875118#hooks
+          ;;
+          ;; Disable because it makes -hook names fail the grep test.
+          ;; http://jamie-wong.com/2013/07/12/grep-test/
+          use-package-hook-name-suffix nil)
 
-  (use-package use-package-chords :config (key-chord-mode t) :demand t)
+    (use-package use-package-chords :config (key-chord-mode t) :demand t)
 #+END_SRC
 
 * Utility functions
@@ -877,10 +892,9 @@ Note that is this is included as ~auth-source-pass~ in Emacs 26 and up.
       ;; We could just use `auth-pass-enable' here which adds `password-store' to
       ;; `auth-sources', but I prefer to override it completely so that Emacs
       ;; never tries to read from ~/.authinfo{,.gpg} or ~/.netrc.
-      (setq auth-sources '(password-store))
-      ;; Don't open in DCL mode
-      (add-to-list 'auto-mode-alist
-                   '("\\.com.gpg$" . fundamental-mode)))
+      (setq auth-sources '(password-store)))
+        ;; Don't open in DCL mode
+    :mode ("\\.com.gpg$" . fundamental-mode)
     :demand t)
 #+END_SRC
 ** ~auto-fill-mode~                                                :builtin:
@@ -990,187 +1004,180 @@ So diminish ~auto-fill-function~, not ~auto-fill-mode~.
 ** ~circe~                                                           :melpa:
 
 #+BEGIN_SRC emacs-lisp
-    (defun eqyiel/irc ()
-      "Connect to IRC."
-      (interactive)
-      (eqyiel/circe-setup-networks)
-      (circe "freenode"))
+  (defun eqyiel/irc ()
+    "Connect to IRC."
+    (interactive)
+    (eqyiel/circe-setup-networks)
+    (circe "freenode"))
 
-    (defun eqyiel/circe-setup-networks ()
-      (setq
-       circe-network-options
-       `(("freenode"
-          :nick "eqyiel"
-          :host "irc.freenode.net"
-          :service "6697"
-          :tls t
-          :pass ,(password-store-get "www/irc.freenode.net")))))
+  (defun eqyiel/circe-setup-networks ()
+    (setq
+     circe-network-options
+     `(("freenode"
+        :nick "eqyiel"
+        :host "irc.freenode.net"
+        :service "6697"
+        :tls t
+        :pass ,(password-store-get "www/irc.freenode.net")))))
 
-    (defun eqyiel/circe-clear-passwords ()
-      (if (boundp 'circe-network-options)
-          (dolist (network circe-network-options)
-            (plist-put (cdr network) :pass nil))))
+  (defun eqyiel/circe-clear-passwords ()
+    (if (boundp 'circe-network-options)
+        (dolist (network circe-network-options)
+          (plist-put (cdr network) :pass nil))))
 
-    (defun eqyiel/circe-wait-for-authentication ()
-      (setq eqyiel/circe-authentications-count
-            (+ 1 eqyiel/circe-authentications-count))
-      (unless (> (length circe-network-options)
-                 eqyiel/circe-authentications-count)
-        (progn
-          (eqyiel/circe-clear-passwords)
-          (setq eqyiel/circe-authentications-count 0))))
-
-    (defun eqyiel/circe-set-margin ()
-      (setq right-margin-width 5))
-
-    (defvar eqyiel/circe-authentications-count 0
-      "Clear passwords after this many authentications have been seen.")
-
-    ;; Warning: this is very dumb
-    ;;
-    ;; ZNC's MOTD is 25 lines.
-    ;; I have two networks defined in `circe-network-options'.
-    ;; So wait to see 50 notices from ZNC before enabling notifications.
-    (defvar eqyiel/circe-znc-notices 0
-      "How many notices have we received from ZNC?")
-
-    (defvar eqyiel/circe-znc-motd-length 25
-      "How many lines are in ZNC's MOTD?")
-
-    (defun eqyiel/circe-znc-count-networks ()
-      "Return the number of networks in `circe-network-options' multiplied by
-      `eqyiel/circe-znc-motd-length', so we can know how many notices to expect before
-      enabling notifications."
-      (* eqyiel/circe-znc-motd-length (length circe-network-options)))
-
-    (defun eqyiel/circe-wait-for-znc (nick userhost _command target text)
-      "If this TEXT from NICK and USERHOST looks like a line of ZNC's MOTD,
-      increment `eqyiel/circe-znc-notices', and enable notifications if there have
-      been at least `eqyiel/circe-znc-count-networks' `eqyiel/circe-znc-notices'."
-      (when (and (string-equal nick "*status")
-                 (string-equal userhost "znc@znc.in"))
-        (setq eqyiel/circe-znc-notices (+ 1 eqyiel/circe-znc-notices))
-        (message "That's %d ..." eqyiel/circe-znc-notices)
-        (when (<= (eqyiel/circe-znc-count-networks) eqyiel/circe-znc-notices)
-          (message "OK.")
-          (advice-remove 'circe-display-NOTICE 'eqyiel/circe-wait-for-znc)
-          (enable-circe-notifications))))
-
-    (defun eqyiel/enable-circe-notifications ()
-      (interactive)
-      (advice-add 'circe-display-NOTICE :after 'eqyiel/circe-wait-for-znc)
-      (advice-add 'circe-reconnect-all :before
-                  'eqyiel/disable-circe-notifications))
-
-    (defun eqyiel/disable-circe-notifications ()
-      (interactive)
-      (disable-circe-notifications)
-      (setq eqyiel/circe-znc-notices 0)
-      (advice-add 'circe-display-NOTICE :after 'eqyiel/circe-wait-for-znc))
-
-    (use-package circe
-      :config
+  (defun eqyiel/circe-wait-for-authentication ()
+    (setq eqyiel/circe-authentications-count
+          (+ 1 eqyiel/circe-authentications-count))
+    (unless (> (length circe-network-options)
+               eqyiel/circe-authentications-count)
       (progn
-        (require 'circe-chanop)
-        (require 'circe-color-nicks)
+        (eqyiel/circe-clear-passwords)
+        (setq eqyiel/circe-authentications-count 0))))
 
-        (use-package alert :defer t)
+  (defun eqyiel/circe-set-margin ()
+    (setq right-margin-width 5))
 
-        (use-package circe-notifications
-          :load-path "site-lisp/circe-notifications"
-          :config
-          (progn (setq circe-notifications-watch-strings
-                       '("eqyiel" "versapunk" "nyarlu" "eqyiel1" "fthagn" "forcer")
-                       circe-notifications-alert-style 'osx-notifier
-                       circe-notifications-wait-for 30))
-          :demand t)
+  (defvar eqyiel/circe-authentications-count 0
+    "Clear passwords after this many authentications have been seen.")
 
-        (use-package pass :demand t)
+  ;; Warning: this is very dumb
+  ;;
+  ;; ZNC's MOTD is 25 lines.
+  ;; I have two networks defined in `circe-network-options'.
+  ;; So wait to see 50 notices from ZNC before enabling notifications.
+  (defvar eqyiel/circe-znc-notices 0
+    "How many notices have we received from ZNC?")
 
-        (setq circe-default-quit-message
-              "( ' ヮ')ノ.・ﾟ*｡・.・ﾟ*｡・.・ﾟ*｡・ヽ(ﾟДﾟ,,)ノ"
-              circe-default-part-message
-              "( ' ヮ')ノ.・ﾟ*｡・.・ﾟ*｡・.・ﾟ*｡・ヽ(ﾟДﾟ,,)ノ"
-              circe-highlight-nick-type 'all
-              circe-reduce-lurker-spam nil ;; sometimes, I want to see this
-              circe-format-say "<{nick}> {body}"
-              circe-format-self-say "<{nick}> {body}"
-              circe-color-nicks-everywhere t
-              lui-highlight-keywords '("eqyiel")
-              lui-time-stamp-position 'right-margin
-              lui-time-stamp-format "%H:%M"
-              lui-flyspell-p t
-              lui-max-buffer-size 10000
-              lui-fill-column 70
-              lui-fill-type 'variable
-              lui-flyspell-alist '(("." "en_GB")))
-        (add-hook 'circe-channel-mode-hook 'turn-on-flyspell)
-        (enable-circe-color-nicks))
-      :init
-      (progn
-        (advice-add 'circe-reconnect-all :before 'eqyiel/circe-setup-networks)
-        ;; (add-hook 'circe-server-connected-hook
-        ;;           'eqyiel/circe-wait-for-authentication)
-        (add-hook 'circe-server-connected-hook
-                  'enable-circe-notifications)
-        (add-hook 'lui-mode-hook 'eqyiel/circe-set-margin)))
+  (defvar eqyiel/circe-znc-motd-length 25
+    "How many lines are in ZNC's MOTD?")
+
+  (defun eqyiel/circe-znc-count-networks ()
+    "Return the number of networks in `circe-network-options' multiplied by
+    `eqyiel/circe-znc-motd-length', so we can know how many notices to expect before
+    enabling notifications."
+    (* eqyiel/circe-znc-motd-length (length circe-network-options)))
+
+  (defun eqyiel/circe-wait-for-znc (nick userhost _command target text)
+    "If this TEXT from NICK and USERHOST looks like a line of ZNC's MOTD,
+    increment `eqyiel/circe-znc-notices', and enable notifications if there have
+    been at least `eqyiel/circe-znc-count-networks' `eqyiel/circe-znc-notices'."
+    (when (and (string-equal nick "*status")
+               (string-equal userhost "znc@znc.in"))
+      (setq eqyiel/circe-znc-notices (+ 1 eqyiel/circe-znc-notices))
+      (message "That's %d ..." eqyiel/circe-znc-notices)
+      (when (<= (eqyiel/circe-znc-count-networks) eqyiel/circe-znc-notices)
+        (message "OK.")
+        (advice-remove 'circe-display-NOTICE 'eqyiel/circe-wait-for-znc)
+        (enable-circe-notifications))))
+
+  (defun eqyiel/enable-circe-notifications ()
+    (interactive)
+    (advice-add 'circe-display-NOTICE :after 'eqyiel/circe-wait-for-znc)
+    (advice-add 'circe-reconnect-all :before
+                'eqyiel/disable-circe-notifications))
+
+  (defun eqyiel/disable-circe-notifications ()
+    (interactive)
+    (disable-circe-notifications)
+    (setq eqyiel/circe-znc-notices 0)
+    (advice-add 'circe-display-NOTICE :after 'eqyiel/circe-wait-for-znc))
+
+  (use-package circe
+    :config
+    (progn
+      (require 'circe-chanop)
+      (require 'circe-color-nicks)
+
+      (use-package alert)
+
+      (use-package circe-notifications
+        :load-path "site-lisp/circe-notifications"
+        :config
+        (progn (setq circe-notifications-watch-strings
+                     '("eqyiel" "versapunk" "nyarlu" "eqyiel1" "fthagn" "forcer")
+                     circe-notifications-alert-style 'osx-notifier
+                     circe-notifications-wait-for 30))
+        :demand t)
+
+      (use-package pass :demand t)
+
+      (setq circe-default-quit-message
+            "( ' ヮ')ノ.・ﾟ*｡・.・ﾟ*｡・.・ﾟ*｡・ヽ(ﾟДﾟ,,)ノ"
+            circe-default-part-message
+            "( ' ヮ')ノ.・ﾟ*｡・.・ﾟ*｡・.・ﾟ*｡・ヽ(ﾟДﾟ,,)ノ"
+            circe-highlight-nick-type 'all
+            circe-reduce-lurker-spam nil ;; sometimes, I want to see this
+            circe-format-say "<{nick}> {body}"
+            circe-format-self-say "<{nick}> {body}"
+            circe-color-nicks-everywhere t
+            lui-highlight-keywords '("eqyiel")
+            lui-time-stamp-position 'right-margin
+            lui-time-stamp-format "%H:%M"
+            lui-flyspell-p t
+            lui-max-buffer-size 10000
+            lui-fill-column 70
+            lui-fill-type 'variable
+            lui-flyspell-alist '(("." "en_GB")))
+      (enable-circe-color-nicks))
+    :hook ((circe-server-connected-hook . enable-circe-notifications)
+           (lui-mode-hook . eqyiel/circe-set-margin)
+           (circe-channel-mode-hook . turn-on-flyspell)
+           ;; (circe-server-connected-hook . eqyiel/circe-wait-for-authentication)
+           )
+    :init
+    (progn
+      (advice-add 'circe-reconnect-all :before 'eqyiel/circe-setup-networks)))
 #+END_SRC
 
 ** ~column-enforce-mode~                                             :melpa:
 #+BEGIN_SRC emacs-lisp
   (use-package column-enforce-mode
-    :init (add-hook 'prog-mode-hook 'column-enforce-mode)
+    :hook (prog-mode-hook . column-enforce-mode)
     :diminish column-enforce-mode)
 #+END_SRC
 
 ** ~company~                                                         :melpa:
 #+BEGIN_SRC emacs-lisp
+  (defun eqyiel/company-nixos ()
+    (set (make-local-variable 'company-backends)
+         '((company-nixos-options
+            company-yasnippet
+            company-keywords
+            company-dabbrev-code
+            company-files))))
+
+  (defun eqyiel/company-elisp ()
+    (set (make-local-variable 'company-backends)
+         '((company-yasnippet
+            company-elisp
+            company-keywords
+            company-dabbrev-code
+            company-files))))
+
+  (defun eqyiel/company-shell ()
+    (set (make-local-variable 'company-backends)
+         '((company-capf))))
+
   (use-package company
     :config
-    (setq company-minimum-prefix-length 1
-          company-idle-delay 0
-          company-dabbrev-code-everywhere t
-          company-tooltip-align-annotations t)
+    (progn
+      (setq company-minimum-prefix-length 1
+            company-idle-delay 0
+            company-dabbrev-code-everywhere t
+            company-tooltip-align-annotations t)
+      (add-to-list 'company-backends 'company-emoji)
+      (global-company-mode))
     :init
     (progn
       (use-package company-emoji :demand t)
-
       (setq company-backends
             '((company-files
                company-yasnippet
-               company-emoji)))
-
-      (defun eqyiel/company-nixos ()
-        (set (make-local-variable 'company-backends)
-             '((company-nixos-options
-                company-yasnippet
-                company-keywords
-                company-dabbrev-code
-                company-files))))
-
-      (add-hook 'nix-mode-hook 'eqyiel/company-nixos)
-
-      (defun eqyiel/company-elisp ()
-        (set (make-local-variable 'company-backends)
-             '((company-yasnippet
-                company-elisp
-                company-keywords
-                company-dabbrev-code
-                company-files))))
-
-      (add-hook 'emacs-lisp-mode-hook 'eqyiel/company-elisp)
-
-      (defun eqyiel/company-shell ()
-        (set (make-local-variable 'company-backends)
-             '((company-capf))))
-
-      :config (add-to-list 'company-backends 'company-emoji)
-
-      (add-hook 'shell-mode-hook 'eqyiel/company-shell)
-
-      (add-hook 'circe-channel-mode-hook (lambda () (company-mode -1)))
-
-      (global-company-mode))
+               company-emoji))))
+    :hook ((emacs-lisp-mode-hook . eqyiel/company-elisp)
+           (nix-mode-hook . eqyiel/company-nixos)
+           (shell-mode-hook . eqyiel/company-shell)
+           (circe-channel-mode-hook . (lambda () (company-mode -1))))
     :bind (("M-/" . company-complete))
     :diminish company-mode)
 #+END_SRC
@@ -1203,14 +1210,12 @@ is enabled.
 
 ** ~css-mode~                                                      :builtin:
 #+BEGIN_SRC emacs-lisp
+  (defun eqyiel/css-mode-hook ()
+    (rainbow-turn-on))
+
   (use-package css-mode
-    :init
-    (progn
-      (defun eqyiel/css-mode-hook ()
-        (require 'rainbow-mode)
-        (setq css-indent-offset 2)
-        (rainbow-turn-on))
-      (add-hook 'css-mode-hook 'eqyiel/css-mode-hook)))
+    :config (setq css-indent-offset 2)
+    :hook (css-mode-hook . eqyiel/css-mode-hook))
 #+END_SRC
 
 ** ~dired~                                                         :builtin:
@@ -1316,7 +1321,7 @@ specific ~eslint~ executable, but it should be easy to fix.
                  local-project-flow-executable))))))
 
   (use-package flow-minor-mode
-    :config (add-hook 'flow-minor-mode-hook 'eqyiel/flow-minor-mode-hook)
+    :hook (flow-minor-mode-hook . eqyiel/flow-minor-mode-hook)
     :demand t)
 #+END_SRC
 
@@ -1386,13 +1391,13 @@ PHP debugger thing.
 
 #+BEGIN_SRC emacs-lisp
   (use-package go-mode
-    :hook (before-save . gofmt-before-save))
+    :hook (before-save-hook . gofmt-before-save))
 #+END_SRC
 
 ** ~google-c-style~                                                  :melpa:
 #+BEGIN_SRC emacs-lisp
   (use-package google-c-style
-    :init (add-hook 'c-mode-common-hook 'google-set-c-style))
+    :hook (c-mode-common-hook . google-set-c-style))
 #+END_SRC
 
 ** ~google-translate~                                                :melpa:
@@ -1410,9 +1415,8 @@ PHP debugger thing.
 This is pretty much exclusively for the sake of editing ~build.gradle~ files.
 
 #+BEGIN_SRC emacs-lisp
-  (use-package groovy-mode)
-
-  (add-to-list 'auto-mode-alist '("\\.gradle\\'" . groovy-mode))
+  (use-package groovy-mode
+    :mode ("\\.gradle\\'" . groovy-mode))
 #+END_SRC
 
 ** ~help-at-pt~                                                    :builtin:
@@ -1427,19 +1431,17 @@ This is pretty much exclusively for the sake of editing ~build.gradle~ files.
 ** ~highlight-indentation~                                           :melpa:
 #+BEGIN_SRC emacs-lisp
   (use-package highlight-indentation
-    :init (add-hook 'prog-mode-hook 'highlight-indentation-mode)
+    :hook (prog-mode-hook . highlight-indentation-mode)
     :diminish highlight-indentation-mode)
 #+END_SRC
 
 ** ~html-mode~                                                     :builtin:
 #+BEGIN_SRC emacs-lisp
+  (defun eqyiel/html-mode-hook ()
+    (rainbow-turn-on))
+
   (use-package html-mode
-    :init
-    (progn
-      (defun eqyiel/html-mode-hook ()
-        (require 'rainbow-mode)
-        (rainbow-turn-on))
-      (add-hook 'html-mode-hook 'eqyiel/html-mode-hook)))
+    :hook (html-mode-hook . eqyiel/html-mode-hook))
 #+END_SRC
 
 ** ~ibuffer~                                                       :builtin:
@@ -1488,10 +1490,8 @@ can't do well (like searching for a substring in a long command in
 ** ~ispell~                                                        :builtin:
 #+BEGIN_SRC emacs-lisp
   (use-package ispell
-    :init
-    (add-hook 'text-mode-hook 'turn-on-flyspell)
-    (add-hook 'org-mode-hook 'turn-on-flyspell)
-    (add-hook 'prog-mode-hook 'flyspell-prog-mode)
+    :hook (((text-mode-hook org-mode-hook) . turn-on-flyspell)
+           (prog-mode-hook . flyspell-prog-mode))
     :config
     (when (and (bound-and-true-p ispell-program-name)
                (executable-find ispell-program-name))
@@ -1529,20 +1529,13 @@ instead of ~js2-mode~ or ~web-mode~.
             company-keywords))))
 
   (use-package java-mode
-    :hook (java-mode . eqyiel/company-java-mode-hook))
+    :hook (java-mode-hook . eqyiel/company-java-mode-hook))
 #+END_SRC
 
 ** ~js-mode~                                                       :builtin:
 #+BEGIN_SRC emacs-lisp
-  (use-package js-mode
-    :config (setq js-indent-level 2))
-
-  ;; For lack of a better mode for game-maker stuff
-  (add-to-list 'auto-mode-alist '("\\.gml\\'" . js-mode))
-  (add-to-list 'auto-mode-alist '("\\.yy\\'" . js-mode))
-  (add-to-list 'auto-mode-alist '("\\.yyp\\'" . js-mode))
-
   (defun eqyiel/pseudo-gml-mode-hook ()
+    "For lack of a better mode for game-maker stuff, use `js-mode'."
     (let
         ((extension (file-name-extension (buffer-file-name))))
       (when
@@ -1554,7 +1547,12 @@ instead of ~js2-mode~ or ~web-mode~.
         ;; diffs.
         (setq-local require-final-newline nil))))
 
-  (add-hook 'js-mode-hook 'eqyiel/pseudo-gml-mode-hook)
+  (use-package js-mode
+    :config (setq js-indent-level 2)
+    :hook (js-mode-hook . eqyiel/pseudo-gml-mode-hook)
+    :mode (("\\.gml\\'" . js-mode)
+           ("\\.yy\\'" . js-mode)
+           ("\\.yyp\\'" . js-mode)))
 #+END_SRC
 
 ** ~js2-mode~                                                        :melpa:
@@ -1581,8 +1579,6 @@ instead of ~js2-mode~ or ~web-mode~.
                 company-lsp
                 company-keywords))))
 
-      (add-hook 'js2-mode-hook 'eqyiel/company-js2-mode-hook)
-
       (defun eqyiel/js2-mode-hook ()
         (progn
           (setq-local js-switch-indent-offset 2)
@@ -1603,16 +1599,12 @@ instead of ~js2-mode~ or ~web-mode~.
           (activate-flow-js2-mode)
           (rainbow-mode)))
 
-      (add-hook 'js2-mode-hook 'eqyiel/js2-mode-hook)
-      (add-hook 'js2-jsx2-mode-hook 'eqyiel/js2-mode-hook)
 
       ;; https://emacs.stackexchange.com/questions/22044/treat-shebang-as-a-comment
       (modify-syntax-entry ?# ". 1" js2-mode-syntax-table)
       (modify-syntax-entry ?! ". 2b" js2-mode-syntax-table))
-      ;; :init
-      ;; (progn
-      ;;   (add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
-      ;;   (add-to-list 'auto-mode-alist '("\\.jsx$" . js2-jsx-mode)))
+    :hook ((js2-mode-hook . eqyiel/company-js2-mode-hook)
+           (js2-mode-hook js2-jsx2-mode-hook) . eqyiel/js2-mode-hook)
     :bind
     (:map js2-mode-map
           ("C-M-s-\"" . eqyiel/toggle-js2-mode-to-web-mode)
@@ -1623,40 +1615,38 @@ instead of ~js2-mode~ or ~web-mode~.
 This package adds itself to ~auto-mode-alist~.
 
 #+BEGIN_SRC emacs-lisp
+  (defun eqyiel/json-mode-hook ()
+      (setq js-indent-level 2
+            json-reformat:indent-width 2))
+
+  (defun eqyiel/json-run-jq (query &optional arg)
+    "Run jq(1) on current buffer.
+  With prefix argument \\[universal-argument] replace the buffer
+  with the result of running jq(1)."
+    (interactive "sjq query: \nP")
+    (shell-command-on-region
+     (point-min) (point-max)
+     (concat "jq " (shell-quote-argument query))
+     (when arg (current-buffer))
+     (when arg t)))
+
+  (defun eqyiel/json-minify ()
+    "Minify the json at point."
+    (interactive)
+    (goto-char (point-min))
+    (let* ((p (point))
+           (json (json-read)))
+      (delete-region p (point))
+      (save-excursion
+        (insert (json-encode json)))))
+
   (use-package json-mode
     :bind (:map json-mode-map
                 ("C-c C-c" . eqyiel/json-run-jq)
                 ("C-c C-m" . eqyiel/json-minify))
-    :config
-    (progn
-      (defun eqyiel/json-run-jq (query &optional arg)
-        "Run jq(1) on current buffer.
-  With prefix argument \\[universal-argument] replace the buffer
-  with the result of running jq(1)."
-        (interactive "sjq query: \nP")
-        (shell-command-on-region
-         (point-min) (point-max)
-         (concat "jq " (shell-quote-argument query))
-         (when arg (current-buffer))
-         (when arg t)))
-
-      (defun eqyiel/json-minify ()
-        "Minify the json at point."
-        (interactive)
-        (goto-char (point-min))
-        (let* ((p (point))
-               (json (json-read)))
-          (delete-region p (point))
-          (save-excursion
-            (insert (json-encode json)))))
-
-      (add-to-list 'auto-mode-alist '("\\.eslintrc.*$" . json-mode))
-      (add-to-list 'auto-mode-alist '("\\.babelrc$" . json-mode)))
-    :init
-    (defun eqyiel/json-mode-hook ()
-      (setq js-indent-level 2
-            json-reformat:indent-width 2))
-    (add-hook 'json-mode-hook 'eqyiel/json-mode-hook))
+    :mode (("\\.eslintrc.*$" . json-mode)
+           ("\\.babelrc$" . json-mode))
+    :hook (json-mode-hook . eqyiel/json-mode-hook))
 #+END_SRC
 
 ** ~kubernetes-mode~                                                 :melpa:
@@ -1720,7 +1710,7 @@ This package adds itself to ~auto-mode-alist~.
 ** ~lsp-mode~                                                        :melpa:
 
 #+BEGIN_SRC emacs-lisp
-  (use-package lsp-ui :defer t)
+  (use-package lsp-ui)
 
   (use-package lsp-mode
     :requires flycheck nix-buffer
@@ -1747,7 +1737,7 @@ This package adds itself to ~auto-mode-alist~.
 
   (use-package
     flow-minor-mode
-    :hook ((js-mode js2-mode rjsx-mode)
+    :hook ((js-mode-hook js2-mode-hook rjsx-mode-hook)
            . eqyiel/lsp-javascript-flow-enable-maybe)
     :demand t)
 
@@ -1772,7 +1762,7 @@ This package adds itself to ~auto-mode-alist~.
       (lsp-ui-mode)))
 
   (use-package lsp-java
-    :hook (java-mode . eqyiel/lsp-java-enable-maybe))
+    :hook (java-mode-hook . eqyiel/lsp-java-enable-maybe))
 #+END_SRC
 
 ** ~magit~                                                           :melpa:
@@ -1795,10 +1785,8 @@ This package adds itself to ~auto-mode-alist~.
     :config
     (progn
       (setq markdown-command "pandoc -f markdown -t html -s --mathjax --highlight-style=pygments"))
-    :init
-    (progn
-      (add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
-      (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))))
+    :mode (("\\.markdown\\'" . markdown-mode)
+           ("\\.md\\'" . markdown-mode)))
 #+END_SRC
 
 ** ~matrix-client~                                                   :melpa:
@@ -1828,8 +1816,7 @@ vanished.
      message-default-mail-headers "Cc: \nBcc: \n"
      message-from-style 'angles
      message-generate-headers-first t
-     message-kill-buffer-on-exit t)
-    :defer t)
+     message-kill-buffer-on-exit t))
 #+END_SRC
 
 ** ~mu4e~                                                           :system:
@@ -1879,13 +1866,16 @@ Check out this for tips: https://vxlabs.com/2017/02/07/mu4e-0-9-18-e-mailing-wit
           (mu4e-compose-mode)
           (message-send-and-exit)))
 
+      ;; It's not possible to use use-package's :hook for this right now because
+      ;; the "local" argument is not supported there.
+      ;; https://github.com/jwiegley/use-package/issues/668
       (add-hook 'org-ctrl-c-ctrl-c-hook 'eqyiel/htmlize-and-send t)
       (setq
        mu4e-get-mail-command
        (if (eq system-type 'darwin)
            "mbsync r-maher@mercari.com"
          "mbsync ruben@maher.fyi"))
-      (use-package org-mu4e :defer t :config (setq org-mu4e-convert-to-html t))
+      (use-package org-mu4e :config (setq org-mu4e-convert-to-html t))
       (use-package simple :config (setq mail-user-agent 'mu4e-user-agent))
       (setq mu4e-change-filenames-when-moving t) ;; needed for mbsync?
       (setq mu4e-maildir eqyiel/mail-directory)
@@ -2067,7 +2057,7 @@ Check out this for tips: https://vxlabs.com/2017/02/07/mu4e-0-9-18-e-mailing-wit
     :config
     (nix-buffer-update-directory-name
      (f-join eqyiel/xdg-cache-home "emacs/nix-buffer"))
-    :hook (find-file . eqyiel/nix-buffer-find-file-hook)
+    :hook (find-file-hook . eqyiel/nix-buffer-find-file-hook)
     :demand t)
 #+END_SRC
 
@@ -2075,9 +2065,8 @@ Check out this for tips: https://vxlabs.com/2017/02/07/mu4e-0-9-18-e-mailing-wit
 #+BEGIN_SRC emacs-lisp
   (use-package nix-mode
     :commands (nix-mode nix-repl-show nix-format-buffer)
-    :init (progn
-            (defalias 'nix-format-buffer 'nixpkgs-fmt-buffer)
-            (add-to-list 'auto-mode-alist '("\\.nix\\'" . nix-mode))))
+    :mode ("\\.nix\\'" . nix-mode)
+    :init (progn (defalias 'nix-format-buffer 'nixpkgs-fmt-buffer)))
 #+END_SRC
 
 ** ~nix-shell~                                                       :melpa:
@@ -2107,7 +2096,7 @@ Check out this for tips: https://vxlabs.com/2017/02/07/mu4e-0-9-18-e-mailing-wit
 
 #+BEGIN_SRC emacs-lisp
   (use-package nixpkgs-fmt
-    :hook (nix-mode . nixpkgs-fmt-on-save-mode)
+    :hook (nix-mode-hook . nixpkgs-fmt-on-save-mode)
     :after nix-mode
     :commands nixpkgs-fmt-on-save-mode)
 #+END_SRC
@@ -2131,7 +2120,7 @@ Check out this for tips: https://vxlabs.com/2017/02/07/mu4e-0-9-18-e-mailing-wit
 ** ~omnisharp~                                                       :melpa:
 #+BEGIN_SRC emacs-lisp
   (use-package omnisharp
-    :hook (csharp-mode . omnisharp-mode))
+    :hook (csharp-mode-hook . omnisharp-mode))
 #+END_SRC
 
 ** ~org-caldav~                                                      :melpa:
@@ -2260,9 +2249,6 @@ A tool to insert a link in the clipboard as an ~org-mode~ link at point.
   heading."
     (org-back-to-heading))
 
-  (add-hook 'org-capture-prepare-finalize-hook
-            'eqyiel/org-capture-prepare-finalize-hook)
-
   (defun eqyiel/org-capture-before-finalize-hook ()
     "Add slugified category to tags.
   That is: if a file has a \"#+CATEGORY: test\" header or a subtree has a
@@ -2277,6 +2263,11 @@ A tool to insert a link in the clipboard as an ~org-mode~ link at point.
         (progn
           (org-set-tags-to tags)
           (org-align-all-tags)))))
+
+  (defun eqyiel/org-mode-hook ()
+    (progn
+      (org-indent-mode t)
+      (turn-on-auto-fill)))
 
   (defun eqyiel/org-remove-deadline ()
     "Remove deadline from the entry at point."
@@ -2556,14 +2547,11 @@ A tool to insert a link in the clipboard as an ~org-mode~ link at point.
            (if selected-value (symbol-name selected-value)
              selected-key))))
 
-      (add-hook 'org-mode-hook (lambda () (org-indent-mode t)))
       (org-babel-do-load-languages
        'org-babel-load-languages
        '((js . t)
          (emacs-lisp . t)
          (shell . t)))
-
-      (add-hook 'org-mode-hook 'turn-on-auto-fill)
 
       (require 'ox-gfm)
       (org-export-define-derived-backend 'rkm-md 'gfm
@@ -2594,7 +2582,10 @@ A tool to insert a link in the clipboard as an ~org-mode~ link at point.
      ("M-p" . eqyiel/org-prev-visible-heading)
      ("M-n" . org-next-visible-heading))
     :load-path "site-lisp/org-mode"
+    :hook ((org-capture-prepare-finalize-hook . eqyiel/org-capture-prepare-finalize-hook)
+           (org-mode-hook . eqyiel/org-mode-hook))
     :demand t)
+
 #+END_SRC
 
 ** ~ox-gfm~                                                          :melpa:
@@ -2631,20 +2622,16 @@ Export ~org~ files to Github-flavoured markdown.
               (set (make-local-variable 'prettier-js-command)
                    local-project-prettier-executable)))))))
 
+  (defun eqyiel/prettier-web-mode-hook ()
+    "Enable Prettier if `web-mode-content-type' is something supported by Prettier."
+    (when (or (string-equal web-mode-content-type "javascript")
+              (string-equal web-mode-content-type "jsx"))
+      (eqyiel/prettier-js-mode-hook)))
+
   (use-package prettier-js
-    :init (progn
-            (add-hook 'js-mode-hook 'eqyiel/prettier-js-mode-hook)
-            (add-hook 'markdown-mode-hook 'eqyiel/prettier-js-mode-hook)
-            (add-hook 'js2-mode-hook 'eqyiel/prettier-js-mode-hook)
-            (add-hook 'typescript-mode-hook 'eqyiel/prettier-js-mode-hook)
-            (add-hook 'graphql-mode-hook 'eqyiel/prettier-js-mode-hook)
-            (add-hook 'web-mode-hook
-                      (lambda ()
-                        (when (or (string-equal web-mode-content-type "javascript")
-                                  (string-equal web-mode-content-type "jsx"))
-                          (eqyiel/prettier-js-mode-hook)))))
-    :config (setq prettier-js-command "prettier")
-    :defer t)
+    :hook (((js-mode-hook js2-mode-hook markdown-mode-hook typescript-mode-hook graphql-mode-hook) . eqyiel/prettier-js-mode-hook)
+           (web-mode-hook . eqyiel/prettier-web-mode-hook))
+    :config (setq prettier-js-command "prettier"))
 #+END_SRC
 
 ** ~projectile~                                                      :melpa:
@@ -2703,7 +2690,7 @@ Export ~org~ files to Github-flavoured markdown.
 
 ** ~rainbow-mode~                                                     :elpa:
 #+BEGIN_SRC emacs-lisp
-  (use-package rainbow-mode)
+  (use-package rainbow-mode :commands rainbow-turn-on)
 #+END_SRC
 
 ** ~recentf~                                                       :builtin:
@@ -2722,6 +2709,9 @@ Export ~org~ files to Github-flavoured markdown.
 ** ~rjsx-mode~                                                       :melpa:
 #+BEGIN_SRC emacs-lisp
   (use-package rjsx-mode
+    :hook ((rjsx-mode-hook . eqyiel/js2-mode-hook)
+           (rjsx-mode-hook . eqyiel/company-rjsx-mode-hook)
+           (rjsx-mode-hook . eqyiel/flycheck-rjsx-mode-hook))
     :config
     (progn
       (use-package web-mode)
@@ -2732,15 +2722,11 @@ Export ~org~ files to Github-flavoured markdown.
         (interactive)
         (web-mode))
 
-      (add-hook 'rjsx-mode-hook 'eqyiel/js2-mode-hook)
-
       (defun eqyiel/company-rjsx-mode-hook ()
         (set (make-local-variable 'company-backends)
              '((company-files
                 company-lsp
                 company-keywords))))
-
-      (add-hook 'rjsx-mode-hook 'eqyiel/company-rjsx-mode-hook)
 
       (defun eqyiel/flycheck-rjsx-mode-hook ()
         (require 'flycheck)
@@ -2763,8 +2749,6 @@ Export ~org~ files to Github-flavoured markdown.
                   (set (make-local-variable 'flycheck-javascript-flow-executable)
                        local-project-flow-executable)))))))
 
-      (add-hook 'rjsx-mode-hook 'eqyiel/flycheck-rjsx-mode-hook)
-
       ;; https://emacs.stackexchange.com/questions/22044/treat-shebang-as-a-comment
       (modify-syntax-entry ?# ". 1" rjsx-mode-syntax-table)
       (modify-syntax-entry ?! ". 2b" rjsx-mode-syntax-table))
@@ -2772,9 +2756,9 @@ Export ~org~ files to Github-flavoured markdown.
             (require 'flycheck)
             (require 'flycheck-flow)
             (flycheck-add-mode 'javascript-flow 'rjsx-mode)
-            (flycheck-add-mode 'javascript-flow-coverage 'rjsx-mode)
-            (add-to-list 'auto-mode-alist '("\\.js$" . rjsx-mode))
-            (add-to-list 'auto-mode-alist '("\\.jsx$" . rjsx-mode)))
+            (flycheck-add-mode 'javascript-flow-coverage 'rjsx-mode))
+    :mode (("\\.js$" . rjsx-mode)
+           ("\\.jsx$" . rjsx-mode))
     :bind (:map rjsx-mode-map
                 ("C-M-s-\"" . eqyiel/toggle-rjsx-mode-to-web-mode)
                 ("H-'" . eqyiel/toggle-rjsx-mode-to-web-mode)))
@@ -2806,14 +2790,15 @@ Export ~org~ files to Github-flavoured markdown.
 
 ** ~scss-mode~                                                       :melpa:
 #+BEGIN_SRC emacs-lisp
+  (defun eqyiel/scss-mode-hook ()
+    "Make Emacs comment features prefer double slash instead of block comment syntax "
+    ;; use // instead of /* */
+    (set (make-local-variable 'comment-start) "//")
+    (set (make-local-variable 'comment-end) "")
+    (set (make-local-variable 'comment-continue) "//"))
+
   (use-package scss-mode
-    :init
-    (add-hook
-     'scss-mode-hook
-     (lambda () ;; use // instead of /* */
-       (set (make-local-variable 'comment-start) "//")
-       (set (make-local-variable 'comment-end) "")
-       (set (make-local-variable 'comment-continue) "//"))))
+    :hook (scss-mode-hook . eqyiel/scss-mode-hook))
 #+END_SRC
 
 ** ~shell-mode~                                                    :builtin:
@@ -2831,7 +2816,7 @@ Export ~org~ files to Github-flavoured markdown.
           sh-indentation 2))
 
   (use-package shell-script-mode
-    :init (add-hook 'sh-mode-hook 'eqyiel/setup-sh-mode))
+    :hook (sh-mode-hook . eqyiel/setup-sh-mode))
 #+END_SRC
 
 ** ~skewer-mode~                                                     :melpa:
@@ -2887,7 +2872,7 @@ Export ~org~ files to Github-flavoured markdown.
 
 ** ~sql-indent~                                                       :elpa:
 #+BEGIN_SRC emacs-lisp
-(use-package sql-indent :hook (sql-mode . sqlind-minor-mode))
+(use-package sql-indent :hook (sql-mode-hook . sqlind-minor-mode))
 #+END_SRC
 
 ** ~subword~                                                       :builtin:
@@ -3097,12 +3082,9 @@ This is a new one for me.  See [[http://oremacs.com/swiper/#key-bindings-for-sin
 
   (use-package tide
     :after (typescript-mode company flycheck)
-    :init
-    (progn
-      (add-to-list 'auto-mode-alist '("\\.ts$" . typescript-mode))
-      (add-to-list 'auto-mode-alist '("\\.tsx$" . typescript-mode)))
+    :mode (("\\.ts$" . typescript-mode) ("\\.tsx$" . typescript-mode))
     :config (flycheck-add-next-checker 'javascript-eslint 'jsx-tide 'append)
-    :hook (((js2-mode web-mode rjsx-mode typescript-mode) . eqyiel/ts-tide-enable-maybe)
+    :hook (((js2-mode-hook web-mode-hook rjsx-mode-hook typescript-mode-hook) . eqyiel/ts-tide-enable-maybe)
            (before-save . eqyiel/ts-maybe-format-before-save)))
 #+END_SRC
 
@@ -3118,7 +3100,7 @@ This is a new one for me.  See [[http://oremacs.com/swiper/#key-bindings-for-sin
     (local-unset-key (kbd "C-c '")))
 
   (use-package typescript-mode
-    :hook (typescript-mode . eqyiel/typescript-mode-remove-annoying-bindings))
+    :hook (typescript-mode-hook . eqyiel/typescript-mode-remove-annoying-bindings))
 #+END_SRC
 
 ** ~tiny~                                                            :melpa:
@@ -3225,9 +3207,9 @@ This is a pretty good replacement  for ~longlines-mode~.
       (require 'flycheck-flow)
       (flycheck-add-mode 'javascript-eslint 'web-mode)
       (flycheck-add-mode 'javascript-flow 'web-mode)
-      (flycheck-add-mode 'javascript-flow-coverage 'web-mode)
-      (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
-      (add-hook 'web-mode-hook 'eqyiel/flycheck-web-mode-hook))
+      (flycheck-add-mode 'javascript-flow-coverage 'web-mode))
+    :mode ("\\.html?\\'" . web-mode)
+    :hook (web-mode-hook . eqyiel/flycheck-web-mode-hook)
     :config
     (setq
      web-mode-enable-auto-indentation nil

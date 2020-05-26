@@ -297,14 +297,14 @@
   (setq use-package-always-ensure t
         use-package-always-defer t)
 
-  (use-package use-package-chords :config (key-chord-mode t) :demand)
+  (use-package use-package-chords :config (key-chord-mode t) :demand t)
 #+END_SRC
 
 * Utility functions
 #+BEGIN_SRC emacs-lisp
-  (use-package dash :demand)
+  (use-package dash :demand t)
 
-  (use-package s :demand)
+  (use-package s :demand t)
 
   (defun eqyiel/kill-region-or-backward-kill-word (&optional arg region)
     "`kill-region' if the region is active, otherwise `backward-kill-word'
@@ -689,10 +689,10 @@
 ** Functions for working with node projects
 
 #+BEGIN_SRC emacs-lisp
-  (use-package dash :demand)
-  (use-package f :demand)
-  (use-package s :demand)
-  (use-package json :demand)
+  (use-package dash :demand t)
+  (use-package f :demand t)
+  (use-package s :demand t)
+  (use-package json :demand t)
 
   (defun eqyiel/node-json-read-file-safely (json-file)
     "Read JSON-FILE and return its contents or nil if it was malformed."
@@ -860,7 +860,7 @@ text!/.
 #+BEGIN_SRC emacs-lisp
   (use-package atomic-chrome
     :init (atomic-chrome-start-server)
-    :demand)
+    :demand t)
 #+END_SRC
 
 (require 'atomic-chrome)
@@ -881,8 +881,7 @@ Note that is this is included as ~auth-source-pass~ in Emacs 26 and up.
       ;; Don't open in DCL mode
       (add-to-list 'auto-mode-alist
                    '("\\.com.gpg$" . fundamental-mode)))
-    :ensure nil
-    :demand)
+    :demand t)
 #+END_SRC
 ** ~auto-fill-mode~                                                :builtin:
 This is here just so it can be diminished.
@@ -897,7 +896,7 @@ is named by ~auto-fill-function~.
 So diminish ~auto-fill-function~, not ~auto-fill-mode~.
 
 #+BEGIN_SRC emacs-lisp
-  (use-package simple :ensure nil :diminish auto-fill-function)
+  (use-package simple :diminish auto-fill-function)
 #+END_SRC
 
 ** ~beacon~                                                          :melpa:
@@ -939,8 +938,7 @@ So diminish ~auto-fill-function~, not ~auto-fill-mode~.
       ;; (setq w32-rwindow-modifier 'super)
       (setq w32-pass-apps-to-system nil) ; Menu/App key
       (setq w32-apps-modifier 'hyper))
-    :ensure nil
-    :demand)
+    :demand t)
 
   (use-package buffer-move
     ;; I don't think it's possible to do these guys with other hyper prefixes
@@ -961,15 +959,14 @@ So diminish ~auto-fill-function~, not ~auto-fill-mode~.
       (bind-key (concat eqyiel/hyper-prefix "-f") 'enlarge-window-horizontally)
       (bind-key (concat eqyiel/hyper-prefix "-n") 'shrink-window)
       (bind-key (concat eqyiel/hyper-prefix "-p") 'enlarge-window))
-    :demand)
+    :demand t)
 #+END_SRC
 
 ** ~c++-mode~                                                      :builtin:
 #+BEGIN_SRC emacs-lisp
   (use-package c++-mode
     :config (c-set-offset 'arglist-cont-nonempty '+)
-    :bind (:map c++-mode-map ("C-c C-l" . flycheck-list-errors))
-    :ensure nil)
+    :bind (:map c++-mode-map ("C-c C-l" . flycheck-list-errors)))
 #+END_SRC
 
 ** ~calfw~                                                           :melpa:
@@ -1086,7 +1083,6 @@ So diminish ~auto-fill-function~, not ~auto-fill-mode~.
                        '("eqyiel" "versapunk" "nyarlu" "eqyiel1" "fthagn" "forcer")
                        circe-notifications-alert-style 'osx-notifier
                        circe-notifications-wait-for 30))
-          :ensure nil
           :demand t)
 
         (use-package pass :demand t)
@@ -1137,7 +1133,7 @@ So diminish ~auto-fill-function~, not ~auto-fill-mode~.
           company-tooltip-align-annotations t)
     :init
     (progn
-      (use-package company-emoji :demand)
+      (use-package company-emoji :demand t)
 
       (setq company-backends
             '((company-files
@@ -1201,7 +1197,7 @@ is enabled.
 #+BEGIN_SRC emacs-lisp
   (use-package counsel-projectile
     :after (projectile counsel)
-    :demand
+    :demand t
     :bind ("C-c k" . counsel-projectile-rg))
 #+END_SRC
 
@@ -1214,8 +1210,7 @@ is enabled.
         (require 'rainbow-mode)
         (setq css-indent-offset 2)
         (rainbow-turn-on))
-      (add-hook 'css-mode-hook 'eqyiel/css-mode-hook))
-    :ensure nil)
+      (add-hook 'css-mode-hook 'eqyiel/css-mode-hook)))
 #+END_SRC
 
 ** ~dired~                                                         :builtin:
@@ -1257,8 +1252,7 @@ is enabled.
      ("RET" . eqyiel/dired-find-alternate-file-or-find-file)
      ("^" . eqyiel/dired-up-directory)
      ("M-<" . eqyiel/dired-back-to-top)
-     ("M->" . eqyiel/dired-jump-to-bottom))
-    :ensure nil)
+     ("M->" . eqyiel/dired-jump-to-bottom)))
 #+END_SRC
 
 ** ~direnv~                                                          :melpa:
@@ -1267,12 +1261,12 @@ is enabled.
     :config (setq direnv-always-show-summary t
                   direnv-show-paths-in-summary t)
     :init (direnv-mode)
-    :demand)
+    :demand t)
 #+END_SRC
 
 ** ~dtrt-indent~                                                     :melpa:
 #+BEGIN_SRC emacs-lisp
-  (use-package dtrt-indent :init (dtrt-indent-mode) :demand)
+  (use-package dtrt-indent :init (dtrt-indent-mode) :demand t)
 #+END_SRC
 
 ** ~emojify~                                                         :melpa:
@@ -1298,7 +1292,7 @@ specific ~eslint~ executable, but it should be easy to fix.
     :chords ((("jk" . er/expand-region)
               ("kj" . er/expand-region)))
     :bind ("C-=" . er/expand-region)
-    :demand)
+    :demand t)
 #+END_SRC
 
 ** ~fasd~                                                            :melpa:
@@ -1345,7 +1339,7 @@ specific ~eslint~ executable, but it should be easy to fix.
       (flycheck-add-mode 'javascript-eslint 'web-mode)
       (setq flycheck-eslintrc ".eslintrc.json"))
     :bind ("C-c C-l" . flycheck-list-errors)
-    :demand
+    :demand t
     :diminish flycheck-mode)
 #+END_SRC
 
@@ -1427,8 +1421,7 @@ This is pretty much exclusively for the sake of editing ~build.gradle~ files.
     :config
     (setq help-at-pt-timer-delay 0.1
           help-at-pt-display-when-idle t)
-    :ensure nil
-    :demand)
+    :demand t)
 #+END_SRC
 
 ** ~highlight-indentation~                                           :melpa:
@@ -1446,16 +1439,14 @@ This is pretty much exclusively for the sake of editing ~build.gradle~ files.
       (defun eqyiel/html-mode-hook ()
         (require 'rainbow-mode)
         (rainbow-turn-on))
-      (add-hook 'html-mode-hook 'eqyiel/html-mode-hook))
-    :ensure nil)
+      (add-hook 'html-mode-hook 'eqyiel/html-mode-hook)))
 #+END_SRC
 
 ** ~ibuffer~                                                       :builtin:
 
 #+BEGIN_SRC emacs-lisp
   (use-package ibuffer
-    :bind (("C-x C-b" . ibuffer))
-    :ensure nil)
+    :bind (("C-x C-b" . ibuffer)))
 #+END_SRC
 
 ** ~ibuffer-projectile~                                              :melpa:
@@ -1466,8 +1457,7 @@ This is pretty much exclusively for the sake of editing ~build.gradle~ files.
     (ibuffer-hook . (lambda ()
       (ibuffer-projectile-set-filter-groups)
       (unless (eq ibuffer-sorting-mode 'alphabetic)
-        (ibuffer-do-sort-by-alphabetic))))
-    :ensure nil)
+        (ibuffer-do-sort-by-alphabetic)))))
 #+END_SRC
 
 ** ~info~                                                          :builtin:
@@ -1480,8 +1470,7 @@ This is pretty much exclusively for the sake of editing ~build.gradle~ files.
     :bind
     (:map Info-mode-map
           ;; Let me use S-SPC to scroll backwards in info mode.
-          ("S-SPC" . Info-scroll-down))
-    :ensure nil)
+          ("S-SPC" . Info-scroll-down)))
 #+END_SRC
 
 ** ~isearch~                                                       :builtin:
@@ -1493,8 +1482,7 @@ can't do well (like searching for a substring in a long command in
 #+BEGIN_SRC emacs-lisp
   (use-package isearch
     :bind (("C-c C-M-s" . isearch-forward)
-           ("C-c C-M-r" . isearch-backward))
-    :ensure nil)
+           ("C-c C-M-r" . isearch-backward)))
 #+END_SRC
 
 ** ~ispell~                                                        :builtin:
@@ -1513,8 +1501,7 @@ can't do well (like searching for a substring in a long command in
             (lambda ()
               (let ((nix-aspell-dict-dir "/run/current-system/sw/lib/aspell"))
                 (when (file-exists-p (directory-file-name nix-aspell-dict-dir))
-                  nix-aspell-dict-dir)))))
-    :ensure nil)
+                  nix-aspell-dict-dir))))))
 #+END_SRC
 
 ** ~js-mode~                                                       :builtin:
@@ -1529,8 +1516,7 @@ instead of ~js2-mode~ or ~web-mode~.
       (setq js-indent-level 2)
       ;; https://emacs.stackexchange.com/questions/22044/treat-shebang-as-a-comment
       (modify-syntax-entry ?# ". 1" js-mode-syntax-table)
-      (modify-syntax-entry ?! ". 2b" js-mode-syntax-table))
-    :ensure nil)
+      (modify-syntax-entry ?! ". 2b" js-mode-syntax-table)))
 #+END_SRC
 
 ** ~java-mode~                                                     :builtin:
@@ -1543,15 +1529,13 @@ instead of ~js2-mode~ or ~web-mode~.
             company-keywords))))
 
   (use-package java-mode
-    :ensure nil
     :hook (java-mode . eqyiel/company-java-mode-hook))
 #+END_SRC
 
 ** ~js-mode~                                                       :builtin:
 #+BEGIN_SRC emacs-lisp
   (use-package js-mode
-    :config (setq js-indent-level 2)
-    :ensure nil)
+    :config (setq js-indent-level 2))
 
   ;; For lack of a better mode for game-maker stuff
   (add-to-list 'auto-mode-alist '("\\.gml\\'" . js-mode))
@@ -1585,7 +1569,6 @@ instead of ~js2-mode~ or ~web-mode~.
       (use-package flow-js2-mode
         :load-path "site-lisp/flow-js2-mode"
         :config (use-package flow-minor-mode :demand t)
-        :ensure nil
         :demand t)
 
       (defun eqyiel/toggle-js2-mode-to-web-mode ()
@@ -1846,8 +1829,7 @@ vanished.
      message-from-style 'angles
      message-generate-headers-first t
      message-kill-buffer-on-exit t)
-    :defer t
-    :ensure nil)
+    :defer t)
 #+END_SRC
 
 ** ~mu4e~                                                           :system:
@@ -1903,8 +1885,8 @@ Check out this for tips: https://vxlabs.com/2017/02/07/mu4e-0-9-18-e-mailing-wit
        (if (eq system-type 'darwin)
            "mbsync r-maher@mercari.com"
          "mbsync ruben@maher.fyi"))
-      (use-package org-mu4e :defer t :ensure nil :config (setq org-mu4e-convert-to-html t))
-      (use-package simple :ensure nil :config (setq mail-user-agent 'mu4e-user-agent))
+      (use-package org-mu4e :defer t :config (setq org-mu4e-convert-to-html t))
+      (use-package simple :config (setq mail-user-agent 'mu4e-user-agent))
       (setq mu4e-change-filenames-when-moving t) ;; needed for mbsync?
       (setq mu4e-maildir eqyiel/mail-directory)
       (setq mu4e-sent-folder eqyiel/mail-directory)
@@ -2044,12 +2026,11 @@ Check out this for tips: https://vxlabs.com/2017/02/07/mu4e-0-9-18-e-mailing-wit
                             ("/r-maher@mercari.com/Drafts"    . ?d)
                             ("/r-maher@mercari.com/Trash"     . ?t)
                             ("/r-maher@mercari.com/Sent Mail" . ?s))))))))
-    :init (use-package org-mu4e :ensure nil :demand)
+    :init (use-package org-mu4e :demand t)
     :bind (("<f4>" . mu4e)
            ("C-c 4" . mu4e)
            ("C-x m" . mu4e-compose-new))
-    :demand
-    :ensure nil
+    :demand t
     :load-path "/run/current-system/sw/share/emacs/site-lisp/mu4e")
 #+END_SRC
 
@@ -2057,7 +2038,6 @@ Check out this for tips: https://vxlabs.com/2017/02/07/mu4e-0-9-18-e-mailing-wit
 #+BEGIN_SRC emacs-lisp
   (use-package mule
     :init (setq default-input-method "japanese")
-    :ensure nil
     :demand t)
 #+END_SRC
 
@@ -2094,7 +2074,6 @@ Check out this for tips: https://vxlabs.com/2017/02/07/mu4e-0-9-18-e-mailing-wit
 ** ~nix-mode~                                                        :melpa:
 #+BEGIN_SRC emacs-lisp
   (use-package nix-mode
-    :ensure nil
     :commands (nix-mode nix-repl-show nix-format-buffer)
     :init (progn
             (defalias 'nix-format-buffer 'nixpkgs-fmt-buffer)
@@ -2105,7 +2084,6 @@ Check out this for tips: https://vxlabs.com/2017/02/07/mu4e-0-9-18-e-mailing-wit
 
 #+BEGIN_SRC emacs-lisp
   (use-package nix-shell
-    :ensure nil
     :commands nix-shell)
 #+END_SRC
 
@@ -2216,8 +2194,7 @@ A tool to insert a link in the clipboard as an ~org-mode~ link at point.
   (use-package org-indent
     :load-path "site-lisp/org-mode"
     :diminish org-indent-mode
-    :ensure nil
-    :demand)
+    :demand t)
 #+END_SRC
 
 ** ~org-mode~                                                      :builtin:
@@ -2616,21 +2593,20 @@ A tool to insert a link in the clipboard as an ~org-mode~ link at point.
      :map org-mode-map
      ("M-p" . eqyiel/org-prev-visible-heading)
      ("M-n" . org-next-visible-heading))
-    :ensure nil
     :load-path "site-lisp/org-mode"
-    :demand)
+    :demand t)
 #+END_SRC
 
 ** ~ox-gfm~                                                          :melpa:
 Export ~org~ files to Github-flavoured markdown.
 
 #+BEGIN_SRC emacs-lisp
-  (use-package ox-gfm :demand)
+  (use-package ox-gfm :demand t)
 #+END_SRC
 
 ** ~pass~                                                            :melpa:
 #+BEGIN_SRC emacs-lisp
-  (use-package pass :demand)
+  (use-package pass :demand t)
 #+END_SRC
 
 ** ~php-mode~                                                        :melpa:
@@ -2722,8 +2698,7 @@ Export ~org~ files to Github-flavoured markdown.
   (use-package python-mode
     :bind
     (:map inferior-python-mode-map
-          ("C-d" . eqyiel/comint-delchar-or-eof-or-kill-buffer))
-    :ensure nil)
+          ("C-d" . eqyiel/comint-delchar-or-eof-or-kill-buffer)))
 #+END_SRC
 
 ** ~rainbow-mode~                                                     :elpa:
@@ -2741,8 +2716,7 @@ Export ~org~ files to Github-flavoured markdown.
        recentf-save-file (concat eqyiel/xdg-cache-home "/emacs/.recentf")
        recentf-max-saved-items 1000)
       (recentf-mode))
-    :ensure nil
-    :demand)
+    :demand t)
 #+END_SRC
 
 ** ~rjsx-mode~                                                       :melpa:
@@ -2816,8 +2790,7 @@ Export ~org~ files to Github-flavoured markdown.
      savehist-file
      (concat eqyiel/xdg-cache-home "/emacs/history")
      history-length 10000)
-    :ensure nil
-    :demand)
+    :demand t)
 #+END_SRC
 
 ** ~saveplace~                                                     :builtin:
@@ -2828,8 +2801,7 @@ Export ~org~ files to Github-flavoured markdown.
       (setq save-place-file
             (concat eqyiel/xdg-cache-home "/emacs/saveplace"))
       (setq-default save-place t))
-    :ensure nil
-    :demand)
+    :demand t)
 #+END_SRC
 
 ** ~scss-mode~                                                       :melpa:
@@ -2849,8 +2821,7 @@ Export ~org~ files to Github-flavoured markdown.
   (use-package shell
     :bind
     (:map shell-mode-map
-          ("C-d" . eqyiel/comint-delchar-or-eof-or-kill-buffer))
-    :ensure nil)
+          ("C-d" . eqyiel/comint-delchar-or-eof-or-kill-buffer)))
 #+END_SRC
 
 ** ~shell-script-mode~                                             :builtin:
@@ -2860,8 +2831,7 @@ Export ~org~ files to Github-flavoured markdown.
           sh-indentation 2))
 
   (use-package shell-script-mode
-    :init (add-hook 'sh-mode-hook 'eqyiel/setup-sh-mode)
-    :ensure nil)
+    :init (add-hook 'sh-mode-hook 'eqyiel/setup-sh-mode))
 #+END_SRC
 
 ** ~skewer-mode~                                                     :melpa:
@@ -2898,7 +2868,7 @@ Export ~org~ files to Github-flavoured markdown.
       (sp-local-pair 'org-mode "=" "=")
       (sp-local-pair 'org-mode "_" "_")
       (sp-local-pair 'org-mode "/" "/"))
-    :demand
+    :demand t
     :diminish smartparens-mode)
 #+END_SRC
 
@@ -2925,8 +2895,7 @@ Export ~org~ files to Github-flavoured markdown.
   (use-package subword
     :init (global-subword-mode 1)
     :diminish subword-mode
-    :ensure nil
-    :demand)
+    :demand t)
 #+END_SRC
 
 ** ~swift-mode~                                                      :melpa:
@@ -2965,7 +2934,7 @@ This is a new one for me.  See [[http://oremacs.com/swiper/#key-bindings-for-sin
     (setq
      smex-save-file
      (concat eqyiel/xdg-cache-home "/emacs/smex-items"))
-    :demand)
+    :demand t)
 
   (use-package counsel
     :init (use-package ivy)
@@ -2995,7 +2964,7 @@ This is a new one for me.  See [[http://oremacs.com/swiper/#key-bindings-for-sin
      ("C-c j" . counsel-git-grep)
      ("C-c K" . eqyiel/counsel-rg-from-current-directory)
      ("C-x l" . counsel-locate))
-    :demand)
+    :demand t)
 
   (defun eqyiel/counsel-projectile-rg-around (orig-fun &rest args)
     "If `projectile-counsel-rg' throws an error, fallback to regular `counsel-rg'."
@@ -3016,7 +2985,7 @@ This is a new one for me.  See [[http://oremacs.com/swiper/#key-bindings-for-sin
            ("M-g e" . avy-goto-word-0)
            ("M-g o" . avy-org-refile-as-child)
            ("M-g j" . avy-org-goto-heading-timer))
-    :demand)
+    :demand t)
 
   (use-package ivy
     :config
@@ -3046,7 +3015,7 @@ This is a new one for me.  See [[http://oremacs.com/swiper/#key-bindings-for-sin
      ivy-switch-buffer-map
      ("C-r" . ivy-previous-line)
      ("C-s" . ivy-next-line))
-    :demand
+    :demand t
     :diminish ivy-mode)
 
   (use-package swiper
@@ -3057,7 +3026,7 @@ This is a new one for me.  See [[http://oremacs.com/swiper/#key-bindings-for-sin
     (progn
       (use-package ivy)
       (add-to-list 'swiper-font-lock-exclude 'nix-mode))
-    :demand)
+    :demand t)
 #+END_SRC
 
 ** ~tide~                                                            :melpa:
@@ -3177,8 +3146,7 @@ This is a new one for me.  See [[http://oremacs.com/swiper/#key-bindings-for-sin
       ;; Uses sudo password for the user defined in ~/.ssh/config, not root password.
       ;; No need to allow ssh for root.
       (add-to-list 'tramp-default-proxies-alist '(".*" "\\`root\\'" "/ssh:%h:"))
-      (add-to-list 'tramp-default-proxies-alist '("\\`localhost\\'" "\\`root\\'" nil)))
-    :ensure nil)
+      (add-to-list 'tramp-default-proxies-alist '("\\`localhost\\'" "\\`root\\'" nil))))
 #+END_SRC
 
 ** ~unfill~                                                          :melpa:
@@ -3191,8 +3159,7 @@ This is a new one for me.  See [[http://oremacs.com/swiper/#key-bindings-for-sin
   (use-package uniquify
     :config
     (setq uniquify-buffer-name-style 'forward)
-    :ensure nil
-    :demand)
+    :demand t)
 #+END_SRC
 
 ** ~visual-fill-column~                                              :melpa:
@@ -3211,7 +3178,7 @@ This is a pretty good replacement  for ~longlines-mode~.
   (use-package visual-fill-column
     :commands (visual-fill-column-mode)
     :config (require 'simple)
-    :demand)
+    :demand t)
 #+END_SRC
 
 ** ~web-mode~                                                        :melpa:
@@ -3287,8 +3254,7 @@ This is a pretty good replacement  for ~longlines-mode~.
 #+BEGIN_SRC emacs-lisp
   (use-package winner
     :config (winner-mode t)
-    :ensure nil
-    :demand)
+    :demand t)
 #+END_SRC
 
 ** ~ws-butler~                                                       :melpa:
@@ -3296,7 +3262,7 @@ This is a pretty good replacement  for ~longlines-mode~.
   (use-package ws-butler
     :init (ws-butler-global-mode)
     :diminish ws-butler-mode
-    :demand)
+    :demand t)
 #+END_SRC
 
 ** ~yaml-mode~                                                       :melpa:

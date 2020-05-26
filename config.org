@@ -2091,7 +2091,9 @@ Check out this for tips: https://vxlabs.com/2017/02/07/mu4e-0-9-18-e-mailing-wit
   (use-package nix-mode
     :ensure nil
     :commands (nix-mode nix-repl-show nix-format-buffer)
-    :init (add-to-list 'auto-mode-alist '("\\.nix\\'" . nix-mode)))
+    :init (progn
+            (defalias 'nix-format-buffer 'nixpkgs-fmt-buffer)
+            (add-to-list 'auto-mode-alist '("\\.nix\\'" . nix-mode))))
 #+END_SRC
 
 ** ~nix-shell~                                                       :melpa:

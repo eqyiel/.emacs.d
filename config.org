@@ -1383,6 +1383,11 @@ PHP debugger thing.
         :token (password-store-get "tokens/github.com/eqyiel/gist")))))
 #+END_SRC
 
+** ~git-link~                                                        :melpa:
+#+BEGIN_SRC emacs-lisp
+  (use-package git-link)
+#+END_SRC
+
 ** ~go-mode~                                                         :melpa:
 
 #+BEGIN_SRC emacs-lisp

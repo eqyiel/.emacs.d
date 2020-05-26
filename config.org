@@ -2933,10 +2933,16 @@ This is a new one for me.  See [[http://oremacs.com/swiper/#key-bindings-for-sin
     ;; https://stackoverflow.com/a/17396928
     (custom-set-variables
      `(counsel-rg-base-command
-       ,(concat (s-replace-regexp
-                 "[\[:space:]]?%s[\[:space:]]?.?"
-                 " --follow %s ."
-                 (eval (car (get 'counsel-rg-base-command 'standard-value)))))))
+       ,(concat
+         (s-replace-regexp
+          "[\[:space:]]?%s[\[:space:]]?.?"
+          " --follow %s ."
+          (eval (car (get 'counsel-rg-base-command 'standard-value))))
+         ;; Further workaround for how ripgrep returns a fatal error code despite
+         ;; a partial result.
+         ;; https://github.com/hlissner/doom-emacs/issues/3038#issuecomment-624165004
+         " || true"
+         )))
     :bind
     (("M-x" . counsel-M-x)
      ("C-x C-f" . counsel-find-file)

@@ -489,14 +489,28 @@
                 (read-string "DuckDuckGo: "))))))
 
   (defun eqyiel/copy-file-name-to-clipboard ()
-    "Copy the current `buffer-file-name' to the clipboard."
+    "Copy the path to the current `buffer-file-name' to the clipboard.  If
+  `universal-argument' is given, use absolute path.  Otherwise: try to copy
+  relative path from repository root, or just copy buffer name if this is not a
+  git directory."
     (interactive)
-    (let ((filename (if (equal major-mode 'dired-mode)
-                        default-directory
-                      (buffer-file-name))))
-      (when filename
-        (kill-new filename)
-        (message "Copied buffer file name '%s' to the clipboard." filename))))
+    (let ((path (let ((filename
+                       (if (equal major-mode 'dired-mode)
+                           default-directory
+                         (buffer-file-name))))
+                  (if filename
+                      (if (equal current-prefix-arg nil) ; Was C-u provided?
+                          (let ((repository-root-dir (vc-root-dir)))
+                            (if repository-root-dir
+                                (s-chop-prefix
+                                 (expand-file-name repository-root-dir)
+                                 filename)
+                              filename))
+                        filename)
+                    (buffer-name)))))
+      (progn
+        (kill-new path)
+        (message "Copied buffer file name '%s' to the clipboard." path))))
 
   (bind-key "C-c w" 'eqyiel/copy-file-name-to-clipboard)
 

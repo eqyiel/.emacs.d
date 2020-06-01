@@ -1557,6 +1557,36 @@ instead of ~js2-mode~ or ~web-mode~.
 
 ** ~js2-mode~                                                        :melpa:
 #+BEGIN_SRC emacs-lisp
+  (defun eqyiel/toggle-js2-mode-to-web-mode ()
+    (interactive)
+    (web-mode))
+
+  (defun eqyiel/company-js2-mode-hook ()
+    (set (make-local-variable 'company-backends)
+         '((company-files
+            company-lsp
+            company-keywords))))
+
+  (defun eqyiel/js2-mode-hook ()
+    (progn
+      (setq-local js-switch-indent-offset 2)
+      (setq-local js2-basic-offset 2)
+      (setq-local js2-concat-multiline-strings nil)
+      (setq-local js2-concat-multiline-strings t)
+      (setq-local js2-highlight-level 3)
+      (setq-local js2-idle-timer-delay 3)  ;; wait until I'm actually idle
+      (setq-local js2-include-node-externs t)
+      (setq-local js2-mode-show-parse-errors nil)
+      (setq-local js2-mode-show-strict-warnings nil)
+      (setq-local js2-strict-cond-assign-warning nil)
+      (setq-local js2-strict-inconsistent-return-warning nil)
+      (setq-local js2-strict-missing-semi-warning nil)
+      (setq-local js2-strict-trailing-comma-warning nil)
+      (setq-local js2-strict-var-hides-function-arg-warning nil)
+      (setq-local js2-strict-var-redeclaration-warning nil)
+      (activate-flow-js2-mode)
+      (rainbow-mode)))
+
   (use-package js2-mode
     :config
     (progn
@@ -1569,42 +1599,11 @@ instead of ~js2-mode~ or ~web-mode~.
         :config (use-package flow-minor-mode :demand t)
         :demand t)
 
-      (defun eqyiel/toggle-js2-mode-to-web-mode ()
-        (interactive)
-        (web-mode))
-
-      (defun eqyiel/company-js2-mode-hook ()
-        (set (make-local-variable 'company-backends)
-             '((company-files
-                company-lsp
-                company-keywords))))
-
-      (defun eqyiel/js2-mode-hook ()
-        (progn
-          (setq-local js-switch-indent-offset 2)
-          (setq-local js2-basic-offset 2)
-          (setq-local js2-concat-multiline-strings nil)
-          (setq-local js2-concat-multiline-strings t)
-          (setq-local js2-highlight-level 3)
-          (setq-local js2-idle-timer-delay 3)  ;; wait until I'm actually idle
-          (setq-local js2-include-node-externs t)
-          (setq-local js2-mode-show-parse-errors nil)
-          (setq-local js2-mode-show-strict-warnings nil)
-          (setq-local js2-strict-cond-assign-warning nil)
-          (setq-local js2-strict-inconsistent-return-warning nil)
-          (setq-local js2-strict-missing-semi-warning nil)
-          (setq-local js2-strict-trailing-comma-warning nil)
-          (setq-local js2-strict-var-hides-function-arg-warning nil)
-          (setq-local js2-strict-var-redeclaration-warning nil)
-          (activate-flow-js2-mode)
-          (rainbow-mode)))
-
-
       ;; https://emacs.stackexchange.com/questions/22044/treat-shebang-as-a-comment
       (modify-syntax-entry ?# ". 1" js2-mode-syntax-table)
       (modify-syntax-entry ?! ". 2b" js2-mode-syntax-table))
     :hook ((js2-mode-hook . eqyiel/company-js2-mode-hook)
-           (js2-mode-hook js2-jsx2-mode-hook) . eqyiel/js2-mode-hook)
+           ((js2-mode-hook js2-jsx2-mode-hook) . eqyiel/js2-mode-hook))
     :bind
     (:map js2-mode-map
           ("C-M-s-\"" . eqyiel/toggle-js2-mode-to-web-mode)

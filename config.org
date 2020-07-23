@@ -1800,10 +1800,37 @@ This package adds itself to ~auto-mode-alist~.
 
 ** ~markdown-mode~                                                   :melpa:
 #+BEGIN_SRC emacs-lisp
+  (defun eqyiel/markdown-lint-error-parser (output checker buffer)
+    (let ((parsed-output (caar (flycheck-parse-json output))))
+      (seq-map
+       (lambda (message)
+         (let-alist message
+           (flycheck-error-new-at
+            .location.start.line
+            .location.start.column
+            'warning .reason
+            :id .ruleId
+            :checker checker
+            :buffer buffer
+            :filename (buffer-file-name buffer)
+            :end-line .location.end.line
+            :end-column .location.end.column)))
+       (alist-get 'messages parsed-output))))
+
   (use-package markdown-mode
     :config
     (progn
-      (setq markdown-command "pandoc -f markdown -t html -s --mathjax --highlight-style=pygments"))
+      (setq markdown-command "pandoc -f markdown -t html -s --mathjax --highlight-style=pygments")
+      (use-package flycheck
+        :init
+        (progn
+          (require 'warnings)
+          (flycheck-define-checker markdown-lint
+            "Flycheck plugin for markdown-mode"
+            :command ("markdown-lint" "--report" "json" source-inplace)
+            :error-parser eqyiel/markdown-lint-error-parser
+            :modes markdown-mode))))
+    :init (add-to-list 'flycheck-checkers 'markdown-lint)
     :mode (("\\.markdown\\'" . markdown-mode)
            ("\\.md\\'" . markdown-mode)))
 #+END_SRC

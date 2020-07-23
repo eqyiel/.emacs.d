@@ -1283,6 +1283,11 @@ is enabled.
     :init (direnv-mode)
     :demand t)
 #+END_SRC
+** ~dockerfile-mode~                                                 :melpa:
+
+#+BEGIN_SRC emacs-lisp
+  (use-package dockerfile-mode :demand t)
+#+END_SRC
 
 ** ~dtrt-indent~                                                     :melpa:
 #+BEGIN_SRC emacs-lisp

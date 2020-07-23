@@ -1223,6 +1223,7 @@ is enabled.
 #+END_SRC
 
 ** ~css-mode~                                                      :builtin:
+
 #+BEGIN_SRC emacs-lisp
   (defun eqyiel/css-mode-hook ()
     (rainbow-turn-on))

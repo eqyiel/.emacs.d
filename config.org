@@ -3066,6 +3066,13 @@ This is a new one for me.  See [[http://oremacs.com/swiper/#key-bindings-for-sin
     :demand t)
 #+END_SRC
 
+** ~terraform-mode~                                                  :melpa:
+
+#+BEGIN_SRC emacs-lisp
+  (use-package terraform-mode
+    :hook (terraform-mode-hook . terraform-format-on-save-mode))
+#+END_SRC
+
 ** ~tide~                                                            :melpa:
 
 #+BEGIN_SRC emacs-lisp

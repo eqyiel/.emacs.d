@@ -2302,15 +2302,6 @@ A tool to insert a link in the clipboard as an ~org-mode~ link at point.
   (defun eqyiel/create-org-file-path (filename)
     (format "%s/%s" eqyiel/org-directory filename))
 
-  (defun eqyiel/maybe-create-org-agenda-file (filename)
-    (let ((target
-           (eqyiel/create-org-file-path filename)))
-      (progn (unless (and (file-exists-p target)
-                          (file-readable-p target)
-                          (file-writable-p target))
-               (with-temp-buffer (write-file target)))
-             target)))
-
   (defun eqyiel/org-capture-prepare-finalize-hook ()
     "Quality of life hack for for `org-capture' buffers.
 
@@ -2503,7 +2494,7 @@ A tool to insert a link in the clipboard as an ~org-mode~ link at point.
      org-export-default-language "en"
      org-export-before-processing-hook '(eqyiel/org-export-before-processing-hook)
      org-capture-templates
-     `(("t" "Todo" entry (file ,(eqyiel/maybe-create-org-agenda-file "inbox.org"))
+     `(("t" "Todo" entry (file ,(eqyiel/create-org-file-path "inbox.org"))
         "* TODO %?
   SCHEDULED: %T
   :PROPERTIES:

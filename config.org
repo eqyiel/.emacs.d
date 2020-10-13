@@ -879,7 +879,8 @@
 ** ~aggressive-indent-mode~                                          :melpa:
 #+BEGIN_SRC emacs-lisp
   (use-package aggressive-indent
-    :config (global-aggressive-indent-mode 1))
+    :config (global-aggressive-indent-mode 1)
+    :ensure t)
 #+END_SRC
 ** ~atomic-chrome~                                                   :melpa:
 
@@ -889,6 +890,7 @@ text!/.
 #+BEGIN_SRC emacs-lisp
   (use-package atomic-chrome
     :init (atomic-chrome-start-server)
+    :ensure t
     :demand t)
 #+END_SRC
 
@@ -909,7 +911,8 @@ Note that is this is included as ~auth-source-pass~ in Emacs 26 and up.
       (setq auth-sources '(password-store)))
         ;; Don't open in DCL mode
     :mode ("\\.com.gpg$" . fundamental-mode)
-    :demand t)
+    :demand t
+    :ensure t)
 #+END_SRC
 ** ~auto-fill-mode~                                                :builtin:
 This is here just so it can be diminished.
@@ -931,7 +934,8 @@ So diminish ~auto-fill-function~, not ~auto-fill-mode~.
 #+BEGIN_SRC emacs-lisp
   (use-package beacon
     :init (beacon-mode t)
-    :diminish beacon-mode)
+    :diminish beacon-mode
+    :ensure t)
 #+END_SRC
 
 ** ~buffer-move~                                                     :melpa:
@@ -987,7 +991,8 @@ So diminish ~auto-fill-function~, not ~auto-fill-mode~.
       (bind-key (concat eqyiel/hyper-prefix "-f") 'enlarge-window-horizontally)
       (bind-key (concat eqyiel/hyper-prefix "-n") 'shrink-window)
       (bind-key (concat eqyiel/hyper-prefix "-p") 'enlarge-window))
-    :demand t)
+    :demand t
+    :ensure t)
 #+END_SRC
 
 ** ~c++-mode~                                                      :builtin:
@@ -1111,9 +1116,10 @@ So diminish ~auto-fill-function~, not ~auto-fill-mode~.
                      '("eqyiel" "versapunk" "nyarlu" "eqyiel1" "fthagn" "forcer")
                      circe-notifications-alert-style 'osx-notifier
                      circe-notifications-wait-for 30))
+        :ensure nil
         :demand t)
 
-      (use-package pass :demand t)
+      (use-package pass :demand t :ensure t)
 
       (setq circe-default-quit-message
             "( ' ヮ')ノ.・ﾟ*｡・.・ﾟ*｡・.・ﾟ*｡・ヽ(ﾟДﾟ,,)ノ"
@@ -1147,10 +1153,12 @@ So diminish ~auto-fill-function~, not ~auto-fill-mode~.
 #+BEGIN_SRC emacs-lisp
   (use-package column-enforce-mode
     :hook (prog-mode-hook . column-enforce-mode)
-    :diminish column-enforce-mode)
+    :diminish column-enforce-mode
+    :ensure t)
 #+END_SRC
 
 ** ~company~                                                         :melpa:
+
 #+BEGIN_SRC emacs-lisp
   (defun eqyiel/company-nixos ()
     (set (make-local-variable 'company-backends)
@@ -1181,9 +1189,10 @@ So diminish ~auto-fill-function~, not ~auto-fill-mode~.
             company-tooltip-align-annotations t)
       (add-to-list 'company-backends 'company-emoji)
       (global-company-mode))
+    :ensure t
     :init
     (progn
-      (use-package company-emoji :demand t)
+      (use-package company-emoji :demand t :ensure t)
       (setq company-backends
             '((company-files
                company-yasnippet
@@ -1198,7 +1207,7 @@ So diminish ~auto-fill-function~, not ~auto-fill-mode~.
 
 ** ~company-lsp~                                                     :melpa:
 #+BEGIN_SRC emacs-lisp
-  (use-package company-lsp :after company :demand t)
+  (use-package company-lsp :after company :demand t :ensure t)
 #+END_SRC
 
 ** ~company-posframe~                                                :melpa:
@@ -1211,7 +1220,8 @@ is enabled.
   ;; (use-package company-posframe
   ;;   :after company
   ;;   :demand t
-  ;;   :config (company-posframe-mode t))
+  ;;   :config (company-posframe-mode t)
+  ;;   :ensure t)
 #+END_SRC
 
 ** ~counsel-projectile~                                              :melpa:
@@ -1219,7 +1229,8 @@ is enabled.
   (use-package counsel-projectile
     :after (projectile counsel)
     :demand t
-    :bind ("C-c k" . counsel-projectile-rg))
+    :bind ("C-c k" . counsel-projectile-rg)
+    :ensure t)
 #+END_SRC
 
 ** ~css-mode~                                                      :builtin:
@@ -1281,34 +1292,27 @@ is enabled.
     :config (setq direnv-always-show-summary t
                   direnv-show-paths-in-summary t)
     :init (direnv-mode)
-    :demand t)
+    :demand t
+    :ensure t)
 #+END_SRC
 ** ~dockerfile-mode~                                                 :melpa:
 
 #+BEGIN_SRC emacs-lisp
-  (use-package dockerfile-mode :demand t)
+  (use-package dockerfile-mode :demand t :ensure t)
 #+END_SRC
 
 ** ~dtrt-indent~                                                     :melpa:
 #+BEGIN_SRC emacs-lisp
-  (use-package dtrt-indent :init (dtrt-indent-mode) :demand t)
+  (use-package dtrt-indent :init (dtrt-indent-mode) :demand t :ensure t)
 #+END_SRC
 
 ** ~emojify~                                                         :melpa:
 #+BEGIN_SRC emacs-lisp
-    (use-package emojify
-      :config
-      (setq emojify-display-style 'unicode
-            emojify-composed-text-p nil))
-#+END_SRC
-
-** ~eslint-fix~                                                      :melpa:
-
-This package is kind of crap right now because it doesn't let you set the path a
-specific ~eslint~ executable, but it should be easy to fix.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package eslint-fix :after js-mode js2-mode web-mode)
+  (use-package emojify
+    :config
+    (setq emojify-display-style 'unicode
+          emojify-composed-text-p nil)
+    :ensure t)
 #+END_SRC
 
 ** ~expand-region~                                                   :melpa:
@@ -1317,7 +1321,8 @@ specific ~eslint~ executable, but it should be easy to fix.
     :chords ((("jk" . er/expand-region)
               ("kj" . er/expand-region)))
     :bind ("C-=" . er/expand-region)
-    :demand t)
+    :demand t
+    :ensure t)
 #+END_SRC
 
 ** ~fasd~                                                            :melpa:
@@ -1325,24 +1330,26 @@ specific ~eslint~ executable, but it should be easy to fix.
 #+BEGIN_SRC emacs-lisp
   (use-package fasd
     :bind ("C-z" . fasd-find-file)
-    :init (global-fasd-mode 1))
+    :init (global-fasd-mode 1)
+    :ensure t)
 #+END_SRC
 
 ** ~flow-minor-mode~                                                 :melpa:
 #+BEGIN_SRC emacs-lisp
-  (defun eqyiel/flow-minor-mode-hook ()
-    (let ((js-project-roots (eqyiel/node-find-js-project-roots)))
-      (when (eqyiel/node-should-use-package-p js-project-roots '(flow flow-bin))
-        (let ((local-project-flow-executable
-               (eqyiel/node-find-project-local-executable-path
-                js-project-roots '(flow flow-bin))))
-          (when local-project-flow-executable
-            (set (make-local-variable 'flow-minor-default-binary)
-                 local-project-flow-executable))))))
+    (defun eqyiel/flow-minor-mode-hook ()
+      (let ((js-project-roots (eqyiel/node-find-js-project-roots)))
+        (when (eqyiel/node-should-use-package-p js-project-roots '(flow flow-bin))
+          (let ((local-project-flow-executable
+                 (eqyiel/node-find-project-local-executable-path
+                  js-project-roots '(flow flow-bin))))
+            (when local-project-flow-executable
+              (set (make-local-variable 'flow-minor-default-binary)
+                   local-project-flow-executable))))))
 
-  (use-package flow-minor-mode
-    :hook (flow-minor-mode-hook . eqyiel/flow-minor-mode-hook)
-    :demand t)
+    (use-package flow-minor-mode
+      :hook (flow-minor-mode-hook . eqyiel/flow-minor-mode-hook)
+      :demand t
+      :ensure t)
 #+END_SRC
 
 ** ~flycheck~                                                        :melpa:
@@ -1359,12 +1366,13 @@ specific ~eslint~ executable, but it should be easy to fix.
             flycheck-error-list-minimum-level 'warning))
     :init
     (progn
-      (use-package web-mode)
+      (use-package web-mode :ensure t)
       (global-flycheck-mode)
       (flycheck-add-mode 'javascript-eslint 'web-mode)
       (setq flycheck-eslintrc ".eslintrc.json"))
     :bind ("C-c C-l" . flycheck-list-errors)
     :demand t
+    :ensure t
     :diminish flycheck-mode)
 #+END_SRC
 
@@ -1378,15 +1386,8 @@ specific ~eslint~ executable, but it should be easy to fix.
       ;; (flycheck-add-next-checker 'javascript-flow '(t . javascript-flow-coverage))
       ;; (flycheck-add-next-checker 'javascript-flow-coverage '(t . javascript-eslint))
       ;; if just using flow
-      (flycheck-add-next-checker 'javascript-flow '(t . javascript-eslint))))
-#+END_SRC
-
-** ~geben~                                                           :melpa:
-
-PHP debugger thing.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package geben)
+      (flycheck-add-next-checker 'javascript-flow '(t . javascript-eslint)))
+    :ensure t)
 #+END_SRC
 
 ** ~gist~                                                            :melpa:
@@ -1399,35 +1400,38 @@ PHP debugger thing.
        gh-vals
        (plist-put
         gh-vals
-        :token (password-store-get "tokens/github.com/eqyiel/gist")))))
+        :token (password-store-get "tokens/github.com/eqyiel/gist"))))
+    :ensure t)
 #+END_SRC
 
 ** ~git-link~                                                        :melpa:
 #+BEGIN_SRC emacs-lisp
-  (use-package git-link)
+  (use-package git-link :ensure t)
 #+END_SRC
 
 ** ~go-mode~                                                         :melpa:
 
 #+BEGIN_SRC emacs-lisp
   (use-package go-mode
-    :hook (before-save-hook . gofmt-before-save))
+    :hook (before-save-hook . gofmt-before-save)
+    :ensure t)
 #+END_SRC
 
 ** ~google-c-style~                                                  :melpa:
 #+BEGIN_SRC emacs-lisp
   (use-package google-c-style
-    :hook (c-mode-common-hook . google-set-c-style))
+    :hook (c-mode-common-hook . google-set-c-style)
+    :ensure t)
 #+END_SRC
 
 ** ~google-translate~                                                :melpa:
 #+BEGIN_SRC emacs-lisp
-  (use-package google-translate)
+  (use-package google-translate :ensure t)
 #+END_SRC
 
 ** ~graphql-mode~                                                    :melpa:
 #+BEGIN_SRC emacs-lisp
-  (use-package graphql-mode)
+  (use-package graphql-mode :ensure t)
 #+END_SRC
 
 ** ~groovy-mode~                                                     :melpa:
@@ -1436,7 +1440,8 @@ This is pretty much exclusively for the sake of editing ~build.gradle~ files.
 
 #+BEGIN_SRC emacs-lisp
   (use-package groovy-mode
-    :mode ("\\.gradle\\'" . groovy-mode))
+    :mode ("\\.gradle\\'" . groovy-mode)
+    :ensure t)
 #+END_SRC
 
 ** ~help-at-pt~                                                    :builtin:
@@ -1450,9 +1455,10 @@ This is pretty much exclusively for the sake of editing ~build.gradle~ files.
 
 ** ~highlight-indentation~                                           :melpa:
 #+BEGIN_SRC emacs-lisp
-  (use-package highlight-indentation
-    :hook (prog-mode-hook . highlight-indentation-mode)
-    :diminish highlight-indentation-mode)
+    (use-package highlight-indentation
+      :hook (prog-mode-hook . highlight-indentation-mode)
+      :diminish highlight-indentation-mode
+      :ensure t)
 #+END_SRC
 
 ** ~html-mode~                                                     :builtin:
@@ -1479,7 +1485,8 @@ This is pretty much exclusively for the sake of editing ~build.gradle~ files.
     (ibuffer-hook . (lambda ()
       (ibuffer-projectile-set-filter-groups)
       (unless (eq ibuffer-sorting-mode 'alphabetic)
-        (ibuffer-do-sort-by-alphabetic)))))
+        (ibuffer-do-sort-by-alphabetic))))
+    :ensure t)
 #+END_SRC
 
 ** ~info~                                                          :builtin:
@@ -1572,86 +1579,87 @@ instead of ~js2-mode~ or ~web-mode~.
 
 ** ~js2-mode~                                                        :melpa:
 #+BEGIN_SRC emacs-lisp
-    (defun eqyiel/toggle-js2-mode-to-web-mode ()
-      (interactive)
-      (web-mode))
+  (defun eqyiel/toggle-js2-mode-to-web-mode ()
+    (interactive)
+    (web-mode))
 
-    (defun eqyiel/company-js2-mode-hook ()
-      (set (make-local-variable 'company-backends)
-           '((company-files
-              company-lsp
-              company-keywords))))
+  (defun eqyiel/company-js2-mode-hook ()
+    (set (make-local-variable 'company-backends)
+         '((company-files
+            company-lsp
+            company-keywords))))
 
-    (defun eqyiel/js2-mode-hook ()
+  (defun eqyiel/js2-mode-hook ()
+    (progn
+      (setq-local js-switch-indent-offset 2)
+      (setq-local js2-basic-offset 2)
+      (setq-local js2-concat-multiline-strings nil)
+      (setq-local js2-concat-multiline-strings t)
+      (setq-local js2-highlight-level 3)
+      (setq-local js2-idle-timer-delay 3)  ;; wait until I'm actually idle
+      (setq-local js2-include-node-externs t)
+      (setq-local js2-mode-show-parse-errors nil)
+      (setq-local js2-mode-show-strict-warnings nil)
+      (setq-local js2-strict-cond-assign-warning nil)
+      (setq-local js2-strict-inconsistent-return-warning nil)
+      (setq-local js2-strict-missing-semi-warning nil)
+      (setq-local js2-strict-trailing-comma-warning nil)
+      (setq-local js2-strict-var-hides-function-arg-warning nil)
+      (setq-local js2-strict-var-redeclaration-warning nil)
+      (activate-flow-js2-mode)
+      (rainbow-mode)))
+
+  (defun eqyiel/flycheck-js2-mode-hook ()
+    (require 'flycheck)
+    (require 'flycheck-flow)
+    (flycheck-mode)
+    (let ((js-project-roots (eqyiel/node-find-js-project-roots)))
       (progn
-        (setq-local js-switch-indent-offset 2)
-        (setq-local js2-basic-offset 2)
-        (setq-local js2-concat-multiline-strings nil)
-        (setq-local js2-concat-multiline-strings t)
-        (setq-local js2-highlight-level 3)
-        (setq-local js2-idle-timer-delay 3)  ;; wait until I'm actually idle
-        (setq-local js2-include-node-externs t)
-        (setq-local js2-mode-show-parse-errors nil)
-        (setq-local js2-mode-show-strict-warnings nil)
-        (setq-local js2-strict-cond-assign-warning nil)
-        (setq-local js2-strict-inconsistent-return-warning nil)
-        (setq-local js2-strict-missing-semi-warning nil)
-        (setq-local js2-strict-trailing-comma-warning nil)
-        (setq-local js2-strict-var-hides-function-arg-warning nil)
-        (setq-local js2-strict-var-redeclaration-warning nil)
-        (activate-flow-js2-mode)
-        (rainbow-mode)))
+        (when (eqyiel/node-should-use-package-p js-project-roots '(eslint))
+          (let ((local-project-eslint-executable
+                 (eqyiel/node-find-project-local-executable-path
+                  js-project-roots '(eslint))))
+            (when local-project-eslint-executable
+              (set (make-local-variable 'flycheck-javascript-eslint-executable)
+                   local-project-eslint-executable))))
+        (when (eqyiel/node-should-use-package-p js-project-roots '(flow flow-bin))
+          (let ((local-project-flow-executable
+                 (eqyiel/node-find-project-local-executable-path
+                  js-project-roots '(flow flow-bin))))
+            (when local-project-flow-executable
+              (set (make-local-variable 'flycheck-javascript-flow-executable)
+                   local-project-flow-executable)))))))
 
-    (defun eqyiel/flycheck-js2-mode-hook ()
-      (require 'flycheck)
-      (require 'flycheck-flow)
-      (flycheck-mode)
-      (let ((js-project-roots (eqyiel/node-find-js-project-roots)))
-        (progn
-          (when (eqyiel/node-should-use-package-p js-project-roots '(eslint))
-            (let ((local-project-eslint-executable
-                   (eqyiel/node-find-project-local-executable-path
-                    js-project-roots '(eslint))))
-              (when local-project-eslint-executable
-                (set (make-local-variable 'flycheck-javascript-eslint-executable)
-                     local-project-eslint-executable))))
-          (when (eqyiel/node-should-use-package-p js-project-roots '(flow flow-bin))
-            (let ((local-project-flow-executable
-                   (eqyiel/node-find-project-local-executable-path
-                    js-project-roots '(flow flow-bin))))
-              (when local-project-flow-executable
-                (set (make-local-variable 'flycheck-javascript-flow-executable)
-                     local-project-flow-executable)))))))
+  (use-package js2-mode
+    :config
+    (progn
+      (use-package web-mode :ensure t)
+      (use-package flycheck :ensure t)
+      (use-package company :ensure t)
 
-    (use-package js2-mode
-      :config
-      (progn
-        (use-package web-mode)
-        (use-package flycheck)
-        (use-package company)
+      (use-package flow-js2-mode
+        :load-path "site-lisp/flow-js2-mode"
+        :config (use-package flow-minor-mode :demand t :ensure t)
+        :demand t)
 
-        (use-package flow-js2-mode
-          :load-path "site-lisp/flow-js2-mode"
-          :config (use-package flow-minor-mode :demand t)
-          :demand t)
-
-        ;; https://emacs.stackexchange.com/questions/22044/treat-shebang-as-a-comment
-        (modify-syntax-entry ?# ". 1" js2-mode-syntax-table)
-        (modify-syntax-entry ?! ". 2b" js2-mode-syntax-table))
-      :init (progn
-              (require 'flycheck)
-              (require 'flycheck-flow)
-              (flycheck-add-mode 'javascript-flow 'js2-mode)
-              (flycheck-add-mode 'javascript-flow-coverage 'js2-mode))
-      :hook ((js2-mode-hook . eqyiel/flycheck-js2-mode-hook)
-             (js2-mode-hook . eqyiel/company-js2-mode-hook)
-             ((js2-mode-hook js2-jsx2-mode-hook) . eqyiel/js2-mode-hook))
-      :mode (("\\.js$" . js2-mode)
-             ("\\.jsx$" . js2-jsx-mode))
-      :bind
-      (:map js2-mode-map
-            ("C-M-s-\"" . eqyiel/toggle-js2-mode-to-web-mode)
-            ("H-'" . eqyiel/toggle-js2-mode-to-web-mode)))
+      ;; https://emacs.stackexchange.com/questions/22044/treat-shebang-as-a-comment
+      (modify-syntax-entry ?# ". 1" js2-mode-syntax-table)
+      (modify-syntax-entry ?! ". 2b" js2-mode-syntax-table))
+    :init (progn
+            (require 'flycheck)
+            (require 'flycheck-flow)
+            (flycheck-add-mode 'javascript-flow 'js2-mode)
+            (flycheck-add-mode 'javascript-flow-coverage 'js2-mode))
+    :hook ((js2-mode-hook . eqyiel/flycheck-js2-mode-hook)
+           (js2-mode-hook . eqyiel/company-js2-mode-hook)
+           ((js2-mode-hook js2-jsx2-mode-hook) . eqyiel/js2-mode-hook))
+    :ensure t
+    :mode (("\\.js$" . js2-mode)
+           ("\\.jsx$" . js2-jsx-mode))
+    :bind
+    (:map js2-mode-map
+          ("C-M-s-\"" . eqyiel/toggle-js2-mode-to-web-mode)
+          ("H-'" . eqyiel/toggle-js2-mode-to-web-mode)))
 #+END_SRC
 
 ** ~json-mode~                                                       :melpa:
@@ -1689,7 +1697,8 @@ This package adds itself to ~auto-mode-alist~.
                 ("C-c C-m" . eqyiel/json-minify))
     :mode (("\\.eslintrc.*$" . json-mode)
            ("\\.babelrc$" . json-mode))
-    :hook (json-mode-hook . eqyiel/json-mode-hook))
+    :hook (json-mode-hook . eqyiel/json-mode-hook)
+    :ensure t)
 #+END_SRC
 
 ** ~kubernetes-mode~                                                 :melpa:
@@ -1742,23 +1751,25 @@ This package adds itself to ~auto-mode-alist~.
     ;; Emacs hangs if this updates too frequently.  Use "g" to update.
     (setq kubernetes-poll-frequency 3600
           kubernetes-redraw-frequency 3600)
-    :commands (kubernetes-overview))
+    :commands (kubernetes-overview)
+    :ensure t)
 #+END_SRC
 
 ** ~legalese~                                                        :melpa:
 #+BEGIN_SRC emacs-lisp
-  (use-package legalese)
+  (use-package legalese :ensure t)
 #+END_SRC
 
 ** ~lsp-mode~                                                        :melpa:
 
 #+BEGIN_SRC emacs-lisp
-  (use-package lsp-ui)
+  (use-package lsp-ui :ensure t)
 
   (use-package lsp-mode
     :requires flycheck nix-buffer
     :demand t
-    :config (require 'lsp-ui))
+    :config (require 'lsp-ui)
+    :ensure t)
 
   (defun eqyiel/lsp-javascript-flow-find-executable ()
     (let ((js-project-roots (eqyiel/node-find-js-project-roots)))
@@ -1804,7 +1815,8 @@ This package adds itself to ~auto-mode-alist~.
       (lsp-ui-mode)))
 
   (use-package lsp-java
-    :hook (java-mode-hook . eqyiel/lsp-java-enable-maybe))
+    :hook (java-mode-hook . eqyiel/lsp-java-enable-maybe)
+    :ensure t)
 #+END_SRC
 
 ** ~magit~                                                           :melpa:
@@ -1818,7 +1830,8 @@ This package adds itself to ~auto-mode-alist~.
        magit-save-repository-buffers 'dontask))
     :bind
     (("<f8>" . magit-status)
-     ("C-x g" . magit-status)))
+     ("C-x g" . magit-status))
+    :ensure t)
 #+END_SRC
 
 ** ~markdown-mode~                                                   :melpa:
@@ -1852,25 +1865,12 @@ This package adds itself to ~auto-mode-alist~.
             "Flycheck plugin for markdown-mode"
             :command ("remark-lint" "--report" "json" source-inplace)
             :error-parser eqyiel/remark-lint-error-parser
-            :modes markdown-mode))))
+            :modes markdown-mode))
+        :ensure t))
     :init (add-to-list 'flycheck-checkers 'remark-lint)
     :mode (("\\.markdown\\'" . markdown-mode)
-           ("\\.md\\'" . markdown-mode)))
-#+END_SRC
-
-** ~matrix-client~                                                   :melpa:
-This is no longer on MELPA unfortunately.  This is how I found out that MELPA
-will be contacted on each startup if the package you want to install has
-vanished.
-
-#+BEGIN_SRC emacs-lisp
-  ;; (use-package matrix-client
-  ;;   :init
-  ;;   (defun eqyiel/launch-matrix-client ()
-  ;;     (interactive)
-  ;;     (matrix-client "eqyiel"))
-  ;;   :config
-  ;;   (setq matrix-homeserver-base-url "https://matrix.rkm.id.au"))
+           ("\\.md\\'" . markdown-mode))
+    :ensure t)
 #+END_SRC
 
 ** ~message~                                                       :builtin:
@@ -1925,7 +1925,7 @@ Check out this for tips: https://vxlabs.com/2017/02/07/mu4e-0-9-18-e-mailing-wit
   (use-package mu4e
     :config
     (progn
-      (use-package org-mime :demand t)
+      (use-package org-mime :demand t :ensure t)
       (defun eqyiel/htmlize-and-send ()
         "When in an org-mu4e-compose-org-mode message, htmlize and send it."
         (interactive)
@@ -2112,7 +2112,8 @@ Check out this for tips: https://vxlabs.com/2017/02/07/mu4e-0-9-18-e-mailing-wit
            ("C->" . mc/mark-next-like-this)
            ("C-<" . mc/mark-previous-like-this)
            ("C-8" . mc/mark-all-like-this)
-           ("C-*" . mc/mark-all-like-this)))
+           ("C-*" . mc/mark-all-like-this))
+    :ensure t)
 #+END_SRC
 
 ** ~nix-buffer~                                                      :melpa:
@@ -2127,7 +2128,8 @@ Check out this for tips: https://vxlabs.com/2017/02/07/mu4e-0-9-18-e-mailing-wit
     (nix-buffer-update-directory-name
      (f-join eqyiel/xdg-cache-home "emacs/nix-buffer"))
     :hook (find-file-hook . eqyiel/nix-buffer-find-file-hook)
-    :demand t)
+    :demand t
+    :ensure t)
 #+END_SRC
 
 ** ~nix-mode~                                                        :melpa:
@@ -2135,30 +2137,19 @@ Check out this for tips: https://vxlabs.com/2017/02/07/mu4e-0-9-18-e-mailing-wit
   (use-package nix-mode
     :commands (nix-mode nix-repl-show nix-format-buffer)
     :mode ("\\.nix\\'" . nix-mode)
-    :init (progn (defalias 'nix-format-buffer 'nixpkgs-fmt-buffer)))
-#+END_SRC
-
-** ~nix-shell~                                                       :melpa:
-
-#+BEGIN_SRC emacs-lisp
-  (use-package nix-shell
-    :commands nix-shell)
-#+END_SRC
-
-** ~nix-update~                                                      :melpa:
-
-#+BEGIN_SRC emacs-lisp
-  (use-package nix-update
-    :commands nix-update-fetch)
+    :init (progn (defalias 'nix-format-buffer 'nixpkgs-fmt-buffer))
+    :ensure t)
 #+END_SRC
 
 ** ~nixos-options~                                                   :melpa:
 #+BEGIN_SRC emacs-lisp
   (use-package company-nixos-options
-    :after (company nix-mode))
+    :after (company nix-mode)
+    :ensure t)
 
   (use-package nixos-options
-    :after nix-mode)
+    :after nix-mode
+    :ensure t)
 #+END_SRC
 
 ** ~nixpkgs-fmt~                                                     :melpa:
@@ -2167,12 +2158,13 @@ Check out this for tips: https://vxlabs.com/2017/02/07/mu4e-0-9-18-e-mailing-wit
   (use-package nixpkgs-fmt
     :hook (nix-mode-hook . nixpkgs-fmt-on-save-mode)
     :after nix-mode
-    :commands nixpkgs-fmt-on-save-mode)
+    :commands nixpkgs-fmt-on-save-mode
+    :ensure t)
 #+END_SRC
 
 ** ~no-littering~                                                    :melpa:
 #+BEGIN_SRC emacs-lisp
-  (use-package no-littering)
+  (use-package no-littering :ensure t)
 #+END_SRC
 
 ** ~nodejs-repl~                                                     :melpa:
@@ -2183,13 +2175,8 @@ Check out this for tips: https://vxlabs.com/2017/02/07/mu4e-0-9-18-e-mailing-wit
       (funcall orig-fun)))
 
   (use-package nodejs-repl
-    :config (advice-add 'nodejs-repl :around 'eqyiel/nodejs-repl-nix-buffer-around))
-#+END_SRC
-
-** ~omnisharp~                                                       :melpa:
-#+BEGIN_SRC emacs-lisp
-  (use-package omnisharp
-    :hook (csharp-mode-hook . omnisharp-mode))
+    :config (advice-add 'nodejs-repl :around 'eqyiel/nodejs-repl-nix-buffer-around)
+    :ensure t)
 #+END_SRC
 
 ** ~org-caldav~                                                      :melpa:
@@ -2231,20 +2218,22 @@ use ~AND~ instead of ~OR~.
        org-icalendar-include-todo t
        org-caldav-skip-conditions t ; must be truthy to run `org-caldav-skip-function'
        org-icalendar-timezone eqyiel/timezone
-       org-icalendar-use-scheduled '(event-if-todo))))
+       org-icalendar-use-scheduled '(event-if-todo)))
+    :ensure t)
 #+END_SRC
 
 ** ~org-cliplink~                                                    :melpa:
 A tool to insert a link in the clipboard as an ~org-mode~ link at point.
 
 #+BEGIN_SRC emacs-lisp
-(use-package org-cliplink :bind (("H-i" . org-cliplink)))
+(use-package org-cliplink :bind (("H-i" . org-cliplink)) :ensure t)
 #+END_SRC
 
 ** ~org-download~                                                    :melpa:
 #+BEGIN_SRC emacs-lisp
   (use-package org-download
-    :config (setq org-download-method 'attach))
+    :config (setq org-download-method 'attach)
+    :ensure t)
 #+END_SRC
 
 ** ~org-indent-mode~                                               :builtin:
@@ -2652,17 +2641,17 @@ A tool to insert a link in the clipboard as an ~org-mode~ link at point.
 Export ~org~ files to Github-flavoured markdown.
 
 #+BEGIN_SRC emacs-lisp
-  (use-package ox-gfm :demand t)
+  (use-package ox-gfm :demand t :ensure t)
 #+END_SRC
 
 ** ~pass~                                                            :melpa:
 #+BEGIN_SRC emacs-lisp
-  (use-package pass :demand t)
+  (use-package pass :demand t :ensure t)
 #+END_SRC
 
 ** ~php-mode~                                                        :melpa:
 #+BEGIN_SRC emacs-lisp
-  (use-package php-mode)
+  (use-package php-mode :ensure t)
 #+END_SRC
 
 ** ~prettier-emacs~                                                  :melpa:
@@ -2692,7 +2681,8 @@ Export ~org~ files to Github-flavoured markdown.
   (use-package prettier-js
     :demand
     :hook (((js-mode-hook js2-mode-hook markdown-mode-hook typescript-mode-hook graphql-mode-hook) . eqyiel/prettier-js-mode-hook)
-           (web-mode-hook . eqyiel/prettier-web-mode-hook)))
+           (web-mode-hook . eqyiel/prettier-web-mode-hook))
+    :ensure t)
 #+END_SRC
 
 ** ~projectile~                                                      :melpa:
@@ -2738,7 +2728,8 @@ Export ~org~ files to Github-flavoured markdown.
             projectile-globally-ignored-directories
             (append '("dist" "node_modules")
                     projectile-globally-ignored-directories)))
-    :bind ("<f5>" . projectile-compile-project))
+    :bind ("<f5>" . projectile-compile-project)
+    :ensure t)
 #+END_SRC
 
 ** ~python-mode~                                                   :builtin:
@@ -2746,12 +2737,13 @@ Export ~org~ files to Github-flavoured markdown.
   (use-package python-mode
     :bind
     (:map inferior-python-mode-map
-          ("C-d" . eqyiel/comint-delchar-or-eof-or-kill-buffer)))
+          ("C-d" . eqyiel/comint-delchar-or-eof-or-kill-buffer))
+    :ensure t)
 #+END_SRC
 
 ** ~rainbow-mode~                                                     :elpa:
 #+BEGIN_SRC emacs-lisp
-  (use-package rainbow-mode :commands rainbow-turn-on)
+  (use-package rainbow-mode :commands rainbow-turn-on :ensure t)
 #+END_SRC
 
 ** ~recentf~                                                       :builtin:
@@ -2801,7 +2793,7 @@ Export ~org~ files to Github-flavoured markdown.
     (set (make-local-variable 'comment-continue) "//"))
 
   (use-package scss-mode
-    :hook (scss-mode-hook . eqyiel/scss-mode-hook))
+    :hook (scss-mode-hook . eqyiel/scss-mode-hook) :ensure t)
 #+END_SRC
 
 ** ~shell-mode~                                                    :builtin:
@@ -2820,11 +2812,6 @@ Export ~org~ files to Github-flavoured markdown.
 
   (use-package shell-script-mode
     :hook (sh-mode-hook . eqyiel/setup-sh-mode))
-#+END_SRC
-
-** ~skewer-mode~                                                     :melpa:
-#+BEGIN_SRC emacs-lisp
-  (use-package skewer-mode)
 #+END_SRC
 
 ** ~smartparens~                                                     :melpa:
@@ -2857,6 +2844,7 @@ Export ~org~ files to Github-flavoured markdown.
       (sp-local-pair 'org-mode "_" "_")
       (sp-local-pair 'org-mode "/" "/"))
     :demand t
+    :ensure t
     :diminish smartparens-mode)
 #+END_SRC
 
@@ -2869,13 +2857,15 @@ Export ~org~ files to Github-flavoured markdown.
             solarized-use-variable-pitch nil
             solarized-scale-org-headlines nil)
       (load-theme 'solarized-light t))
+    :ensure t
     :demand t)
-
 #+END_SRC
 
 ** ~sql-indent~                                                       :elpa:
 #+BEGIN_SRC emacs-lisp
-(use-package sql-indent :hook (sql-mode-hook . sqlind-minor-mode))
+  (use-package sql-indent
+    :hook (sql-mode-hook . sqlind-minor-mode)
+    :ensure t)
 #+END_SRC
 
 ** ~subword~                                                       :builtin:
@@ -2904,12 +2894,14 @@ Export ~org~ files to Github-flavoured markdown.
              (warning line-start (file-name) ":" line ":" column ": "
                       "warning: " (message) line-end))
 
-            :modes swift-mode)))
+            :modes swift-mode))
+        :ensure t)
       (setq swift-indent-offset 2))
     :init
     (progn '((add-to-list 'flycheck-checkers 'swift)
              (add-to-list 'flycheck-checkers 'swiftlint)
-             (flycheck-add-next-checker 'swiftlint '(t . swift)))))
+             (flycheck-add-next-checker 'swiftlint '(t . swift))))
+    :ensure t)
 #+END_SRC
 
 ** ~swiper~ and friends                                              :melpa:
@@ -2922,10 +2914,11 @@ This is a new one for me.  See [[http://oremacs.com/swiper/#key-bindings-for-sin
     (setq
      smex-save-file
      (concat eqyiel/xdg-cache-home "/emacs/smex-items"))
-    :demand t)
+    :demand t
+    :ensure t)
 
   (use-package counsel
-    :init (use-package ivy)
+    :init (use-package ivy :ensure t)
     :config
     ;; Override `counsel-rg-base-command' with the flag to follow symlinks, but do
     ;; it in a way that won't change the output if evaluated twice by getting the
@@ -2940,12 +2933,13 @@ This is a new one for me.  See [[http://oremacs.com/swiper/#key-bindings-for-sin
          (s-replace-regexp
           "[\[:space:]]?%s[\[:space:]]?.?"
           " --follow %s ."
-          (eval (car (get 'counsel-rg-base-command 'standard-value))))
+          (string-join (eval (car (get 'counsel-rg-base-command 'standard-value))) " "))
          ;; Further workaround for how ripgrep returns a fatal error code despite
          ;; a partial result.
          ;; https://github.com/hlissner/doom-emacs/issues/3038#issuecomment-624165004
          " || true"
          )))
+    :ensure t
     :bind
     (("M-x" . counsel-M-x)
      ("C-x C-f" . counsel-find-file)
@@ -2979,7 +2973,8 @@ This is a new one for me.  See [[http://oremacs.com/swiper/#key-bindings-for-sin
            ("M-g e" . avy-goto-word-0)
            ("M-g o" . avy-org-refile-as-child)
            ("M-g j" . avy-org-goto-heading-timer))
-    :demand t)
+    :demand t
+    :ensure t)
 
   (use-package ivy
     :config
@@ -3010,7 +3005,8 @@ This is a new one for me.  See [[http://oremacs.com/swiper/#key-bindings-for-sin
      ("C-r" . ivy-previous-line)
      ("C-s" . ivy-next-line))
     :demand t
-    :diminish ivy-mode)
+    :diminish ivy-mode
+    :ensure t)
 
   (use-package swiper
     :bind
@@ -3018,16 +3014,18 @@ This is a new one for me.  See [[http://oremacs.com/swiper/#key-bindings-for-sin
      ("C-r" . swiper-isearch))
     :init
     (progn
-      (use-package ivy)
+      (use-package ivy :ensure t)
       (add-to-list 'swiper-font-lock-exclude 'nix-mode))
-    :demand t)
+    :demand t
+    :ensure t)
 #+END_SRC
 
 ** ~terraform-mode~                                                  :melpa:
 
 #+BEGIN_SRC emacs-lisp
   (use-package terraform-mode
-    :hook (terraform-mode-hook . terraform-format-on-save-mode))
+    :hook (terraform-mode-hook . terraform-format-on-save-mode)
+    :ensure t)
 #+END_SRC
 
 ** ~tide~                                                            :melpa:
@@ -3101,13 +3099,15 @@ This is a new one for me.  See [[http://oremacs.com/swiper/#key-bindings-for-sin
     :mode (("\\.ts$" . typescript-mode) ("\\.tsx$" . typescript-mode))
     :config (flycheck-add-next-checker 'javascript-eslint 'jsx-tide 'append)
     :hook (((js2-mode-hook web-mode-hook typescript-mode-hook) . eqyiel/ts-tide-enable-maybe)
-           (before-save . eqyiel/ts-maybe-format-before-save)))
+           (before-save . eqyiel/ts-maybe-format-before-save))
+    :ensure t)
 #+END_SRC
 
 ** ~tiny~                                                            :melpa:
 #+BEGIN_SRC emacs-lisp
   (use-package tiny
-    :bind (("H-;" . tiny-expand)))
+    :bind (("H-;" . tiny-expand))
+    :ensure t)
 #+END_SRC
 
 ** ~tramp~                                                         :builtin:
@@ -3144,12 +3144,16 @@ This is a new one for me.  See [[http://oremacs.com/swiper/#key-bindings-for-sin
     (local-unset-key (kbd "C-c '")))
 
   (use-package typescript-mode
-    :hook (typescript-mode-hook . eqyiel/typescript-mode-remove-annoying-bindings))
+    :hook (typescript-mode-hook . eqyiel/typescript-mode-remove-annoying-bindings)
+    :ensure t)
 #+END_SRC
 
 ** ~unfill~                                                          :melpa:
 #+BEGIN_SRC emacs-lisp
-  (use-package unfill :demand t :bind ("M-q" . unfill-toggle))
+  (use-package unfill
+    :ensure t
+    :demand t
+    :bind ("M-q" . unfill-toggle))
 #+END_SRC
 
 ** ~uniquify~                                                      :builtin:
@@ -3176,6 +3180,7 @@ This is a pretty good replacement  for ~longlines-mode~.
   (use-package visual-fill-column
     :commands (visual-fill-column-mode)
     :config (require 'simple)
+    :ensure t
     :demand t)
 #+END_SRC
 
@@ -3241,7 +3246,8 @@ This is a pretty good replacement  for ~longlines-mode~.
           ("C-M-s-\"" . eqyiel/toggle-web-mode-to-js2-mode)
           ("H-'" . eqyiel/toggle-web-mode-to-js2-mode)
           ("M-j" . newline-and-indent)
-          ("C-c C-l" . flycheck-list-errors)))
+          ("C-c C-l" . flycheck-list-errors))
+    :ensure t)
 #+END_SRC
 
 ** ~winner~                                                        :builtin:
@@ -3256,14 +3262,15 @@ This is a pretty good replacement  for ~longlines-mode~.
   (use-package ws-butler
     :init (ws-butler-global-mode)
     :diminish ws-butler-mode
-    :demand t)
+    :demand t
+    :ensure t)
 #+END_SRC
 
 ** ~yaml-mode~                                                       :melpa:
 This package adds itself to ~auto-mode-alist~.
 
 #+BEGIN_SRC emacs-lisp
-  (use-package yaml-mode)
+  (use-package yaml-mode :ensure t)
 #+END_SRC
 
 ** ~yasnippet~                                                       :melpa:
@@ -3284,5 +3291,6 @@ This package adds itself to ~auto-mode-alist~.
       (yas-global-mode t))
     :bind (("C-c TAB" . yas-expand))
     :diminish yas-minor-mode
-    :demand t)
+    :demand t
+    :ensure t)
 #+END_SRC

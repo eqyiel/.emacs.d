@@ -1888,6 +1888,17 @@ This package adds itself to ~auto-mode-alist~.
      message-kill-buffer-on-exit t))
 #+END_SRC
 
+** ~mode-line-bell~                                                  :melpa:
+
+Flash the mode line instead of ringing the terminal bell.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package mode-line-bell
+    :config (mode-line-bell-mode)
+    :ensure t
+    :demand t)
+#+END_SRC
+
 ** ~mu4e~                                                           :system:
 
 Check out this for tips: https://vxlabs.com/2017/02/07/mu4e-0-9-18-e-mailing-with-emacs-now-even-better/

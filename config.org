@@ -1828,6 +1828,28 @@ This package adds itself to ~auto-mode-alist~.
       (setq
        magit-completing-read-function 'ivy-completing-read
        magit-save-repository-buffers 'dontask))
+    :hook
+    ((git-commit-mode-hook
+      ;; > git-commit-mode is a minor-mode but you have limited the snippets to be
+      ;; > used with a major-mode git-commit-mode. Such a major-mode no longer
+      ;; > exists, so you have to use a different mechanism to restrict your
+      ;; > snippets to "when I edit a commit message".
+      ;;
+      ;; > The reason git-commit-mode is a minor-mode is to allow you to choose
+      ;; > the major-mode most suitable for commit messages according to the
+      ;; > conventions used by the projects you contribute to. By default this is
+      ;; > text-mode, but if some project uses Markdown or Org-Mode for commit
+      ;; > messages, then you can configure that on a per project basis.
+      ;; >
+      ;; > Assuming you have some snippets that are appropriate for
+      ;; > text-mode+git-commit-mode, but not just text-mode or say
+      ;; > markdown-mode+git-commit-mode, then use something like:
+      ;;
+      ;; https://emacs.stackexchange.com/questions/27946/yasnippets-wont-expand-in-git-commit-mode
+      . (lambda ()
+          (require 'yasnippet)
+          (when (derived-mode-p 'text-mode)
+            (yas-activate-extra-mode 'text-mode+git-commit-mode)))))
     :bind
     (("<f8>" . magit-status)
      ("C-x g" . magit-status))

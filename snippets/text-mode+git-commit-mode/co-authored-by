@@ -1,0 +1,18 @@
+# -*- mode: snippet -*-
+#
+# GitHub/GitLab use this trailer in commits to show multiple authors in the UI.
+#
+# https://github.blog/2018-01-29-commit-together-with-co-authors/
+#
+# > Why not `git-commit-mode'?
+#
+# > git-commit-mode is a minor-mode but you have limited the snippets to be used
+# > with a major-mode git-commit-mode. Such a major-mode no longer exists, so
+# > you have to use a different mechanism to restrict your snippets to "when I
+# > edit a commit message".
+#
+# https://emacs.stackexchange.com/questions/27946/yasnippets-wont-expand-in-git-commit-mode
+#
+# name: co-authored-by
+# --
+Co-authored-by: ${1:name} <${2:email}>$0

@@ -1701,6 +1701,12 @@ This package adds itself to ~auto-mode-alist~.
     :ensure t)
 #+END_SRC
 
+** ~kotlin-mode~                                                     :melpa:
+
+#+BEGIN_SRC emacs-lisp
+  (use-package kotlin-mode :ensure t)
+#+END_SRC
+
 ** ~kubernetes-mode~                                                 :melpa:
 
 #+BEGIN_SRC emacs-lisp

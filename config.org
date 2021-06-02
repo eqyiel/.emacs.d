@@ -2676,6 +2676,16 @@ A tool to insert a link in the clipboard as an ~org-mode~ link at point.
 
 #+END_SRC
 
+** ~osx-trash~                                                       :melpa:
+
+#+BEGIN_SRC emacs-lisp
+  (use-package osx-trash
+    :demand ,(eq system-type 'darwin)
+    :ensure t
+    :init (osx-trash-setup)
+    :config (setq delete-by-moving-to-trash t))
+#+END_SRC
+
 ** ~ox-gfm~                                                          :melpa:
 Export ~org~ files to Github-flavoured markdown.
 

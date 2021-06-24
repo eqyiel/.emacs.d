@@ -1584,10 +1584,12 @@ instead of ~js2-mode~ or ~web-mode~.
     (web-mode))
 
   (defun eqyiel/company-js2-mode-hook ()
-    (set (make-local-variable 'company-backends)
-         '((company-files
-            company-lsp
-            company-keywords))))
+    ;; Do not replace tide's company configuration if it is active
+    (unless (eqyiel/ts-should-enable)
+      (set (make-local-variable 'company-backends)
+           '((company-files
+              company-lsp
+              company-keywords)))))
 
   (defun eqyiel/js2-mode-hook ()
     (progn
@@ -3080,29 +3082,6 @@ This is a new one for me.  See [[http://oremacs.com/swiper/#key-bindings-for-sin
 ** ~tide~                                                            :melpa:
 
 #+BEGIN_SRC emacs-lisp
-  (defun eqyiel/ts-check-tag-present-p ()
-    "Return true if the '// @ts-check' tag is present in the current buffer."
-    (save-excursion
-      (goto-char (point-min))
-      (let (stop found)
-        (while (not stop)
-          (when (not (re-search-forward "[^\n[:space:]]" nil t))
-            (setq stop t))
-          (if (equal (point) (point-min))
-              (setq stop t)
-            (backward-char))
-          (cond ((or (looking-at "//+[ ]*@ts-check")
-                     (looking-at "/\\**[ ]*@ts-check"))
-                 (setq found t)
-                 (setq stop t))
-                ((looking-at "//")
-                 (forward-line))
-                ((looking-at "/\\*")
-                 (when (not (re-search-forward "*/" nil t))
-                   (setq stop t)))
-                (t (setq stop t))))
-        found)))
-
   (defun eqyiel/ts-tsserver-find-executable ()
     "Find tsserver executable in node_modules, if it exists."
     (let ((js-project-roots (eqyiel/node-find-js-project-roots)))
@@ -3117,7 +3096,8 @@ This is a new one for me.  See [[http://oremacs.com/swiper/#key-bindings-for-sin
       (and (buffer-file-name) ;; can be nil, in ediff buffers for example
            (or (string-equal "ts" (file-name-extension (buffer-file-name)))
                (string-equal "tsx" (file-name-extension (buffer-file-name)))
-               (eqyiel/ts-check-tag-present-p))
+               (string-equal "js" (file-name-extension (buffer-file-name)))
+               (string-equal "jsx" (file-name-extension (buffer-file-name))))
            (or (locate-dominating-file (buffer-file-name) "jsconfig.json")
                (locate-dominating-file (buffer-file-name) "tsconfig.json"))
            tsserver-executable)))
@@ -3144,8 +3124,7 @@ This is a new one for me.  See [[http://oremacs.com/swiper/#key-bindings-for-sin
         (tide-format-before-save))))
 
   (use-package tide
-    :after (typescript-mode company flycheck)
-    :mode (("\\.ts$" . typescript-mode) ("\\.tsx$" . typescript-mode))
+    :after (company flycheck)
     :config (flycheck-add-next-checker 'javascript-eslint 'jsx-tide 'append)
     :hook (((js2-mode-hook web-mode-hook typescript-mode-hook) . eqyiel/ts-tide-enable-maybe)
            (before-save . eqyiel/ts-maybe-format-before-save))
@@ -3194,6 +3173,7 @@ This is a new one for me.  See [[http://oremacs.com/swiper/#key-bindings-for-sin
 
   (use-package typescript-mode
     :hook (typescript-mode-hook . eqyiel/typescript-mode-remove-annoying-bindings)
+    :mode (("\\.ts$" . typescript-mode) ("\\.tsx$" . typescript-mode))
     :ensure t)
 #+END_SRC
 
